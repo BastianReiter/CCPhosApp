@@ -6,29 +6,36 @@
 #' @export
 #'
 #' @author Bastian Reiter
-UIComponent <- function()
+UIComponent <- function(CCPhosData)
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 {
-    require(shiny)
+require(shiny)
 
-    fluidPage(
+# Unpack CCPhos data
+CurationReport <- CCPhosData
+
+fluidPage(
 
     # Application title
-    titlePanel("Old Faithful Geyser Data"),
+    titlePanel("CCPhos Curation Monitor"),
 
     # Sidebar with a slider input for number of bins
     sidebarLayout(
         sidebarPanel(
-            sliderInput("bins",
-                        "Number of bins:",
-                        min = 1,
-                        max = 50,
-                        value = 30)
+            selectInput(inputId = "SiteName",
+                        label = "Select Site",
+                        choices = names(CurationReport)),
+            selectInput(inputId = "TableName",
+                        label = "Select Table",
+                        choices = list("Monitor_Diagnosis",
+                                       "Monitor_Staging",
+                                       "Monitor_SystemicTherapy"))
         ),
 
         # Show a plot of the generated distribution
         mainPanel(
-            plotOutput("distPlot")
+            tableOutput(outputId = "TestTable"),
+            textOutput(outputId = "TestText")
         )
     )
 )

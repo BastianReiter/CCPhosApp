@@ -6,22 +6,20 @@
 #' @export
 #'
 #' @author Bastian Reiter
-ServerComponent <- function()
+ServerComponent <- function(CCPhosData)
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 {
-    function(input, output, session)
-    {
-        output$distPlot <- renderPlot({
+require(shiny)
 
-            # generate bins based on input$bins from ui.R
-            x    <- faithful[, 2]
-            bins <- seq(min(x), max(x), length.out = input$bins + 1)
+# Unpack CCPhos data
+CurationReport <- CCPhosData
 
-            # draw the histogram with the specified number of bins
-            hist(x, breaks = bins, col = 'darkgray', border = 'white',
-                 xlab = 'Waiting time to next eruption (in mins)',
-                 main = 'Histogram of waiting times')
+function(input, output, session)
+{
+    MonitorTable <- reactive({CurationReport[[input$SiteName]][[input$TableName]]})
 
-        })
-    }
+    output$TestTable <- renderTable({
+                                      MonitorTable()
+                                    })
+}
 }

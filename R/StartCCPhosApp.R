@@ -3,13 +3,18 @@
 #'
 #' Launch Shiny app
 #'
+#' @param CCPhosData List | Data collected by dsCCPhosClient
+#'
 #' @export
 #'
 #' @author Bastian Reiter
-StartCCPhosApp <- function()
+StartCCPhosApp <- function(CCPhosData)
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 {
     require(shiny)
 
-    shinyApp(UIComponent(), ServerComponent())
+    ui <- UIComponent(CCPhosData)
+    server <- ServerComponent(CCPhosData)
+
+    shinyApp(ui, server)
 }
