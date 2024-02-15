@@ -1,0 +1,18 @@
+Package: CCPhosApp
+Title: The app for working with dsCCPhos
+Version: 0.1.1
+Authors@R: 
+    person("Bastian", "Reiter", , "b.reiter@med.uni-frankfurt.de", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0002-1088-0502"))
+Description: Shiny app to facilitate working with dsCCPhosClient
+URL: https://ccphos.netlify.app/, https://github.com/BastianReiter/CCPhosApp
+License: CC BY 4.0
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.3
+Imports: 
+    shiny
+Depends: 
+    R (>= 2.10)
+LazyData: true
+
