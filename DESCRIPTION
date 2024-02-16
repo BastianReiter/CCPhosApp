@@ -11,8 +11,11 @@ Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Imports: 
+    dsCCPhosClient (>= 0.1.15),
+    gt,
     shiny
 Depends: 
     R (>= 2.10)
 LazyData: true
-
+Remotes:  
+    github::BastianReiter/dsCCPhosClient

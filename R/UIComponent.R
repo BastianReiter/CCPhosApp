@@ -9,6 +9,7 @@
 UIComponent <- function(CCPhosData)
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 {
+require(gt)
 require(shiny)
 
 # Unpack CCPhos data
@@ -19,23 +20,25 @@ fluidPage(
     # Application title
     titlePanel("CCPhos Curation Monitor"),
 
-    # Sidebar with a slider input for number of bins
+
     sidebarLayout(
+
+        #--- SIDEBAR -----------------------------------------------------------
         sidebarPanel(
+
             selectInput(inputId = "SiteName",
                         label = "Select Site",
                         choices = names(CurationReport)),
-            selectInput(inputId = "TableName",
+            selectInput(inputId = "MonitorTableName",
                         label = "Select Table",
-                        choices = list("Monitor_Diagnosis",
-                                       "Monitor_Staging",
-                                       "Monitor_SystemicTherapy"))
+                        choices = names(CurationReport[[1]]))
         ),
 
-        # Show a plot of the generated distribution
+        #--- MAIN PANEL --------------------------------------------------------
         mainPanel(
-            tableOutput(outputId = "TestTable"),
-            textOutput(outputId = "TestText")
+
+            gt_output(outputId = "TestTable")
+            #tableOutput(outputId = "TestTable")
         )
     )
 )
