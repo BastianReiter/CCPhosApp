@@ -27,6 +27,7 @@ library(devtools)
 # use_dev_package("dsCCPhosClient", remote = "github::BastianReiter/dsCCPhosClient")
 # use_package("gt")
 # use_package("shiny")
+# use_package("waiter")
 
 
 

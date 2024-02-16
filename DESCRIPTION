@@ -1,6 +1,6 @@
 Package: CCPhosApp
 Title: The app for working with dsCCPhos
-Version: 0.1.1
+Version: 0.1.2
 Authors@R: 
     person("Bastian", "Reiter", , "b.reiter@med.uni-frankfurt.de", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-1088-0502"))
@@ -13,9 +13,10 @@ RoxygenNote: 7.2.3
 Imports: 
     dsCCPhosClient (>= 0.1.15),
     gt,
-    shiny
+    shiny,
+    waiter
 Depends: 
     R (>= 2.10)
 LazyData: true
-Remotes:  
+Remotes: 
     github::BastianReiter/dsCCPhosClient

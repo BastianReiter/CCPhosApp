@@ -8,13 +8,16 @@
 #' @export
 #'
 #' @author Bastian Reiter
-StartCCPhosApp <- function(CCPhosData)
+StartCCPhosApp <- function(CCPConnections,
+                           CCPhosData)
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 {
     require(shiny)
 
     ui <- UIComponent(CCPhosData)
-    server <- ServerComponent(CCPhosData)
+
+    server <- ServerComponent(CCPConnections. = CCPConnections,
+                              CCPhosData)
 
     shinyApp(ui, server)
 }
