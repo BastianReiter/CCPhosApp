@@ -1,0 +1,32 @@
+
+#' PagePrepare
+#'
+#' @noRd
+PagePrepare <- function()
+{
+
+    Page <- div(
+
+                titlePanel("CCPhos Prepare Data"),
+
+                grid(grid_template = shiny.semantic::grid_template(
+
+                                          default = list(areas = rbind(c("DivSteps", "DivStepMonitor"),
+                                                                       c("Main", "Main")),
+
+                                                         rows_height = c("auto", "auto"),
+
+                                                         cols_width = c("auto", "auto"))),
+
+                     DivSteps = ModProcessingSteps_UI("Steps"),
+
+                     DivStepMonitor = ModProcessingTerminal_UI("ConnectToCCP"),
+
+                     Main = div()
+
+                ),
+
+                div(class = "ui divider")
+
+            )
+}
