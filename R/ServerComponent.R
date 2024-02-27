@@ -6,40 +6,57 @@
 #' @export
 #'
 #' @author Bastian Reiter
-ServerComponent <- function(CCPConnections. = CCPConnections,
-                            CCPhosData)
+ServerComponent <- function(TestData)
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 {
 
 require(dsCCPhosClient)
 require(gt)
 require(shiny)
+require(shiny.router)
 require(waiter)
 
 
 # Unpack CCPhos data
-CurationReport <- CCPhosData
+#CurationReport <- CCPhosData
 
 
 # Call of Shiny server component
 function(input, output, session)
 {
+    # Initiate router to enable multi-page appearance
+    shiny.router::router_server()
 
-    Run_ds.CurateData <- function(CCPConnections.. = CCPConnections.)
-    {
-        dsCCPhosClient::ds.CurateData(Name_RawDataSet = "RawDataSet",
-                                      Name_Output = "CurationOutput",
-                                      DataSources = CCPConnections..)
-    }
+    # Initiate reactive variable containing DSConnection objects
+    CCPConnections <- reactiveVal(NULL)
 
-    observeEvent(eventExpr = input$btn_Run_ds.CurateData,
-                 handlerExpr = {
-                                  Return <- Run_ds.CurateData()
-                                  output$return_Run_ds.CurateData <- renderText({ paste0(Return, collapse = " ")})
-                               })
+    CCPTestData <- reactiveVal(TestData)
+
+    #if (!is.null(TestData)) { CCPTestData(TestData) }
 
 
+    CCPConnections <- ModProcessingTerminal_Server(id = "ConnectToCCP",
+                                 CCPTestData = CCPTestData)
 
+    ModProcessingTerminal_Server(id = "CheckServerRequirements")
+
+
+
+    # Run_ds.CurateData <- function(CCPConnections.. = CCPConnections.)
+    # {
+    #     dsCCPhosClient::ds.CurateData(RawDataSetName = "RawDataSet",
+    #                                   OutputName = "CurationOutput",
+    #                                   DataSources = CCPConnections..)
+    # }
+    #
+    # observeEvent(eventExpr = input$btn_Run_ds.CurateData,
+    #              handlerExpr = {
+    #                               Return <- Run_ds.CurateData()
+    #                               output$return_Run_ds.CurateData <- renderText({ paste0(Return, collapse = " ")})
+    #                            })
+    #
+    #
+    #
     # Site <- reactive({ input$SiteName })
     # MonitorTable <- reactive({ input$MonitorTableName })
     # MonitorData <- reactive({ CurationReport[[Site()]][[MonitorTable()]] })
