@@ -1,44 +1,50 @@
 
-#' ServerComponent
+#' MainServerComponent
 #'
-#' Server component of CCPhosApp
+#' Main server component of CCPhosApp
 #'
-#' @export
+#' @return Returns the main server function for the Shiny app
 #'
+#' @noRd
 #' @author Bastian Reiter
-ServerComponent <- function(TestData)
+MainServerComponent <- function(CCPCredentials,
+                                CCPTestData)
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 {
 
-require(dsCCPhosClient)
-require(gt)
-require(shiny)
-require(shiny.router)
-require(waiter)
+# require(dsCCPhosClient)
+# require(gt)
+# require(shiny)
+# require(shiny.router)
+# require(waiter)
+
+  print(typeof(CCPCredentials))
+  print(length(CCPTestData))
 
 
-# Unpack CCPhos data
-#CurationReport <- CCPhosData
-
-
-# Call of Shiny server component
+# Main server function
 function(input, output, session)
 {
+
     # Initiate router to enable multi-page appearance
     shiny.router::router_server()
 
-    # Initiate reactive variable containing DSConnection objects
-    CCPConnections <- reactiveVal(NULL)
-
-    CCPTestData <- reactiveVal(TestData)
-
-    #if (!is.null(TestData)) { CCPTestData(TestData) }
+    # Call module that initializes and sets session$userData objects
+    ModInitialize(id = "Initialize",
+                  CCPCredentials,
+                  CCPTestData)
 
 
-    CCPConnections <- ModProcessingTerminal_Server(id = "ConnectToCCP",
-                                 CCPTestData = CCPTestData)
+    ModLogin_Server(id = "Login")
+
 
     ModProcessingTerminal_Server(id = "CheckServerRequirements")
+
+
+
+
+
+
 
 
 
@@ -83,3 +89,4 @@ function(input, output, session)
     #                                       error = function(error) { print(paste0("The table can not be printed. Error message: ", error)) }) })
 }
 }
+

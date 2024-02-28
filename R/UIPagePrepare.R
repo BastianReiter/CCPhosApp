@@ -1,8 +1,8 @@
 
-#' PagePrepare
+#' UIPagePrepare
 #'
 #' @noRd
-PagePrepare <- function()
+UIPagePrepare <- function()
 {
 
     Page <- div(
@@ -20,7 +20,8 @@ PagePrepare <- function()
 
                      DivSteps = ModProcessingSteps_UI("Steps"),
 
-                     DivStepMonitor = ModProcessingTerminal_UI("ConnectToCCP"),
+                     DivStepMonitor = div(ModProcessingTerminal_UI("CheckServerRequirements",
+                                                                   ButtonLabel = "Check server requirements")),
 
                      Main = div()
 

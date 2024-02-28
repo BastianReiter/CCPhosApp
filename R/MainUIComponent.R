@@ -1,25 +1,18 @@
 
-#' UIComponent
+#' MainUIComponent
 #'
-#' UI component of CCPhosApp
+#' Main UI component of CCPhosApp
 #'
-#' @export
-#'
+#' @noRd
 #' @author Bastian Reiter
-UIComponent <- function()
+MainUIComponent <- function()
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 {
 
-require(gt)
-require(shiny)
-require(shiny.router)
-require(shiny.semantic)
-require(waiter)
-
-
 shiny.semantic::semanticPage(
 
-    #useWaiter()
+    # Initiate dependencies for use of waiter package
+    waiter::use_waiter(),
 
     # Application title
     titlePanel("CCPhos App"),
@@ -31,6 +24,11 @@ shiny.semantic::semanticPage(
         sidebar_panel(
 
             div(class = "ui fluid vertical menu",
+
+                a(class = "item",
+                  icon("wrench"),
+                  "START",
+                  href = route_link("/")),
 
                 a(class = "item",
                   icon("wrench"),
@@ -58,12 +56,12 @@ shiny.semantic::semanticPage(
         #--- MAIN PANEL --------------------------------------------------------
         main_panel(
 
-            # Use shiny.router functionality to enable multi-page UI structure defined in Page() functions
-            shiny.router::router_ui(route("/", PageStart()),
-                                    route("prepare", PagePrepare()),
-                                    route("explore", PageExplore()),
-                                    route("analyze", PageAnalyze()),
-                                    route("export", PageExport()))
+            # Use shiny.router functionality to enable multi-page UI structure defined in UIPage() functions
+            shiny.router::router_ui(route("/", UIPageStart()),
+                                    route("prepare", UIPagePrepare()),
+                                    route("explore", UIPageExplore()),
+                                    route("analyze", UIPageAnalyze()),
+                                    route("export", UIPageExport()))
 
 
 

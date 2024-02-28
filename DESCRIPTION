@@ -12,6 +12,7 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Imports: 
     dsCCPhosClient (>= 0.1.17),
+    DT,
     gt (>= 0.10.1),
     shiny (>= 1.8.0),
     shiny.router,

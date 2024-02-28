@@ -9,22 +9,24 @@
 #' @export
 #'
 #' @author Bastian Reiter
-StartCCPhosApp <- function(TestData = NULL)
+StartCCPhosApp <- function(CCPCredentials = NULL,
+                           CCPTestData)
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 {
+    require(dsCCPhosClient)
+    require(DT)
+    require(gt)
     require(shiny)
+    require(shiny.router)
+    require(shiny.semantic)
     #require(shiny.worker)
+    require(waiter)
+
 
     #Worker <- shiny.worker::initialize_worker()
 
-    # CCPTestData <- reactive(NULL)
-    #
-    # if (!is.null(TestData)) { CCPTestData(TestData) }
 
-
-    ui <- UIComponent()
-
-    server <- ServerComponent(TestData)
-
-    shinyApp(ui, server)
+    shinyApp(ui = MainUIComponent(),
+             server = MainServerComponent(CCPCredentials,
+                                          CCPTestData))
 }

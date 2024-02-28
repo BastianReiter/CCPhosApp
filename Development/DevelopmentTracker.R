@@ -12,7 +12,7 @@
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 library(devtools)
-library(shiny.info)
+#library(shiny.info)
 
 
 
@@ -30,6 +30,7 @@ library(shiny.info)
 # Adding package dependencies using usethis::use_package()
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # use_dev_package("dsCCPhosClient", remote = "github::BastianReiter/dsCCPhosClient")
+# use_package("DT")
 # use_package("gt")
 # use_package("shiny")
 # use_package("shiny.router")
@@ -53,17 +54,19 @@ library(shiny.info)
 # Adding UI Specifications
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-# use_r("PageAnalyze")
-# use_r("PageExplore")
-# use_r("PageExport")
-# use_r("PagePrepare")
-# use_r("PageStart")
+# use_r("UIPageAnalyze")
+# use_r("UIPageExplore")
+# use_r("UIPageExport")
+# use_r("UIPagePrepare")
+# use_r("UIPageStart")
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Adding Shiny modules
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+# use_r("ModInitialize")
+# use_r("ModLogin")
 # use_r("ModProcessingSteps")
 # use_r("ModProcessingTerminal")
 

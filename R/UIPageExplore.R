@@ -1,8 +1,8 @@
 
-#' PageExplore
+#' UIPageExplore
 #'
 #' @noRd
-PageExplore <- function()
+UIPageExplore <- function()
 {
     div(
         titlePanel("CCPhos Explore Data")
