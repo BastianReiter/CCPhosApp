@@ -14,17 +14,21 @@ StartCCPhosApp <- function(CCPCredentials = NULL,
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 {
     require(dsCCPhosClient)
+    require(DSI)
     require(DT)
     require(gt)
     require(shiny)
+    require(shinyjs)
     require(shiny.router)
     require(shiny.semantic)
     #require(shiny.worker)
     require(waiter)
 
 
-    #Worker <- shiny.worker::initialize_worker()
+    # Set option to use themes for semantic CCS
+    #options(semantic.themes = TRUE)
 
+    #Worker <- shiny.worker::initialize_worker()
 
     shinyApp(ui = MainUIComponent(),
              server = MainServerComponent(CCPCredentials,

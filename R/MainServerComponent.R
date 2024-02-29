@@ -18,9 +18,6 @@ MainServerComponent <- function(CCPCredentials,
 # require(shiny.router)
 # require(waiter)
 
-  print(typeof(CCPCredentials))
-  print(length(CCPTestData))
-
 
 # Main server function
 function(input, output, session)
@@ -29,19 +26,40 @@ function(input, output, session)
     # Initiate router to enable multi-page appearance
     shiny.router::router_server()
 
-    # Call module that initializes and sets session$userData objects
+    # Initialize global objects
+    session$userData$CCPConnections <- reactiveVal(NULL)
+    session$userData$CCPCredentials <- reactiveVal(NULL)
+    session$userData$CCPTestData <- NULL
+
+    # Call module that optionally assigns content to session$userData objects at app start
     ModInitialize(id = "Initialize",
                   CCPCredentials,
                   CCPTestData)
 
 
+    # --- Call module: Connection Status ---
+    ModConnectionStatus_Server(id = "ConnectionStatus")
+
+
+    # --- Call module: Login ---
     ModLogin_Server(id = "Login")
 
 
     ModProcessingTerminal_Server(id = "CheckServerRequirements")
 
 
+    output$TestMonitor <- renderText({typeof(session$userData$CCPConnections())})
 
+
+
+    # onStart = function() {
+    #   cat("Doing application setup\n")
+    #
+    #   onStop(function() {
+    #     cat("Doing application cleanup\n")
+    #       if(session$userData$CCPConnections != "None") {DSI::datashield.logout(session$userData$CCPConnections) }
+    #   })
+    # }
 
 
 

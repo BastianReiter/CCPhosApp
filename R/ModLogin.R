@@ -48,22 +48,20 @@ ModLogin_Server <- function(id)
                  {
                     #w <- waiter::Waiter$new(id = "ProcessingMonitor")
 
-                    output$ProcessingMonitor <- renderText({length(session$userData$CCPTestData)})
-
                     observeEvent(input$LoginButton,
                                  {
                                     #waiter::Waiter$new(id = "ProcessingMonitor")$show()
 
-                                    session$userData$CCPConnections <- dsCCPhosClient::ConnectToCCP(CCPSiteCredentials = session$userData$CCPCredentials)
+                                    session$userData$CCPConnections(dsCCPhosClient::ConnectToCCP(CCPSiteCredentials = session$userData$CCPCredentials))
                                  })
 
                     observeEvent(input$LoginButton_Virtual,
                                  {
                                     #waiter::Waiter$new(id = "ProcessingMonitor")$show()
 
-                                    session$userData$CCPConnections <- dsCCPhosClient::ConnectToVirtualCCP(CCPTestData = session$userData$CCPTestData,
-                                                                                                           NumberOfSites = 3,
-                                                                                                           NumberOfPatientsPerSite = 1000)
+                                    session$userData$CCPConnections(dsCCPhosClient::ConnectToVirtualCCP(CCPTestData = session$userData$CCPTestData,
+                                                                                                        NumberOfSites = 3,
+                                                                                                        NumberOfPatientsPerSite = 1000))
                                  })
                  })
 }

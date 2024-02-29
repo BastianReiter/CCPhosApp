@@ -11,17 +11,57 @@ MainUIComponent <- function()
 
 shiny.semantic::semanticPage(
 
-    # Initiate dependencies for use of waiter package
+    # Add custom CSS (this file is compiled via SASS at development stage)
+    tags$head(tags$link(rel = "stylesheet", type = "text/css", href = "styles/CCPhosStyle.min.css")),
+
+    # Title shown in browser
+    title = "CCPhos App",
+
+    # Initiate use of shinyjs functionality
+    shinyjs::useShinyjs(),
+
+    # Initiate use of waiter package functionality
     waiter::use_waiter(),
 
-    # Application title
-    titlePanel("CCPhos App"),
+
+    # Main grid hosting all other UI components
+    grid(
+
+        id = "MainGrid",
+
+        # Provide grid template (including definition of area names)
+        grid_template = shiny.semantic::grid_template(
+
+                              # --- Main grid layout for desktop devices ---
+                              default = list(areas = rbind(c("header", "header", "header"),
+                                                           c("leftside", "main", "rightside")),
+
+                                             rows_height = c("100px", "auto"),
+
+                                             cols_width = c("1fr", "4fr", "1fr")),
+
+                              # --- Main grid layout for mobile devices ---
+                              mobile = list(areas = rbind(c("header", "header", "header"),
+                                                          c("leftside", "main", "rightside")),
+
+                                            rows_height = c("70px", "auto"),
+
+                                            cols_width = c("1fr", "4fr", "1fr"))),
+
+        #container_style = "",
+
+        area_styles = list(header = paste0("background: ", dsCCPhosClient::CCPhosColors$Primary, ";",
+                                           "color: white;")),
 
 
-    sidebar_layout(
 
-        #--- SIDEBAR -----------------------------------------------------------
-        sidebar_panel(
+        #--- HEADER ------------------------------------------------------------
+        header = div(h1("CCPhos App"),
+                     ModConnectionStatus_UI("ConnectionStatus")),
+
+
+        #--- LEFT SIDE COLUMN --------------------------------------------------
+        leftside = div(
 
             div(class = "ui fluid vertical menu",
 
@@ -48,13 +88,14 @@ shiny.semantic::semanticPage(
                 a(class = "item",
                    icon("wrench"),
                    "EXPORT",
-                   href = route_link("export"))
-                )
+                   href = route_link("export"))),
 
-        ),
+                textOutput(outputId = "TestMonitor")
+            ),
+
 
         #--- MAIN PANEL --------------------------------------------------------
-        main_panel(
+        main = div(
 
             # Use shiny.router functionality to enable multi-page UI structure defined in UIPage() functions
             shiny.router::router_ui(route("/", UIPageStart()),
@@ -80,7 +121,11 @@ shiny.semantic::semanticPage(
             # gt_output(outputId = "TestTable")
             # tableOutput(outputId = "TestTable")
             # )
-        )
+        ),
+
+
+        #--- RIGHT SIDE COLUMN -------------------------------------------------
+        rightside = div()
     )
 )
 

@@ -13,6 +13,13 @@
 
 library(devtools)
 #library(shiny.info)
+library(sass)
+
+
+# Compiling of .css-file from SASS-file using package 'sass'
+sass(input = sass_file("./Development/CCPhosStyle.scss"),
+     options = sass_options(output_style = "compressed"),      # Outputs the .css-file in compressed form
+     output = "./inst/app/www/styles/CCPhosStyle.min.css")
 
 
 
@@ -33,6 +40,7 @@ library(devtools)
 # use_package("DT")
 # use_package("gt")
 # use_package("shiny")
+# use_package("shinyjs")
 # use_package("shiny.router")
 # use_package("shiny.semantic")
 # use_package("shiny.worker")
@@ -47,7 +55,7 @@ library(devtools)
 # use_r("UIComponent")
 # use_r("ServerComponent")
 
-# use_r("GetGridTemplate")
+# use_r("MainUIGridTemplate")
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -65,8 +73,10 @@ library(devtools)
 # Adding Shiny modules
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+# use_r("ModConnectionStatus")
 # use_r("ModInitialize")
 # use_r("ModLogin")
+# use_r("ModMessages")
 # use_r("ModProcessingSteps")
 # use_r("ModProcessingTerminal")
 

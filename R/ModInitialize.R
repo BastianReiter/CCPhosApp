@@ -4,15 +4,15 @@
 # Has no UI component, only server
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Module Server
+# Module server component
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-#' Module Initialize Server function
-#'
 #' @param id
 #' @param input
 #' @param output
 #' @param session
+#' @param CCPCredentials
+#' @param CCPTestData
 #' @noRd
 ModInitialize <- function(id,
                           CCPCredentials,
@@ -21,12 +21,8 @@ ModInitialize <- function(id,
     moduleServer(id,
                  function(input, output, session)
                  {
-                      session$userData$CCPConnections <- "None"
-
-                      if (!is.null(CCPCredentials)) { session$userData$CCPCredentials <- CCPCredentials }
+                      if (!is.null(CCPCredentials)) { session$userData$CCPCredentials(CCPCredentials) }
 
                       if (!is.null(CCPTestData)) { session$userData$CCPTestData <- CCPTestData }
-
-
                  })
 }

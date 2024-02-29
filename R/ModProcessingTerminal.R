@@ -1,15 +1,13 @@
 
 
-# --- Module: Processing Terminal ---
-
+# --- MODULE: Processing Terminal ---
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Module UI
+# Module UI component
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-#' Module ProcessingTerminal UI function
-#'
 #' @param id
+#' @param ButtonLabel
 #' @noRd
 ModProcessingTerminal_UI <- function(id,
                                      ButtonLabel)
@@ -18,18 +16,17 @@ ModProcessingTerminal_UI <- function(id,
 
     tagList(action_button(ns("ProcessingTrigger"),
                           label = ButtonLabel),
-            textOutput(ns("ProcessingMonitor"))
+
+            uiOutput(ns("ProcessingMonitor"))
     )
 }
 
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Module Server
+# Module server component
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-#' Module ProcessingTerminal Server function
-#'
 #' @param id
 #' @param input
 #' @param output
@@ -48,13 +45,19 @@ ModProcessingTerminal_Server <- function(id)
 
                     if (id == "CheckServerRequirements")
                     {
-                        observeEvent(input$ProcessingTrigger,
-                                     {
-                                        Return <- dsCCPhosClient::CheckServerRequirements(DataSources = session$userData$CCPConnections)
+                        FunctionReturn <- reactiveVal(NULL)
 
-                                        output$ProcessingMonitor <- renderText({ w$show()
-                                                                                 paste0(unlist(Return), collapse = " ") })
-                                     })
+                        observe({ FunctionReturn(dsCCPhosClient::CheckServerRequirements(DataSources = session$userData$CCPConnections)) }) %>%
+                            bindEvent(input$ProcessingTrigger)
+
+
+                        output$ProcessingMonitor <- renderText({ w$show()
+                                                                 paste0(unlist(FunctionReturn()), collapse = " ") })
+
+                        #reactive({})
+
+
+
                     }
 
                  })
