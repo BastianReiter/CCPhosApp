@@ -17,8 +17,7 @@ ModProcessingTerminal_UI <- function(id,
     tagList(action_button(ns("ProcessingTrigger"),
                           label = ButtonLabel),
 
-            uiOutput(ns("ProcessingMonitor"))
-    )
+            ModMessageMonitor_UI(ns("MonitorCheckServerRequirements")))
 }
 
 
@@ -43,16 +42,24 @@ ModProcessingTerminal_Server <- function(id)
                     #output$ProcessingMonitor <- renderText({ w$show() })
 
 
+
+
                     if (id == "CheckServerRequirements")
                     {
-                        FunctionReturn <- reactiveVal(NULL)
 
-                        observe({ FunctionReturn(dsCCPhosClient::CheckServerRequirements(DataSources = session$userData$CCPConnections)) }) %>%
+
+                        FunctionReturn <- reactiveVal(NULL)
+                        Messages <- reactiveVal(NULL)
+
+                        observe({ FunctionReturn(dsCCPhosClient::CheckServerRequirements(DataSources = session$userData$CCPConnections())) }) %>%
                             bindEvent(input$ProcessingTrigger)
 
 
-                        output$ProcessingMonitor <- renderText({ w$show()
-                                                                 paste0(unlist(FunctionReturn()), collapse = " ") })
+                        ModMessageMonitor_Server("MonitorCheckServerRequirements",
+                                                 FunctionReturn)
+
+                        # output$ProcessingMonitor <- renderText({ w$show()
+                        #                                          paste0(unlist(FunctionReturn()), collapse = " ") })
 
                         #reactive({})
 

@@ -11,7 +11,12 @@ MainUIComponent <- function()
 
 shiny.semantic::semanticPage(
 
-    # Add custom CSS (this file is compiled via SASS at development stage)
+    # Custom body CSS
+    style = "margin: 0;
+             background: rgb(255,255,255);
+             background: linear-gradient(180deg, rgba(237,237,237,1) 20%, rgba(255,255,255,0) 50%, rgba(237,237,237,1) 80%);",
+
+    # Add custom CSS file (this file is compiled via SASS at development stage)
     tags$head(tags$link(rel = "stylesheet", type = "text/css", href = "styles/CCPhosStyle.min.css")),
 
     # Title shown in browser
@@ -25,9 +30,7 @@ shiny.semantic::semanticPage(
 
 
     # Main grid hosting all other UI components
-    grid(
-
-        id = "MainGrid",
+    grid(id = "MainGrid",
 
         # Provide grid template (including definition of area names)
         grid_template = shiny.semantic::grid_template(
@@ -48,16 +51,25 @@ shiny.semantic::semanticPage(
 
                                             cols_width = c("1fr", "4fr", "1fr"))),
 
-        #container_style = "",
+        #container_style = "gap: 20px;",      # Gap between grid areas
 
-        area_styles = list(header = paste0("background: ", dsCCPhosClient::CCPhosColors$Primary, ";",
-                                           "color: white;")),
+        area_styles = list(header = "padding: 10px;
+                                     background: rgb(5,73,150);
+                                     background: linear-gradient(90deg, rgba(5,73,150,1) 8%, rgba(255,255,255,0) 100%);
+                                     color: white;",
+
+                           leftside = "padding: 10px;",
+                           main = "padding: 10px;",
+                           rightside = "padding: 10px;"),
 
 
 
         #--- HEADER ------------------------------------------------------------
-        header = div(h1("CCPhos App"),
-                     ModConnectionStatus_UI("ConnectionStatus")),
+        header = split_layout(style = "align-items: center;",
+
+                      AppTitle = h1("CCPhosApp"),
+
+                      ConnectionStatus = ModConnectionStatus_UI("ConnectionStatus")),
 
 
         #--- LEFT SIDE COLUMN --------------------------------------------------
@@ -95,7 +107,7 @@ shiny.semantic::semanticPage(
 
 
         #--- MAIN PANEL --------------------------------------------------------
-        main = div(
+        main = segment(
 
             # Use shiny.router functionality to enable multi-page UI structure defined in UIPage() functions
             shiny.router::router_ui(route("/", UIPageStart()),

@@ -31,7 +31,7 @@ function(input, output, session)
     session$userData$CCPCredentials <- reactiveVal(NULL)
     session$userData$CCPTestData <- NULL
 
-    # Call module that optionally assigns content to session$userData objects at app start
+    # Call module that (optionally) assigns content to session$userData objects at app start
     ModInitialize(id = "Initialize",
                   CCPCredentials,
                   CCPTestData)

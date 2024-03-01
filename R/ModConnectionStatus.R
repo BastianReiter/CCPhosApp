@@ -12,16 +12,21 @@ ModConnectionStatus_UI <- function(id)
 {
     ns <- NS(id)
 
-    tagList(fluidRow(
-                      # Status Icon
-                      uiOutput(ns("StatusIcon")),
+    tagList(split_layout(style = "grid-template-columns: none;    /* Set to 'none', otherwise horizontal space would be evenly distributed (default) */
+                                  justify-content: end;    /* Align grid items horizontally to the right side */
+                                  align-items: center;",    # Align grid items vertically
 
-                      # Status Text
-                      textOutput(ns("StatusText")),
+                         cell_args = "padding: 10px;",
 
-                      # Logout Button
-                      action_button(ns("LogoutButton"),
-                                    label = "Logout")))
+                         # Status Icon
+                         uiOutput(ns("StatusIcon")),
+
+                         # Status Text
+                         textOutput(ns("StatusText")),
+
+                         # Logout Button
+                         action_button(ns("LogoutButton"),
+                                       label = "Logout")))
 }
 
 
@@ -40,14 +45,14 @@ ModConnectionStatus_Server <- function(id)
     moduleServer(id,
                  function(input, output, session)
                  {
-                      output$StatusIcon <- renderUI({ if (is.null(session$userData$CCPConnections())) { icon(class = "circle outline") }
-                                                      if (!is.null(session$userData$CCPConnections())) { icon(class = "check") } })
+                      output$StatusIcon <- renderUI({ if (is.list(session$userData$CCPConnections())) { icon(class = "large green power off") }
+                                                      else { icon(class = "large grey power off") } })
 
-                      output$StatusText <- renderText({ if (is.null(session$userData$CCPConnections())) { "No connection to CCP" }
-                                                        if (!is.null(session$userData$CCPConnections())) { "Connected to CCP" } })
+                      output$StatusText <- renderText({ if (is.list(session$userData$CCPConnections())) { "Connected to CCP" }
+                                                        else { "No connection established" } })
 
-                      observe({ if (is.null(session$userData$CCPConnections())) { shinyjs::disable("LogoutButton") }
-                                if (!is.null(session$userData$CCPConnections())) { shinyjs::enable("LogoutButton") } })
+                      observe({ if (is.list(session$userData$CCPConnections())) { shinyjs::enable("LogoutButton") }
+                                else { shinyjs::disable("LogoutButton") } })
 
                       observe({ DSI::datashield.logout(session$userData$CCPConnections())
                                 session$userData$CCPConnections(NULL) }) %>%
@@ -63,16 +68,16 @@ ModConnectionStatus_Server <- function(id)
 
 ModConnectionStatusApp <- function()
 {
-  ui <- fluidPage(
-    ModConnectionStatus_UI("Test")
-  )
+    ui <- fluidPage(
+        ModConnectionStatus_UI("Test")
+    )
 
-  server <- function(input, output, session)
-  {
-      ModConnectionStatus_Server("Test")
-  }
+    server <- function(input, output, session)
+    {
+        ModConnectionStatus_Server("Test")
+    }
 
-  shinyApp(ui, server)
+    shinyApp(ui, server)
 }
 
 # Run app

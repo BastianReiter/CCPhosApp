@@ -20,8 +20,8 @@ UIPagePrepare <- function()
 
                      DivSteps = ModProcessingSteps_UI("Steps"),
 
-                     DivStepMonitor = div(ModProcessingTerminal_UI("CheckServerRequirements",
-                                                                   ButtonLabel = "Check server requirements")),
+                     DivStepMonitor = ModProcessingTerminal_UI("CheckServerRequirements",
+                                                               ButtonLabel = "Check server requirements"),
 
                      Main = div()
 
