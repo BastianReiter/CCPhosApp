@@ -1,8 +1,8 @@
 
-#' PageExport
+#' UIPageExport
 #'
 #' @noRd
-PageExport <- function()
+UIPageExport <- function()
 {
     div(
         titlePanel("CCPhos Export Output")

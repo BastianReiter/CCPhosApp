@@ -1,44 +1,68 @@
 
-#' ServerComponent
+#' MainServerComponent
 #'
-#' Server component of CCPhosApp
+#' Main server component of CCPhosApp
 #'
-#' @export
+#' @return Returns the main server function for the Shiny app
 #'
+#' @noRd
 #' @author Bastian Reiter
-ServerComponent <- function(TestData)
+MainServerComponent <- function(CCPCredentials,
+                                CCPTestData)
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 {
 
-require(dsCCPhosClient)
-require(gt)
-require(shiny)
-require(shiny.router)
-require(waiter)
+# require(dsCCPhosClient)
+# require(gt)
+# require(shiny)
+# require(shiny.router)
+# require(waiter)
 
 
-# Unpack CCPhos data
-#CurationReport <- CCPhosData
-
-
-# Call of Shiny server component
+# Main server function
 function(input, output, session)
 {
+
     # Initiate router to enable multi-page appearance
     shiny.router::router_server()
 
-    # Initiate reactive variable containing DSConnection objects
-    CCPConnections <- reactiveVal(NULL)
+    # Initialize global objects
+    session$userData$CCPConnections <- reactiveVal(NULL)
+    session$userData$CCPCredentials <- reactiveVal(NULL)
+    session$userData$CCPTestData <- NULL
 
-    CCPTestData <- reactiveVal(TestData)
+    # Call module that (optionally) assigns content to session$userData objects at app start
+    ModInitialize(id = "Initialize",
+                  CCPCredentials,
+                  CCPTestData)
 
-    #if (!is.null(TestData)) { CCPTestData(TestData) }
+
+    # --- Call module: Connection Status ---
+    ModConnectionStatus_Server(id = "ConnectionStatus")
 
 
-    CCPConnections <- ModProcessingTerminal_Server(id = "ConnectToCCP",
-                                 CCPTestData = CCPTestData)
+    # --- Call module: Login ---
+    ModLogin_Server(id = "Login")
+
 
     ModProcessingTerminal_Server(id = "CheckServerRequirements")
+
+
+    output$TestMonitor <- renderText({typeof(session$userData$CCPConnections())})
+
+
+
+    # onStart = function() {
+    #   cat("Doing application setup\n")
+    #
+    #   onStop(function() {
+    #     cat("Doing application cleanup\n")
+    #       if(session$userData$CCPConnections != "None") {DSI::datashield.logout(session$userData$CCPConnections) }
+    #   })
+    # }
+
+
+
 
 
 
@@ -83,3 +107,4 @@ function(input, output, session)
     #                                       error = function(error) { print(paste0("The table can not be printed. Error message: ", error)) }) })
 }
 }
+

@@ -1,61 +1,57 @@
 
-#' Module ProcessingTerminal UI function
-#'
+
+# --- MODULE: Processing Terminal ---
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Module UI component
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 #' @param id
+#' @param ButtonLabel
 #' @noRd
-ModProcessingTerminal_UI <- function(id)
+ModProcessingTerminal_UI <- function(id,
+                                     ButtonLabel)
 {
-    tagList(action_button(NS(id, "ProcessingTrigger"),
-                          label = "Test"),
-            textOutput(NS(id, "ProcessingMonitor"))
-    )
+    ns <- NS(id)
+
+    tagList(action_button(ns("ProcessingTrigger"),
+                          label = ButtonLabel),
+
+            ModMessageMonitor_UI(ns("MonitorCheckServerRequirements")))
 }
 
 
-#' Module ProcessingTerminal Server function
-#'
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Module server component
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 #' @param id
 #' @param input
 #' @param output
 #' @param session
 #' @noRd
-ModProcessingTerminal_Server <- function(id,
-                                         CCPTestData = reactiveVal(NULL))
+ModProcessingTerminal_Server <- function(id)
 {
-    # Check if 'CCPTestData' is reactive
-    stopifnot(is.reactive(CCPTestData))
-
-    CCPConnections <- reactiveVal(NULL)
 
     moduleServer(id,
                  function(input, output, session)
                  {
+                    w <- waiter::Waiter$new(id = "ProcessingMonitor")
 
-                    observeEvent(eventExpr = input$ProcessingTrigger,
-                                 handlerExpr = {
-                                                  if (id == "EnterCredentials")
-                                                  {
+                    if (id == "CheckServerRequirements")
+                    {
+                        FunctionReturn <- reactiveVal(NULL)
 
-                                                  }
-                                                  else if (id == "ConnectToCCP")
-                                                  {
-                                                      CCPConnections <- dsCCPhosClient::ConnectToVirtualCCP(CCPTestData = CCPTestData(),
-                                                                                                            NumberOfSites = 3,
-                                                                                                            NumberOfPatientsPerSite = 1000)
-                                                      # Store Return in gloabl reactive variable CCPConnections
-                                                      #CCPConnections(Return)
-                                                  }
-                                                  else if (id == "CheckServerRequirements")
-                                                  {
-                                                      Return <- dsCCPhosClient::CheckServerRequirements(DataSources = CCPConnections())
+                        observe({ FunctionReturn(dsCCPhosClient::CheckServerRequirements(DataSources = session$userData$CCPConnections())) }) %>%
+                            bindEvent(input$ProcessingTrigger)
 
-                                                      output$ProcessingMonitor <- renderText({ paste0(unlist(Return), collapse = " ") })
-                                                  }
-                                               })
 
-                    return(reactiveVal(CCPConnections))
-                 }
-    )
+                        ModMessageMonitor_Server("MonitorCheckServerRequirements",
+                                                 MessagesList = FunctionReturn)
+                    }
+
+                 })
 }
 
 

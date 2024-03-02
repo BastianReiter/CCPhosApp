@@ -12,7 +12,14 @@
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 library(devtools)
-library(shiny.info)
+#library(shiny.info)
+library(sass)
+
+
+# Compiling of .css-file from SASS-file using package 'sass'
+sass(input = sass_file("./Development/CCPhosStyle.scss"),
+     options = sass_options(output_style = "compressed"),      # Outputs the .css-file in compressed form
+     output = "./inst/app/www/styles/CCPhosStyle.min.css")
 
 
 
@@ -30,8 +37,10 @@ library(shiny.info)
 # Adding package dependencies using usethis::use_package()
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # use_dev_package("dsCCPhosClient", remote = "github::BastianReiter/dsCCPhosClient")
+# use_package("DT")
 # use_package("gt")
 # use_package("shiny")
+# use_package("shinyjs")
 # use_package("shiny.router")
 # use_package("shiny.semantic")
 # use_package("shiny.worker")
@@ -46,24 +55,28 @@ library(shiny.info)
 # use_r("UIComponent")
 # use_r("ServerComponent")
 
-# use_r("GetGridTemplate")
+# use_r("MainUIGridTemplate")
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Adding UI Specifications
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-# use_r("PageAnalyze")
-# use_r("PageExplore")
-# use_r("PageExport")
-# use_r("PagePrepare")
-# use_r("PageStart")
+# use_r("UIPageAnalyze")
+# use_r("UIPageExplore")
+# use_r("UIPageExport")
+# use_r("UIPagePrepare")
+# use_r("UIPageStart")
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Adding Shiny modules
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+# use_r("ModConnectionStatus")
+# use_r("ModInitialize")
+# use_r("ModLogin")
+# use_r("ModMessages")
 # use_r("ModProcessingSteps")
 # use_r("ModProcessingTerminal")
 

@@ -12,11 +12,13 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Imports: 
     dsCCPhosClient (>= 0.1.17),
+    DT,
     gt (>= 0.10.1),
     shiny (>= 1.8.0),
     shiny.router,
     shiny.semantic (>= 0.5.0),
     shiny.worker,
+    shinyjs,
     waiter (>= 0.2.5)
 Depends: 
     R (>= 2.10)

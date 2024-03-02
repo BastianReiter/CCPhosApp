@@ -1,8 +1,8 @@
 
-#' PageAnalyze
+#' UIPageAnalyze
 #'
 #' @noRd
-PageAnalyze <- function()
+UIPageAnalyze <- function()
 {
     div(
         titlePanel("CCPhos Analyze Data")
