@@ -39,32 +39,16 @@ ModProcessingTerminal_Server <- function(id)
                  {
                     w <- waiter::Waiter$new(id = "ProcessingMonitor")
 
-                    #output$ProcessingMonitor <- renderText({ w$show() })
-
-
-
-
                     if (id == "CheckServerRequirements")
                     {
-
-
                         FunctionReturn <- reactiveVal(NULL)
-                        Messages <- reactiveVal(NULL)
 
                         observe({ FunctionReturn(dsCCPhosClient::CheckServerRequirements(DataSources = session$userData$CCPConnections())) }) %>%
                             bindEvent(input$ProcessingTrigger)
 
 
                         ModMessageMonitor_Server("MonitorCheckServerRequirements",
-                                                 FunctionReturn)
-
-                        # output$ProcessingMonitor <- renderText({ w$show()
-                        #                                          paste0(unlist(FunctionReturn()), collapse = " ") })
-
-                        #reactive({})
-
-
-
+                                                 MessagesList = FunctionReturn)
                     }
 
                  })

@@ -13,6 +13,21 @@ StartCCPhosApp(CCPTestData = TestData_Frankfurt)
 
 
 
+
+library(dsCCPhosClient)
+
+TestData <- readRDS("../dsCCPhos/Development/Data/RealData/CCPRealData_Frankfurt.rds")
+
+CCPConnections <- ConnectToVirtualCCP(CCPTestData = TestData,
+                                      NumberOfSites = 3,
+                                      NumberOfPatientsPerSite = 1000)
+
+Messages_ServerRequirements <- CheckServerRequirements(DataSources = CCPConnections)
+
+
+
+
+
 if (interactive()) {
  library(shiny)
  library(shiny.semantic)

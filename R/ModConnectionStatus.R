@@ -12,21 +12,27 @@ ModConnectionStatus_UI <- function(id)
 {
     ns <- NS(id)
 
-    tagList(split_layout(style = "grid-template-columns: none;    /* Set to 'none', otherwise horizontal space would be evenly distributed (default) */
-                                  justify-content: end;    /* Align grid items horizontally to the right side */
-                                  align-items: center;",    # Align grid items vertically
+    split_layout(style = "justify-self: end;
+                          grid-template-columns: auto 14em auto;    /* Fixed width of middle column */
+                          justify-content: end;    /* Align grid items horizontally to the right side */
+                          align-items: center;    /* Align grid items vertically */
+                          background-color: #ededed;
+                          border: 2px solid rgb(5,73,150);
+                          border-radius: 4px;
+                          box-shadow: 2px 2px 5px black;
+                 ",
 
-                         cell_args = "padding: 10px;",
+                 cell_args = "padding: 10px;",
 
-                         # Status Icon
-                         uiOutput(ns("StatusIcon")),
+                 # Status Icon
+                 uiOutput(ns("StatusIcon")),
 
-                         # Status Text
-                         textOutput(ns("StatusText")),
+                 # Status Text
+                 textOutput(ns("StatusText")),
 
-                         # Logout Button
-                         action_button(ns("LogoutButton"),
-                                       label = "Logout")))
+                 # Logout Button
+                 action_button(ns("LogoutButton"),
+                               label = "Logout"))
 }
 
 
@@ -45,8 +51,8 @@ ModConnectionStatus_Server <- function(id)
     moduleServer(id,
                  function(input, output, session)
                  {
-                      output$StatusIcon <- renderUI({ if (is.list(session$userData$CCPConnections())) { icon(class = "large green power off") }
-                                                      else { icon(class = "large grey power off") } })
+                      output$StatusIcon <- renderUI({ if (is.list(session$userData$CCPConnections())) { shiny.semantic::icon(class = "large green power off") }
+                                                      else { shiny.semantic::icon(class = "large grey power off") } })
 
                       output$StatusText <- renderText({ if (is.list(session$userData$CCPConnections())) { "Connected to CCP" }
                                                         else { "No connection established" } })
