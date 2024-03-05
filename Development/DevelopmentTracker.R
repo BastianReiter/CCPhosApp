@@ -43,7 +43,6 @@ sass(input = sass_file("./Development/CCPhosStyle.scss"),
 # use_package("shinyjs")
 # use_package("shiny.router")
 # use_package("shiny.semantic")
-# use_package("shinyvalidate")
 # use_package("shiny.worker")
 # use_package("waiter")
 

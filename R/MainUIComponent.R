@@ -29,7 +29,7 @@ shiny.semantic::semanticPage(
 
 
     # Main grid hosting all other UI components
-    grid(id = "MainGrid",
+    shiny.semantic::grid(id = "MainGrid",
 
         # Provide grid template (including definition of area names)
         grid_template = shiny.semantic::grid_template(
@@ -52,7 +52,7 @@ shiny.semantic::semanticPage(
 
         #container_style = "height: 100vh",
 
-        area_styles = list(header = "padding: 10px;
+        area_styles = list(header = "padding: 10px 2em;
                                      background: rgb(5,73,150);
                                      background: linear-gradient(90deg, rgba(5,73,150,1) 8%, rgba(255,255,255,1) 100%);
                                      color: #595959;",

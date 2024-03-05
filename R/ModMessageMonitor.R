@@ -13,6 +13,7 @@ ModMessageMonitor_UI <- function(id)
 {
     ns <- NS(id)
 
+    # UI element is hidden at app start
     shinyjs::hidden(uiOutput(ns("MessageMonitor"), style = "line-height: 0.6;"))
 }
 
@@ -23,12 +24,15 @@ ModMessageMonitor_UI <- function(id)
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 #' @param id
+#' @param MessagesList
 #' @param input
 #' @param output
 #' @param session
 #' @noRd
-ModMessageMonitor_Server <- function(id, MessagesList)
+ModMessageMonitor_Server <- function(id,
+                                     MessagesList)
 {
+    # Formal check if argument is reactive (relevant only during development)
     stopifnot(is.reactive(MessagesList))
 
     moduleServer(id,

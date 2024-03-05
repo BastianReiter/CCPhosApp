@@ -20,9 +20,6 @@ ModLogin_UI <- function(id)
                  border-color: rgba(34, 36, 38, 0.15);
                  box-shadow: 0 2px 25px 0 rgba(34, 36, 38, 0.05) inset;",
 
-        h4(class = "ui dividing header",
-           "Connect to CCP sites"),
-
         div(style = "padding: 2em 4em;
                      text-align: center",
 
@@ -79,10 +76,10 @@ ModLogin_Server <- function(id)
 
                     # --- Server logic real CCP connection ---
 
-                    output$TableCredentials <- DT::renderDataTable(semantic_DT(dsCCPhosClient::CCPSiteCredentials,
-                                                                               options = list(filters = "none",
-                                                                                              editable = "all"))
-                                                                   )
+                    output$TableCredentials <- DT::renderDT(semantic_DT(dsCCPhosClient::CCPSiteCredentials,
+                                                                        options = list(dom = "t",
+                                                                                       editable = TRUE)))
+
 
 
                     observe({

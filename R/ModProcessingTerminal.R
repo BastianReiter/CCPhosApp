@@ -42,38 +42,19 @@ ModProcessingTerminal_Server <- function(id)
                     if (id == "CheckServerRequirements")
                     {
                         FunctionReturn <- reactiveVal(NULL)
+                        Complete <- reactiveVal(FALSE)
 
-                        observe({ FunctionReturn(dsCCPhosClient::CheckServerRequirements(DataSources = session$userData$CCPConnections())) }) %>%
+                        observe({ FunctionReturn(dsCCPhosClient::CheckServerRequirements(DataSources = session$userData$CCPConnections()))
+                                  Complete(TRUE) }) %>%
                             bindEvent(input$ProcessingTrigger)
-
 
                         ModMessageMonitor_Server("MonitorCheckServerRequirements",
                                                  MessagesList = FunctionReturn)
+
+                        return(Complete)
                     }
 
                  })
 }
-
-
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Module testing
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-ProcessingTerminalApp <- function()
-{
-  ui <- fluidPage(
-    ModProcessingTerminal_UI("Connect")
-  )
-
-  server <- function(input, output, session)
-  {
-      ModProcessingTerminal_Server("Connect")
-  }
-
-  shinyApp(ui, server)
-}
-
-# Run app
-#ProcessingTerminalApp()
 
 
