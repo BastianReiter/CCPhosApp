@@ -21,6 +21,7 @@ StartCCPhosApp <- function(CCPCredentials = NULL,
     require(shinyjs)
     require(shiny.router)
     require(shiny.semantic)
+    require(shinyvalidate)
     #require(shiny.worker)
     require(waiter)
 
@@ -30,6 +31,10 @@ StartCCPhosApp <- function(CCPCredentials = NULL,
 
     #Worker <- shiny.worker::initialize_worker()
 
+    # Since the app is deployed as a package, the folder for external resources (e.g. static images) needs to be added manually
+    shiny::addResourcePath('www', system.file("www", package = "CCPhosApp"))
+
+    # Start CCPhos app
     shinyApp(ui = MainUIComponent(),
              server = MainServerComponent(CCPCredentials,
                                           CCPTestData))

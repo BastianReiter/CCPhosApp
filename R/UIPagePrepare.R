@@ -4,30 +4,23 @@
 #' @noRd
 UIPagePrepare <- function()
 {
+    div(
+        div(class = "ui placeholder segment",
 
-    Page <- div(
+            div(class = "ui two column grid",
 
-                titlePanel("CCPhos Prepare Data"),
+                div(class = "column",
 
-                grid(grid_template = shiny.semantic::grid_template(
+                    ModProcessingSteps_UI("Steps")),
 
-                                          default = list(areas = rbind(c("DivSteps", "DivStepMonitor"),
-                                                                       c("Main", "Main")),
+                div(class = "column",
 
-                                                         rows_height = c("auto", "auto"),
+                    ModProcessingTerminal_UI("CheckServerRequirements",
+                                             ButtonLabel = "Check server requirements"))),
 
-                                                         cols_width = c("auto", "auto"))),
+            div(class = "ui vertical divider")),
 
-                     DivSteps = ModProcessingSteps_UI("Steps"),
+    div(class = "ui divider"))
 
-                     DivStepMonitor = ModProcessingTerminal_UI("CheckServerRequirements",
-                                                               ButtonLabel = "Check server requirements"),
 
-                     Main = div()
-
-                ),
-
-                div(class = "ui divider")
-
-            )
 }

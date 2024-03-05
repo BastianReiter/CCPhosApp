@@ -19,6 +19,7 @@ Imports:
     shiny.semantic (>= 0.5.0),
     shiny.worker,
     shinyjs,
+    shinyvalidate,
     waiter (>= 0.2.5)
 Depends: 
     R (>= 2.10)

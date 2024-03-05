@@ -13,12 +13,11 @@ shiny.semantic::semanticPage(
 
     # Custom body CSS
     style = "margin: 0;
-             background: rgb(255,255,255);
-             background: linear-gradient(180deg, rgba(237,237,237,1) 20%, rgba(255,255,255,0) 50%, rgba(237,237,237,1) 80%);
+             background: linear-gradient(to bottom, #ededed 20%, white 50%, white 60%, #ededed 80%);
              font-size: 100%;",
 
     # Add custom CSS file (this file is compiled via SASS at development stage)
-    tags$head(tags$link(rel = "stylesheet", type = "text/css", href = "styles/CCPhosStyle.min.css")),
+    #tags$head(tags$link(rel = "stylesheet", type = "text/css", href = "www/styles/CCPhosStyle.min.css")),
 
     # Title shown in browser
     title = "CCPhos App",
@@ -26,8 +25,7 @@ shiny.semantic::semanticPage(
     # Initiate use of shinyjs functionality
     shinyjs::useShinyjs(),
 
-    # Initiate use of waiter package functionality
-    waiter::use_waiter(),
+
 
 
     # Main grid hosting all other UI components
@@ -40,26 +38,27 @@ shiny.semantic::semanticPage(
                               default = list(areas = rbind(c("header", "header", "header"),
                                                            c("leftside", "main", "rightside")),
 
-                                             rows_height = c("100px", "auto"),
+                                             rows_height = c("minmax(100px, 10vh)", "86vh"),
 
-                                             cols_width = c("1fr", "4fr", "1fr")),
+                                             cols_width = c("1fr", "6fr", "1fr")),
 
                               # --- Main grid layout for mobile devices ---
                               mobile = list(areas = rbind(c("header", "header", "header"),
                                                           c("leftside", "main", "rightside")),
 
-                                            rows_height = c("70px", "auto"),
+                                            rows_height = c("100px", "auto"),
 
-                                            cols_width = c("1fr", "4fr", "1fr"))),
+                                            cols_width = c("1fr", "6fr", "1fr"))),
 
-        #container_style = "gap: 20px;",      # Gap between grid areas
+        #container_style = "height: 100vh",
 
         area_styles = list(header = "padding: 10px;
                                      background: rgb(5,73,150);
-                                     background: linear-gradient(90deg, rgba(5,73,150,1) 8%, rgba(255,255,255,0) 100%);
+                                     background: linear-gradient(90deg, rgba(5,73,150,1) 8%, rgba(255,255,255,1) 100%);
                                      color: #595959;",
 
-                           leftside = "padding: 10px;",
+                           leftside = "min-width: 10em;
+                                       padding: 10px;",
                            main = "padding: 10px;",
                            rightside = "padding: 10px;"),
 
@@ -70,7 +69,9 @@ shiny.semantic::semanticPage(
                                        justify-content: space-between;
                                        align-items: center;",
 
-                              h1("CCPhosApp"),
+                              img(src = "www/Logo_CCPhosApp.png",
+                                  alt = "CCPhos App Logo",
+                                  height = "80px"),
 
                               ModConnectionStatus_UI("ConnectionStatus")),
 
@@ -110,14 +111,19 @@ shiny.semantic::semanticPage(
 
 
         #--- MAIN PANEL --------------------------------------------------------
-        main = segment(
+        main = segment(class = "ui raised scrolling segment",
+                       style = "height: 100%;
+                                overflow: auto;",
 
-            # Use shiny.router functionality to enable multi-page UI structure defined in UIPage() functions
-            shiny.router::router_ui(route("/", UIPageStart()),
-                                    route("prepare", UIPagePrepare()),
-                                    route("explore", UIPageExplore()),
-                                    route("analyze", UIPageAnalyze()),
-                                    route("export", UIPageExport()))
+                       # Initiate use of waiter package functionality
+                       waiter::use_waiter(),
+
+                       # Use shiny.router functionality to enable multi-page UI structure defined in UIPage() functions
+                       shiny.router::router_ui(route("/", UIPageStart()),
+                                               route("prepare", UIPagePrepare()),
+                                               route("explore", UIPageExplore()),
+                                               route("analyze", UIPageAnalyze()),
+                                               route("export", UIPageExport()))
 
 
 
