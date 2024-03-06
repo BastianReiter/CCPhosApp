@@ -44,6 +44,8 @@ ModInitialize(id = "Initialize",
 ModConnectionStatus_Server(id = "ConnectionStatus")
 
 
+output$TestMonitor <- renderText({ StatusConnected() })
+
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Page 'Start'
@@ -78,36 +80,92 @@ StatusDataAugmented <- reactiveVal(FALSE)
 observe({ if (is.list(session$userData$CCPConnections())) { StatusConnected(TRUE) }
           else { StatusConnected(FALSE) } })
 
-observe({ toggle_step_state("StepConnect", state = StatusConnected()) }) %>%
+observe({ shinyjs::removeCssClass(id = "StepConnect", class = "StepInactive")
+          shinyjs::addCssClass(id = "StepConnect", class = "StepActive")
+          shinyjs::toggleCssClass(id = "StepResponderConnect-Icon", class = "green check") }) %>%
     bindEvent(StatusConnected())
 
-observe({ toggle_step_state("StepServerRequirements", state = StatusServerRequirementsChecked(), automatic_steps = FALSE) }) %>%
-    bindEvent(StatusServerRequirementsChecked())
-
-observe({ toggle_step_state("StepLoadData", state = StatusDataLoaded()) }) %>%
-    bindEvent(StatusDataLoaded())
-
-observe({ toggle_step_state("StepCurateData", state = StatusDataCurated()) }) %>%
-    bindEvent(StatusDataCurated())
-
-observe({ toggle_step_state("StepAugmentData", state = StatusDataAugmented()) }) %>%
-    bindEvent(StatusDataAugmented())
 
 
-output$TestMonitor <- renderText({ StatusServerRequirementsChecked() })
+
 
 
 
 #shinyjs::onclick("StepServerRequirements")
 
 
+MakeStep <- function(ID,
+                     IconClass = "",
+                     HeaderText = "",
+                     DescriptionText = "")
+{
+    div(class = "ui segment StepInactive",
+        style = "min-height: 3em;",
+        split_layout(style = "background: none;
+                              justify-content: start;
+                              align-items: center;
+                              grid-template-columns: auto auto;",
+                     icon(id = paste0(ID, "-Icon"),
+                          class = paste0("big ", IconClass),
+                          style = "margin: 10px;"),
+                     div(h4(HeaderText),
+                         DescriptionText)))
+}
 
 
-# reactive({ StatusDataLoaded <- ModProcessingTerminal_Server(id = "LoadData") })
-#
-# reactive({ StatusDataCurated <- ModProcessingTerminal_Server(id = "CurateData") })
-#
-# reactive({ StatusDataAugmented <- ModProcessingTerminal_Server(id = "AugmentData") })
+# MakeStep <- function(ID,
+#                      IconClass = "",
+#                      HeaderText = "",
+#                      DescriptionText = "",
+#                      StepResponderClass = "StepInactive")
+# {
+#     div(class = "ui segment",
+#         div(id = ID,
+#             class = StepResponderClass,
+#             style = "min-height: 3em;",
+#             split_layout(style = "background: none;
+#                                   justify-content: start;
+#                                   align-items: center;
+#                                   grid-template-columns: auto auto;",
+#                          icon(id = paste0(ID, "-Icon"),
+#                               class = paste0("big ", IconClass),
+#                               style = "margin: 10px;"),
+#                          div(h4(HeaderText),
+#                              DescriptionText))))
+# }
+
+
+
+output$StepConnect <- renderUI({ MakeStep(ID = "StepResponderConnect",
+                                          IconClass = "door open",
+                                          HeaderText = "Connect to CCP") })
+
+output$StepServerRequirements <- renderUI({ MakeStep(ID = "StepResponderServerRequirements",
+                                                     IconClass = "glasses",
+                                                     HeaderText = "Check server requirements") })
+
+output$StepLoadData <- renderUI({ MakeStep(ID = "StepResponderLoadData",
+                                           IconClass = "database",
+                                           HeaderText = "Load raw data",
+                                           DescriptionText = "From Opal DB into R session") })
+
+output$StepCurateData <- renderUI({ MakeStep(ID = "StepResponderCurateData",
+                                             IconClass = "wrench",
+                                             HeaderText = "Data curation",
+                                             DescriptionText = "Transform raw into curated data") })
+
+output$StepAugmentData <- renderUI({ MakeStep(ID = "StepResponderAugmentData",
+                                              IconClass = "magic",
+                                              HeaderText = "Data augmentation",
+                                              DescriptionText = "Transform into augmented data") })
+
+
+
+
+
+
+
+
 
 
 

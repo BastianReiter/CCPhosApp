@@ -38,13 +38,15 @@ ModLogin_UI <- function(id)
 
                 div(class = "two fields",
 
-                    div(class = "field",
-                        tags$label("Number of sites"),
+                    div(class = "inline field",
+                        div(class = "ui primary pointing below label",
+                            "Number of sites"),
                         text_input(ns("NumberOfSites"),
                                    value = "3")),
 
-                    div(class = "field",
-                        tags$label("Number of patients per site"),
+                    div(class = "inline field",
+                        div(class = "ui primary pointing below label",
+                            "Number of patients per site"),
                         text_input(ns("NumberOfPatientsPerSite"),
                                    value = "1000"))),
 

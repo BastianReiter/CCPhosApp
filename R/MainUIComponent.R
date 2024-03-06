@@ -11,13 +11,11 @@ MainUIComponent <- function()
 
 shiny.semantic::semanticPage(
 
-    # Custom body CSS
-    style = "margin: 0;
-             background: linear-gradient(to bottom, #ededed 20%, white 50%, white 60%, #ededed 80%);
-             font-size: 100%;",
+    # Set margin 0 (default is 10 px)
+    margin = "0",
 
-    # Add custom CSS file (this file is compiled via SASS at development stage)
-    #tags$head(tags$link(rel = "stylesheet", type = "text/css", href = "www/styles/CCPhosStyle.min.css")),
+    # Add custom CSS file
+    tags$head(tags$link(rel = "stylesheet", type = "text/css", href = "www/CCPhosStyle.css")),
 
     # Title shown in browser
     title = "CCPhos App",

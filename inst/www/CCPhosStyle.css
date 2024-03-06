@@ -1,0 +1,14 @@
+
+
+/* ~~~ CCPhos CSS ~~~ */
+
+
+body { background: linear-gradient(to bottom, #ededed 20%, white 50%, white 60%, #ededed 80%);
+       font-size: 100%; }
+
+
+div.ui.segment.StepInactive {  background: none;
+                    color: grey; }
+
+div.ui.segment.StepActive {  background-color: white;
+                  color: black; }

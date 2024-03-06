@@ -16,39 +16,52 @@ UIPagePrepare <- function()
 
                 div(class = "column",
 
-                    shiny.semantic::steps(id = "ProcessingSteps",
-                                          class = "vertical",
-                                          steps_list = list(
+                    div(class = "ui segments",
 
-                                              single_step(id = "StepConnect",
-                                                          title = "Connect to CCP",
-                                                          #description = "Connect to CCP",
-                                                          icon_class = "door open",
-                                                          step_class = "step"),
+                        uiOutput("StepConnect"),
 
-                                              single_step(id = "StepServerRequirements",
-                                                          title = "Check server requirements",
-                                                          #description = "Check server requirements",
-                                                          icon_class = "glasses",
-                                                          step_class = "disabled step"),
+                        uiOutput("StepServerRequirements"),
 
-                                              single_step(id = "StepLoadData",
-                                                          title = "Load data",
-                                                          description = "From Opal DB into R session",
-                                                          icon_class = "database",
-                                                          step_class = "disabled step"),
+                        uiOutput("StepLoadData"),
 
-                                              single_step(id = "StepCurateData",
-                                                          title = "Data curation",
-                                                          description = "Transform raw into curated data",
-                                                          icon_class = "wrench",
-                                                          step_class = "disabled step"),
+                        uiOutput("StepCurateData"),
 
-                                              single_step(id = "StepAugmentData",
-                                                          title = "Data augmentation",
-                                                          description = "Transform into augmented data",
-                                                          icon_class = "magic",
-                                                          step_class = "disabled step")))),
+                        uiOutput("StepAugmentData"))),
+
+
+                    # shiny.semantic::steps(id = "ProcessingSteps",
+                    #                       class = "vertical",
+                    #                       steps_list = list(
+                    #
+                    #                           single_step(id = "StepConnect",
+                    #                                       title = "Connect to CCP",
+                    #                                       #description = "Connect to CCP",
+                    #                                       icon_class = "door open",
+                    #                                       step_class = "step"),
+                    #
+                    #                           single_step(id = "StepServerRequirements",
+                    #                                       title = "Check server requirements",
+                    #                                       #description = "Check server requirements",
+                    #                                       icon_class = "glasses",
+                    #                                       step_class = "disabled step"),
+                    #
+                    #                           single_step(id = "StepLoadData",
+                    #                                       title = "Load data",
+                    #                                       description = "From Opal DB into R session",
+                    #                                       icon_class = "database",
+                    #                                       step_class = "disabled step"),
+                    #
+                    #                           single_step(id = "StepCurateData",
+                    #                                       title = "Data curation",
+                    #                                       description = "Transform raw into curated data",
+                    #                                       icon_class = "wrench",
+                    #                                       step_class = "disabled step"),
+                    #
+                    #                           single_step(id = "StepAugmentData",
+                    #                                       title = "Data augmentation",
+                    #                                       description = "Transform into augmented data",
+                    #                                       icon_class = "magic",
+                    #                                       step_class = "disabled step")))),
 
                 div(class = "column",
 
