@@ -7,8 +7,10 @@ body { background: linear-gradient(to bottom, #ededed 20%, white 50%, white 60%,
        font-size: 100%; }
 
 
-div.ui.segment.StepInactive {  background: none;
-                    color: grey; }
+div.ui.segment.StepInactive { background: none;
+                              color: grey; }
 
-div.ui.segment.StepActive {  background-color: white;
-                  color: black; }
+div.ui.segment.StepActive { background-color: white;
+                            color: black; }
+
+div.ui.segment.StepHover { background-color: green; }

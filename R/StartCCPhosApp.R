@@ -23,6 +23,7 @@ StartCCPhosApp <- function(CCPCredentials = NULL,
     require(shiny.semantic)
     require(shinyvalidate)
     #require(shiny.worker)
+    require(stringr)
     require(waiter)
 
 
@@ -31,7 +32,7 @@ StartCCPhosApp <- function(CCPCredentials = NULL,
 
     #Worker <- shiny.worker::initialize_worker()
 
-    # Since the app is deployed as a package, the folder for external resources (e.g. static images) needs to be added manually
+    # Since the app is deployed as a package, the folder for external resources (e.g. CSS files, static images) needs to be added manually
     shiny::addResourcePath('www', system.file("www", package = "CCPhosApp"))
 
     # Start CCPhos app

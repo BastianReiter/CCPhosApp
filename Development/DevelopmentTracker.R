@@ -44,6 +44,7 @@ sass(input = sass_file("./Development/CCPhosStyle.scss"),
 # use_package("shiny.router")
 # use_package("shiny.semantic")
 # use_package("shiny.worker")
+# use_package("stringr")
 # use_package("waiter")
 
 
