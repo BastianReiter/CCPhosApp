@@ -40,19 +40,19 @@ Mod[...]_Server <- function(id)
 # Module testing
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Mod[...]App <- function()
-{
-  ui <- fluidPage(
-    Mod[...]_UI("Test")
-  )
-
-  server <- function(input, output, session)
-  {
-      Mod[...]_Server("Test")
-  }
-
-  shinyApp(ui, server)
-}
+# Mod[...]App <- function()
+# {
+#   ui <- fluidPage(
+#     Mod[...]_UI("Test")
+#   )
+#
+#   server <- function(input, output, session)
+#   {
+#       Mod[...]_Server("Test")
+#   }
+#
+#   shinyApp(ui, server)
+# }
 
 # Run app
 #Mod[...]App()

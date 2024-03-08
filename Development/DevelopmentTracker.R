@@ -44,6 +44,7 @@ sass(input = sass_file("./Development/CCPhosStyle.scss"),
 # use_package("shiny.router")
 # use_package("shiny.semantic")
 # use_package("shiny.worker")
+# use_package("stringr")
 # use_package("waiter")
 
 
@@ -55,7 +56,7 @@ sass(input = sass_file("./Development/CCPhosStyle.scss"),
 # use_r("UIComponent")
 # use_r("ServerComponent")
 
-# use_r("MainUIGridTemplate")
+# use_r("DataFrameToHtmlTable.R")
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -77,6 +78,6 @@ sass(input = sass_file("./Development/CCPhosStyle.scss"),
 # use_r("ModInitialize")
 # use_r("ModLogin")
 # use_r("ModMessages")
-# use_r("ModProcessingSteps")
 # use_r("ModProcessingTerminal")
+# use_r("ModServerWorkspaceMonitor")
 

@@ -16,11 +16,10 @@ ModConnectionStatus_UI <- function(id)
                           grid-template-columns: auto 14em auto;    /* Fixed width of middle column */
                           justify-content: end;    /* Align grid items horizontally to the right side */
                           align-items: center;    /* Align grid items vertically */
-                          background-color: #ededed;
+                          background: #f9fafb;
+                          box-shadow: 0 2px 8px 0 rgba(34, 36, 38, 0.05) inset;
                           border: 2px solid rgb(5,73,150);
-                          border-radius: 4px;
-                          box-shadow: 2px 2px 5px black;
-                 ",
+                          border-radius: 4px;",
 
                  cell_args = "padding: 10px;",
 

@@ -14,10 +14,19 @@ ModProcessingTerminal_UI <- function(id,
 {
     ns <- NS(id)
 
-    tagList(action_button(ns("ProcessingTrigger"),
-                          label = ButtonLabel),
+    div(style = "display: grid;
+                 height: 100%;
+                 grid-template-rows: 4em 22em;",
 
-            ModMessageMonitor_UI(ns("MonitorCheckServerRequirements")))
+        div(style = "padding: 10px;
+                     text-align: center;",
+
+            action_button(ns("ProcessingTrigger"),
+                          class = "ui blue button",
+                          style = "box-shadow: 0 0 10px 10px white;",
+                          label = ButtonLabel)),
+
+        ModMessageMonitor_UI(ns("Monitor")))
 }
 
 
@@ -39,41 +48,46 @@ ModProcessingTerminal_Server <- function(id)
                  {
                     w <- waiter::Waiter$new(id = "ProcessingMonitor")
 
+
                     if (id == "CheckServerRequirements")
                     {
                         FunctionReturn <- reactiveVal(NULL)
+                        Complete <- reactiveVal(FALSE)
 
-                        observe({ FunctionReturn(dsCCPhosClient::CheckServerRequirements(DataSources = session$userData$CCPConnections())) }) %>%
+                        observe({ FunctionReturn(dsCCPhosClient::CheckServerRequirements(DataSources = session$userData$CCPConnections()))
+                                  Complete(TRUE) }) %>%
                             bindEvent(input$ProcessingTrigger)
 
-
-                        ModMessageMonitor_Server("MonitorCheckServerRequirements",
+                        ModMessageMonitor_Server("Monitor",
                                                  MessagesList = FunctionReturn)
+
+                        observe({ shinyjs::showElement(id = "Monitor", anim = TRUE, animType = "fade") }) %>%
+                            bindEvent(FunctionReturn())
+
+                        return(Complete)
+                    }
+
+
+                    if (id == "LoadData")
+                    {
+                        FunctionReturn <- reactiveVal(NULL)
+                        Complete <- reactiveVal(FALSE)
+
+                        observe({ FunctionReturn(dsCCPhosClient::LoadRawDataSet(DataSources = session$userData$CCPConnections(),
+                                                                                ProjectName = session$userData$ProjectName()))
+
+                                  session$userData$ServerWorkspaceInfo(dsCCPhosClient::GetServerWorkspaceInfo(DataSources = session$userData$CCPConnections()))
+
+                                  Complete(TRUE) }) %>%
+                            bindEvent(input$ProcessingTrigger)
+
+                        ModMessageMonitor_Server("Monitor",
+                                                 MessagesList = FunctionReturn)
+
+                        return(Complete)
                     }
 
                  })
 }
-
-
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Module testing
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-ProcessingTerminalApp <- function()
-{
-  ui <- fluidPage(
-    ModProcessingTerminal_UI("Connect")
-  )
-
-  server <- function(input, output, session)
-  {
-      ModProcessingTerminal_Server("Connect")
-  }
-
-  shinyApp(ui, server)
-}
-
-# Run app
-#ProcessingTerminalApp()
 
 
