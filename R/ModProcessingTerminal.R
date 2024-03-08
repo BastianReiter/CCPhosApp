@@ -16,7 +16,7 @@ ModProcessingTerminal_UI <- function(id,
 
     div(style = "display: grid;
                  height: 100%;
-                 grid-template-rows: 4em 22em;",
+                 grid-template-rows: 4em 22.8em;",
 
         div(style = "padding: 10px;
                      text-align: center;",

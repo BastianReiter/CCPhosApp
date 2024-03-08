@@ -65,15 +65,23 @@ UIPagePrepare <- function()
         #-----------------------------------------------------------------------
 
 
-        div(style = "display: grid;
-                     grid-template-columns: 40em auto;
-                     background: none;",
+        div(class = "ui accordion",      # Note: For this to work extra JS script is necessary (see MainUIComponent())
 
-            div(ModServerWorkspaceMonitor_UI("ServerWorkspaceMonitor")),
+            div(class = "active title",
+                icon(class = "dropdown icon"),
+                "Server Workspace Monitor"),
 
-            div()
+            div(class = "active content",
+                style = "height: 24em;",
 
-            )
+                ModServerWorkspaceMonitor_UI("ServerWorkspaceMonitor"))),
+
+
+        #-----------------------------------------------------------------------
+        div(class = "ui divider")
+        #-----------------------------------------------------------------------
+
+
 
     )
 }

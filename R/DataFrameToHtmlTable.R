@@ -10,10 +10,18 @@
 #' @author Bastian Reiter
 DataFrameToHtmlTable <- function(DataFrame,
                                  SemanticTableClass = "ui celled table",
-                                 RotatedHeaderNames = character())
+                                 RotatedHeaderNames = character(),
+                                 TurnLogicalIntoIcons = FALSE)
 {
+    require(dplyr)
     require(shiny)
     require(shiny.semantic)
+
+    # If DataFrame is empty return empty string
+    if (is.null(DataFrame))
+    {
+        return("")
+    }
 
 
     # Get collection of th-elements as character-vector
@@ -42,8 +50,16 @@ DataFrameToHtmlTable <- function(DataFrame,
 
         for(j in 1:ncol(DataFrame))
         {
+            CellValue <- DataFrame[i, j]
+
             StringsTableRowCells <- c(StringsTableRowCells,
-                                      paste0("tags$td('", DataFrame[i, j], "')"))
+                                      paste0("tags$td(",
+                                             ifelse(TurnLogicalIntoIcons == TRUE,
+                                                    case_when(CellValue == TRUE ~ "icon(class = 'small green check')",
+                                                              CellValue == FALSE ~ "icon(class = 'small red times')",
+                                                              TRUE ~ paste0("'", CellValue, "'")),
+                                                    paste0("'", CellValue, "'")),
+                                             ")"))
         }
 
         StringsTableRows <- c(StringsTableRows,
