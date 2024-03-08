@@ -7,10 +7,45 @@ body { background: linear-gradient(to bottom, #ededed 20%, white 50%, white 60%,
        font-size: 100%; }
 
 
-div.ui.segment.StepInactive { background: none;
-                              color: grey; }
+div.ui.segment.StepInaccessible { background: none;
+                                  color: grey;
+                                  cursor: default; }
 
-div.ui.segment.StepActive { background-color: white;
-                            color: black; }
+div.ui.segment.StepAccessible { background-color: white;
+                                color: black;
+                                cursor: pointer; }
 
-div.ui.segment.StepHover { background-color: green; }
+div.ui.segment.StepHover {  border-color: black;
+                            box-shadow: inset 0 0 6px 6px lightblue;
+                            cursor: pointer;}
+
+div.ui.segment.StepSelected { background-color: white;
+                              box-shadow: inset 0 0 4px 2px blue; }
+
+div.ui.segment.StepCompleted {  background-color: white;
+                                cursor: pointer;}
+
+
+
+
+
+
+th.rotate {
+  /* Something you can count on */
+  height: 140px;
+  white-space: nowrap;
+}
+
+th.rotate > div {
+  transform:
+    /* Magic Numbers */
+    translate(25px, 51px)
+    /* 45 is really 360 - 45 */
+    rotate(315deg);
+  width: 30px;
+}
+
+th.rotate > div > span {
+  border-bottom: 1px solid #ccc;
+  padding: 5px 10px;
+}

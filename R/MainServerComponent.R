@@ -32,6 +32,9 @@ shiny.router::router_server()
 # Initialize global objects
 session$userData$CCPConnections <- reactiveVal(NULL)
 session$userData$CCPCredentials <- reactiveVal(NULL)
+session$userData$ProjectName <- reactiveVal("None")
+session$userData$ServerWorkspaceInfo <- reactiveVal(NULL)
+
 session$userData$CCPTestData <- NULL
 
 # --- Call module: Initialize ---
@@ -44,7 +47,11 @@ ModInitialize(id = "Initialize",
 ModConnectionStatus_Server(id = "ConnectionStatus")
 
 
-output$TestMonitor <- renderText({ StatusConnected() })
+output$ProjectNameOutput <- renderUI({ h3(style = "color: white;",
+                                          paste0("Project: ", session$userData$ProjectName())) })
+
+
+output$TestMonitor <- renderText({ paste0(names(session$userData$ServerWorkspaceInfo())) })
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -64,70 +71,26 @@ ModLogin_Server(id = "Login")
 
 StatusConnected <- reactiveVal(FALSE)
 StatusServerRequirementsChecked <- ModProcessingTerminal_Server(id = "CheckServerRequirements")
-StatusDataLoaded <- reactiveVal(FALSE)
+StatusDataLoaded <- ModProcessingTerminal_Server(id = "LoadData")
 StatusDataCurated <- reactiveVal(FALSE)
 StatusDataAugmented <- reactiveVal(FALSE)
+
+SelectedProcessingStep <- reactiveVal("None")
 
 
 observe({ if (is.list(session$userData$CCPConnections())) { StatusConnected(TRUE) }
           else { StatusConnected(FALSE) } })
 
 
-ToggleStep <- function(StepID,
-                       IconClass)
-{
-    shinyjs::toggleCssClass(selector = paste0("#", StepID, " > div"), class = "StepActive")
-
-    if (StatusConnected() == TRUE)
-    {
-        shinyjs::removeCssClass(selector = paste0("#", StepID, " i"), class = IconClass)
-        shinyjs::addCssClass(selector = paste0("#", StepID, " i"), class = "green check")
-    }
-    else
-    {
-        shinyjs::removeCssClass(selector = paste0("#", StepID, " i"), class = "green check")
-        shinyjs::addCssClass(selector = paste0("#", StepID, " i"), class = IconClass)
-    }
-}
-
-
-
-observe({ ToggleStep(StepID = "Step_Connect",
-                     IconClass = "door open") }) %>%
-    bindEvent(StatusConnected())
-
-
-InitiateStepJS <- function(StepID)
-{
-    shinyjs::onevent("hover",
-                     id = StepID,
-                     expr = shinyjs::toggleCssClass(selector = paste0("#", StepID, " > div"), class = "StepHover"))
-
-    shinyjs::onclick(id = StepID,
-                     expr = { shinyjs::hideElement(selector = "#TerminalContainer div")
-                              shinyjs::showElement(id = stringr::str_replace(StepID, "Step_", "Terminal_"),
-                                                 anim = TRUE,
-                                                 animType = "fade") })
-}
-
-InitiateStepJS(StepID = "Step_Connect")
-InitiateStepJS(StepID = "Step_CheckServerRequirements")
-InitiateStepJS(StepID = "Step_LoadData")
-InitiateStepJS(StepID = "Step_CurateData")
-InitiateStepJS(StepID = "Step_AugmentData")
-
-
-
-
-
+ModServerWorkspaceMonitor_Server("ServerWorkspaceMonitor")
 
 
 MakeStep <- function(IconClass = "",
                      HeaderText = "",
                      DescriptionText = "")
 {
-    div(class = "ui segment StepInactive",
-        style = "min-height: 3em;",
+    div(class = "ui segment StepInaccessible",
+        #style = "min-height: 3em;",
         split_layout(style = "background: none;
                               justify-content: start;
                               align-items: center;
@@ -139,6 +102,92 @@ MakeStep <- function(IconClass = "",
 }
 
 
+InitiateStepJS <- function(StepID)
+{
+    shinyjs::onevent("hover",
+                     id = StepID,
+                     expr = { shinyjs::toggleCssClass(selector = paste0("#", StepID, " > div"), class = "StepHover") })
+
+    shinyjs::onclick(id = StepID,
+                     expr = { if (StepID == "Step_CheckServerRequirements") { SelectedProcessingStep("CheckServerRequirements") }
+                              if (StepID == "Step_LoadData") { SelectedProcessingStep("LoadData") }
+                              if (StepID == "Step_CurateData") { SelectedProcessingStep("CurateData") }
+                              if (StepID == "Step_AugmentData") { SelectedProcessingStep("AugmentData") } })
+}
+
+
+
+ToggleStepState <- function(StepID,
+                            StepState = "Inaccessible",
+                            IconClass = "question")
+{
+    if (StepState == "Inaccessible")
+    {
+        shinyjs::addCssClass(selector = paste0("#", StepID, " > div"), class = "StepInaccessible")
+        shinyjs::removeCssClass(selector = paste0("#", StepID, " > div"), class = "StepAccessible")
+        shinyjs::removeCssClass(selector = paste0("#", StepID, " > div"), class = "StepSelected")
+        shinyjs::removeCssClass(selector = paste0("#", StepID, " > div"), class = "StepCompleted")
+    }
+
+    if (StepState == "Accessible")
+    {
+        shinyjs::removeCssClass(selector = paste0("#", StepID, " > div"), class = "StepInaccessible")
+        shinyjs::addCssClass(selector = paste0("#", StepID, " > div"), class = "StepAccessible")
+    }
+
+    if (StepState == "Selected")
+    {
+        shinyjs::removeCssClass(selector = paste0("#", StepID, " > div"), class = "StepInaccessible")
+        shinyjs::removeCssClass(selector = paste0("#", StepID, " > div"), class = "StepAccessible")
+        shinyjs::addCssClass(selector = paste0("#", StepID, " > div"), class = "StepSelected")
+    }
+}
+
+
+
+ToggleStepCompletion <- function(StepID,
+                                 StepCompleted = FALSE,
+                                 IconClass = "question")
+{
+    if (StepCompleted == TRUE)
+    {
+        # Add class "StepCompleted" to div
+        shinyjs::removeCssClass(selector = paste0("#", StepID, " > div"), class = "StepInaccessible")
+        shinyjs::removeCssClass(selector = paste0("#", StepID, " > div"), class = "StepAccessible")
+        shinyjs::addCssClass(selector = paste0("#", StepID, " > div"), class = "StepCompleted")
+        # Set icon to green check
+        shinyjs::removeCssClass(selector = paste0("#", StepID, " i"), class = IconClass)
+        shinyjs::addCssClass(selector = paste0("#", StepID, " i"), class = "green check")
+    }
+    else
+    {
+        # Remove class "StepCompleted" from div
+        shinyjs::removeCssClass(selector = paste0("#", StepID, " > div"), class = "StepCompleted")
+        # (Re-)Set icon according to passed IconClass
+        shinyjs::addCssClass(selector = paste0("#", StepID, " i"), class = IconClass)
+        shinyjs::removeCssClass(selector = paste0("#", StepID, " i"), class = "green check")
+    }
+}
+
+
+
+ToggleTerminal <- function(TerminalID)
+{
+    shinyjs::hideElement(selector = "#TerminalContainer > div")      # Hide every <div> in TerminalContainer (see UIPagePrepare())
+    shinyjs::showElement(id = TerminalID,
+                         anim = TRUE,
+                         animType = "fade",
+                         time = 0.2)
+}
+
+
+
+
+InitiateStepJS(StepID = "Step_Connect")
+InitiateStepJS(StepID = "Step_CheckServerRequirements")
+InitiateStepJS(StepID = "Step_LoadData")
+InitiateStepJS(StepID = "Step_CurateData")
+InitiateStepJS(StepID = "Step_AugmentData")
 
 
 
@@ -161,6 +210,61 @@ output$Step_AugmentData <- renderUI({ MakeStep(IconClass = "magic",
                                                DescriptionText = "Transform into augmented data") })
 
 
+
+
+# Observers: Procession step selected
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# - Change Step appearance when selected
+
+observe({ shinyjs::toggleCssClass(class = "StepSelected",
+                                  selector = "#Step_CheckServerRequirements > div",
+                                  condition = (SelectedProcessingStep() == "CheckServerRequirements")) })
+
+observe({ shinyjs::toggleCssClass(class = "StepSelected",
+                                  selector = "#Step_LoadData > div",
+                                  condition = (SelectedProcessingStep() == "LoadData")) })
+
+observe({ shinyjs::toggleCssClass(class = "StepSelected",
+                                  selector = "#Step_CurateData > div",
+                                  condition = (SelectedProcessingStep() == "CurateData")) })
+
+observe({ shinyjs::toggleCssClass(class = "StepSelected",
+                                  selector = "#Step_AugmentData > div",
+                                  condition = (SelectedProcessingStep() == "AugmentData")) })
+
+
+# Toggle visibility of terminals when selection of processing step occurs
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+observe({ if (SelectedProcessingStep() == "CheckServerRequirements") { ToggleTerminal("Terminal_CheckServerRequirements") }
+          if (SelectedProcessingStep() == "LoadData") { ToggleTerminal("Terminal_LoadData") }
+          if (SelectedProcessingStep() == "CurateData") { ToggleTerminal("Terminal_CurateData") }
+          if (SelectedProcessingStep() == "AugmentData") { ToggleTerminal("Terminal_AugmentData") } }) %>% bindEvent(SelectedProcessingStep())
+
+
+
+# Observers: Procession step completed
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+observe({ ToggleStepCompletion(StepID = "Step_Connect",
+                               StepCompleted = StatusConnected(),
+                               IconClass = "door open") }) %>% bindEvent(StatusConnected())
+
+observe({ ToggleStepCompletion(StepID = "Step_CheckServerRequirements",
+                               StepCompleted = StatusServerRequirementsChecked(),
+                               IconClass = "glasses") }) %>% bindEvent(StatusServerRequirementsChecked())
+
+observe({ ToggleStepCompletion(StepID = "Step_LoadData",
+                               StepCompleted = StatusDataLoaded(),
+                               IconClass = "database") }) %>% bindEvent(StatusDataLoaded())
+
+observe({ ToggleStepCompletion(StepID = "Step_CurateData",
+                               StepCompleted = StatusDataCurated(),
+                               IconClass = "wrench") }) %>% bindEvent(StatusDataCurated())
+
+observe({ ToggleStepCompletion(StepID = "Step_AugmentData",
+                               StepCompleted = StatusDataAugmented(),
+                               IconClass = "magic") }) %>% bindEvent(StatusDataAugmented())
 
 
 

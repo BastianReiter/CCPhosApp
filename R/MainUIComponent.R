@@ -17,6 +17,10 @@ shiny.semantic::semanticPage(
     # Add custom CSS file
     tags$head(tags$link(rel = "stylesheet", type = "text/css", href = "www/CCPhosStyle.css")),
 
+    # Add extra JS to enable functionality of semantic accordion
+    tags$script(language="javascript",
+                "$(document).ready(function() { window.onload = function(){ $('.ui.accordion').accordion(); }; });"),
+
     # Title shown in browser
     title = "CCPhos App",
 
@@ -63,13 +67,15 @@ shiny.semantic::semanticPage(
 
 
         #--- HEADER ------------------------------------------------------------
-        header = split_layout(style = "display: flex;      /* Set up flexbox to use 'justify-conten: space-between' to enable free space between columns without specifying column width */
+        header = split_layout(style = "display: flex;      /* Set up flexbox to use 'justify-content: space-between' to enable free space between columns without specifying column width */
                                        justify-content: space-between;
                                        align-items: center;",
 
                               img(src = "www/Logo_CCPhosApp.png",
                                   alt = "CCPhos App Logo",
                                   height = "80px"),
+
+                              uiOutput(outputId = "ProjectNameOutput"),
 
                               ModConnectionStatus_UI("ConnectionStatus")),
 

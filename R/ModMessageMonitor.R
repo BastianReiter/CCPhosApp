@@ -13,8 +13,15 @@ ModMessageMonitor_UI <- function(id)
 {
     ns <- NS(id)
 
-    # UI element is hidden at app start
-    shinyjs::hidden(uiOutput(ns("MessageMonitor"), style = "line-height: 0.6;"))
+    div(id = ns("MessagesContainer"),
+        class = "ui scrollable segment",
+        style = "height: 100%;
+                 overflow: auto;",
+
+        div(class = "ui top attached label",
+            "Messages"),
+
+        uiOutput(ns("Messages"), style = "line-height: 0.6;"))
 }
 
 
@@ -38,39 +45,36 @@ ModMessageMonitor_Server <- function(id,
     moduleServer(id,
                  function(input, output, session)
                  {
-                      output$MessageMonitor <- renderUI({
-                                                          HtmlOutput <- list()
+                      output$Messages <- renderUI({ HtmlReturn <- list()
 
-                                                          for (i in 1:length(MessagesList()))
-                                                          {
-                                                              for (j in 1:length(MessagesList()[[i]]))
-                                                              {
-                                                                  message <- MessagesList()[[i]][j]
+                                                    for (i in 1:length(MessagesList()))
+                                                    {
+                                                        for (j in 1:length(MessagesList()[[i]]))
+                                                        {
+                                                            message <- MessagesList()[[i]][j]
 
-                                                                  if (names(message) == "Topic")
-                                                                  {
-                                                                      HtmlMessage <- div(class = "ui horizontal divider", as.character(message))
-                                                                  }
-                                                                  else
-                                                                  {
-                                                                      IconClass <- dplyr::case_when(names(message) == "Info" ~ "blue info circle",
-                                                                                                    names(message) == "Success" ~ "green check circle",
-                                                                                                    names(message) == "Warning" ~ "orange exclamation triangle",
-                                                                                                    names(message) == "Failure" ~ "red times circle",
-                                                                                                    TRUE ~ "none")
+                                                            if (names(message) == "Topic")
+                                                            {
+                                                                HtmlMessage <- div(class = "ui horizontal divider", as.character(message))
+                                                            }
+                                                            else
+                                                            {
+                                                                IconClass <- dplyr::case_when(names(message) == "Info" ~ "blue info circle",
+                                                                                              names(message) == "Success" ~ "green check circle",
+                                                                                              names(message) == "Warning" ~ "orange exclamation triangle",
+                                                                                              names(message) == "Failure" ~ "red times circle",
+                                                                                              TRUE ~ "none")
 
-                                                                      HtmlMessage <- br(span(style = "font-size: 0.8em;", shiny.semantic::icon(class = IconClass), as.character(message)))
-                                                                  }
+                                                                HtmlMessage <- br(span(style = "font-size: 0.8em;", shiny.semantic::icon(class = IconClass), as.character(message)))
+                                                            }
 
-                                                                  HtmlOutput <- c(HtmlOutput,
-                                                                                  list(HtmlMessage))
-                                                              }
-                                                          }
+                                                            HtmlReturn <- c(HtmlReturn,
+                                                                            list(HtmlMessage))
+                                                        }
+                                                    }
 
-                                                          HtmlOutput
-                                                        })
-
-                      observe({ shinyjs::showElement(id = "MessageMonitor", anim = TRUE, animType = "fade") }) %>%
+                                                    HtmlReturn
+                                                  }) %>%
                           bindEvent(MessagesList())
                   })
 }
