@@ -7,7 +7,6 @@ UIPagePrepare <- function()
 
     div(id = "PagePrepare",
 
-
         h4(class = "ui dividing header",
            "Data preparation"),
 
@@ -78,8 +77,32 @@ UIPagePrepare <- function()
 
 
         #-----------------------------------------------------------------------
-        div(class = "ui divider")
+        div(class = "ui divider"),
         #-----------------------------------------------------------------------
+
+
+        div(class = "ui top attached tabular menu",
+            div(class = "active item", 'data-tab' = "one",
+                "Test1"),
+            div(class = "item", 'data-tab' = "two",
+                "Test2"),
+            div(class = "item", 'data-tab' = "three",
+                "Test3")),
+
+        div(class = "ui bottom attached active tab segment", 'data-tab' = "one",
+
+        p()
+        ),
+
+        div(class = "ui bottom attached tab segment", 'data-tab' = "two",
+
+        p()
+        ),
+
+        div(class = "ui bottom attached tab segment", 'data-tab' = "three",
+
+        p()
+        )
 
 
 

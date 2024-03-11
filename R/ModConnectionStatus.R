@@ -71,19 +71,19 @@ ModConnectionStatus_Server <- function(id)
 # Module testing
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-ModConnectionStatusApp <- function()
-{
-    ui <- fluidPage(
-        ModConnectionStatus_UI("Test")
-    )
-
-    server <- function(input, output, session)
-    {
-        ModConnectionStatus_Server("Test")
-    }
-
-    shinyApp(ui, server)
-}
+# ModConnectionStatusApp <- function()
+# {
+#     ui <- fluidPage(
+#         ModConnectionStatus_UI("Test")
+#     )
+#
+#     server <- function(input, output, session)
+#     {
+#         ModConnectionStatus_Server("Test")
+#     }
+#
+#     shinyApp(ui, server)
+# }
 
 # Run app
 #ModConnectionStatusApp()

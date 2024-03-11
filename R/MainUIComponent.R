@@ -11,6 +11,10 @@ MainUIComponent <- function()
 
 shiny.semantic::semanticPage(
 
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # MAIN GRID
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     # Set margin 0 (default is 10 px)
     margin = "0",
 
@@ -27,10 +31,16 @@ shiny.semantic::semanticPage(
     # Initiate use of shinyjs functionality
     shinyjs::useShinyjs(),
 
+    # Initiate use of waiter package
+    waiter::useWaiter(),
+    waiter::waiterShowOnLoad(html = spin_fading_circles()),
+
+    #waiter::autoWaiter(),
 
 
-
-    # Main grid hosting all other UI components
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # MAIN GRID
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     shiny.semantic::grid(id = "MainGrid",
 
         # Provide grid template (including definition of area names)
@@ -119,8 +129,7 @@ shiny.semantic::semanticPage(
                        style = "height: 100%;
                                 overflow: auto;",
 
-                       # Initiate use of waiter package functionality
-                       waiter::use_waiter(),
+
 
                        # Use shiny.router functionality to enable multi-page UI structure defined in UIPage() functions
                        shiny.router::router_ui(route("/", UIPageStart()),
