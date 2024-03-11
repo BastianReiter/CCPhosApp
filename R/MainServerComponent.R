@@ -29,6 +29,9 @@ function(input, output, session)
 # Initiate router to enable multi-page appearance
 shiny.router::router_server()
 
+# Hide waiter loading screen after initial app load has finished
+waiter::waiter_hide()
+
 # Initialize global objects
 session$userData$CCPConnections <- reactiveVal(NULL)
 session$userData$CCPCredentials <- reactiveVal(NULL)
@@ -72,8 +75,8 @@ ModLogin_Server(id = "Login")
 StatusConnected <- reactiveVal(FALSE)
 StatusServerRequirementsChecked <- ModProcessingTerminal_Server(id = "CheckServerRequirements")
 StatusDataLoaded <- ModProcessingTerminal_Server(id = "LoadData")
-StatusDataCurated <- reactiveVal(FALSE)
-StatusDataAugmented <- reactiveVal(FALSE)
+StatusDataCurated <- ModProcessingTerminal_Server(id = "CurateData")
+StatusDataAugmented <- ModProcessingTerminal_Server(id = "AugmentData")
 
 SelectedProcessingStep <- reactiveVal("None")
 

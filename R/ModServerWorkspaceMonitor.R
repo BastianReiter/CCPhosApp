@@ -41,26 +41,8 @@ ModServerWorkspaceMonitor_Server <- function(id)
                  function(input, output, session)
                  {
                       output$ServerObjects <- renderUI({ DataFrameToHtmlTable(DataFrame = session$userData$ServerWorkspaceInfo(),
-                                                                              SemanticTableClass = "ui small very compact selectable celled table")
-
-
-
-                                                        # ListRows <- purrr::modify(.x = session$userData$ServerWorkspaceInfo()$ObjectName,
-                                                        #                            function(objectname)
-                                                        #                            {
-                                                        #                                 paste0("div(class = 'item', ",
-                                                        #                                        "'", objectname, "'",
-                                                        #                                        ")")
-                                                        #                            })
-                                                        #
-                                                        #  HtmlCallString <- paste0("div(class = 'ui selection list', ",
-                                                        #                           paste0(ListRows, collapse = ", "),
-                                                        #                           ")")
-                                                        #
-                                                        #  eval(parse(text = HtmlCallString))
-
-
-                                                         })
+                                                                              SemanticTableClass = "ui small very compact selectable celled table",
+                                                                              TurnLogicalIntoIcons = TRUE) })
                  })
 }
 

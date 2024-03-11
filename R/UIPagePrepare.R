@@ -7,7 +7,6 @@ UIPagePrepare <- function()
 
     div(id = "PagePrepare",
 
-
         h4(class = "ui dividing header",
            "Data preparation"),
 
@@ -65,15 +64,47 @@ UIPagePrepare <- function()
         #-----------------------------------------------------------------------
 
 
-        div(style = "display: grid;
-                     grid-template-columns: 40em auto;
-                     background: none;",
+        div(class = "ui accordion",      # Note: For this to work extra JS script is necessary (see MainUIComponent())
 
-            div(ModServerWorkspaceMonitor_UI("ServerWorkspaceMonitor")),
+            div(class = "active title",
+                icon(class = "dropdown icon"),
+                "Server Workspace Monitor"),
 
-            div()
+            div(class = "active content",
+                style = "height: 24em;",
 
-            )
+                ModServerWorkspaceMonitor_UI("ServerWorkspaceMonitor"))),
+
+
+        #-----------------------------------------------------------------------
+        div(class = "ui divider"),
+        #-----------------------------------------------------------------------
+
+
+        div(class = "ui top attached tabular menu",
+            div(class = "active item", 'data-tab' = "one",
+                "Test1"),
+            div(class = "item", 'data-tab' = "two",
+                "Test2"),
+            div(class = "item", 'data-tab' = "three",
+                "Test3")),
+
+        div(class = "ui bottom attached active tab segment", 'data-tab' = "one",
+
+        p()
+        ),
+
+        div(class = "ui bottom attached tab segment", 'data-tab' = "two",
+
+        p()
+        ),
+
+        div(class = "ui bottom attached tab segment", 'data-tab' = "three",
+
+        p()
+        )
+
+
 
     )
 }

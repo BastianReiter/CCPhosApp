@@ -16,7 +16,7 @@ ModProcessingTerminal_UI <- function(id,
 
     div(style = "display: grid;
                  height: 100%;
-                 grid-template-rows: 4em 22em;",
+                 grid-template-rows: 4em 22.8em;",
 
         div(style = "padding: 10px;
                      text-align: center;",
@@ -26,7 +26,16 @@ ModProcessingTerminal_UI <- function(id,
                           style = "box-shadow: 0 0 10px 10px white;",
                           label = ButtonLabel)),
 
-        ModMessageMonitor_UI(ns("Monitor")))
+            div(style = "position: relative;",
+
+                div(id = ns("WaiterScreenContainer"),
+                    style = "position: absolute;
+                             height: 100%;
+                             width: 100%;
+                             top: 0;
+                             left: 0;"),
+
+                ModMessageMonitor_UI(ns("Monitor"))))
 }
 
 
@@ -46,46 +55,117 @@ ModProcessingTerminal_Server <- function(id)
     moduleServer(id,
                  function(input, output, session)
                  {
-                    w <- waiter::Waiter$new(id = "ProcessingMonitor")
+                    ReturnMessages <- reactiveVal(NULL)
+                    Complete <- reactiveVal(FALSE)
+
+                    ModMessageMonitor_Server("Monitor",
+                                             MessagesList = ReturnMessages)
+
+                    observe({ shinyjs::showElement(id = "Monitor", anim = TRUE, animType = "fade") }) %>%
+                        bindEvent(ReturnMessages())
+
+                    # Setting up loading screen with waiter package
+                    ns <- session$ns
+                    WaiterScreen <- Waiter$new(id = ns("WaiterScreenContainer"),
+                                               html = spin_3(),
+                                               color = transparent(.5))
 
 
                     if (id == "CheckServerRequirements")
                     {
-                        FunctionReturn <- reactiveVal(NULL)
-                        Complete <- reactiveVal(FALSE)
+                        observe({ # Set up loading behaviour
+                                  shinyjs::disable("ProcessingTrigger")
+                                  WaiterScreen$show()
+                                  on.exit({ shinyjs::enable("ProcessingTrigger")
+                                            WaiterScreen$hide() })
 
-                        observe({ FunctionReturn(dsCCPhosClient::CheckServerRequirements(DataSources = session$userData$CCPConnections()))
+                                  # Trigger function CheckServerRequirements() and assign return to reactive value ReturnMessages
+                                  ReturnMessages(dsCCPhosClient::CheckServerRequirements(DataSources = session$userData$CCPConnections()))
+
+                                  # Set reactive value Complete TRUE
                                   Complete(TRUE) }) %>%
                             bindEvent(input$ProcessingTrigger)
 
-                        ModMessageMonitor_Server("Monitor",
-                                                 MessagesList = FunctionReturn)
 
-                        observe({ shinyjs::showElement(id = "Monitor", anim = TRUE, animType = "fade") }) %>%
-                            bindEvent(FunctionReturn())
-
-                        return(Complete)
                     }
 
 
                     if (id == "LoadData")
                     {
-                        FunctionReturn <- reactiveVal(NULL)
-                        Complete <- reactiveVal(FALSE)
+                        observe({ # Set up loading behaviour
+                                  shinyjs::disable("ProcessingTrigger")
+                                  WaiterScreen$show()
+                                  on.exit({ shinyjs::enable("ProcessingTrigger")
+                                            WaiterScreen$hide() })
 
-                        observe({ FunctionReturn(dsCCPhosClient::LoadRawDataSet(DataSources = session$userData$CCPConnections(),
+                                  # Trigger function LoadRawDataSet() and assign return to reactive value ReturnMessages
+                                  ReturnMessages(dsCCPhosClient::LoadRawDataSet(DataSources = session$userData$CCPConnections(),
                                                                                 ProjectName = session$userData$ProjectName()))
 
+                                  # Trigger function GetServerWorkspaceInfo() and assign return to reactive value ServerWorkspaceInfo in session$userData
                                   session$userData$ServerWorkspaceInfo(dsCCPhosClient::GetServerWorkspaceInfo(DataSources = session$userData$CCPConnections()))
 
+                                  # Set reactive value Complete TRUE
+                                  Complete(TRUE)
+
+
+                                  }) %>%
+                            bindEvent(input$ProcessingTrigger)
+                    }
+
+
+                    if (id == "CurateData")
+                    {
+                        observe({ # Set up loading behaviour
+                                  shinyjs::disable("ProcessingTrigger")
+                                  WaiterScreen$show()
+                                  on.exit({ shinyjs::enable("ProcessingTrigger")
+                                            WaiterScreen$hide() })
+
+                                  # Trigger functions ds.CurateData() and ds.UnpackCuratedDataSet() and assign returns (concatenated lists) to reactive value ReturnMessages
+                                  ReturnMessages(c(dsCCPhosClient::ds.CurateData(RawDataSetName = "RawDataSet",
+                                                                               OutputName = "CurationOutput",
+                                                                               DataSources = session$userData$CCPConnections()),
+
+                                                   # Make tables from Curated Data Set directly addressable by unpacking them into R server session
+                                                   dsCCPhosClient::ds.UnpackCuratedDataSet(CuratedDataSetName = "CuratedDataSet",
+                                                                                           DataSources = session$userData$CCPConnections())))
+
+                                  # Trigger function GetServerWorkspaceInfo() and assign return to reactive value ServerWorkspaceInfo in session$userData
+                                  session$userData$ServerWorkspaceInfo(dsCCPhosClient::GetServerWorkspaceInfo(DataSources = session$userData$CCPConnections()))
+
+                                  # Set reactive value Complete TRUE
                                   Complete(TRUE) }) %>%
                             bindEvent(input$ProcessingTrigger)
-
-                        ModMessageMonitor_Server("Monitor",
-                                                 MessagesList = FunctionReturn)
-
-                        return(Complete)
                     }
+
+
+                    if (id == "AugmentData")
+                    {
+                        observe({ # Set up loading behaviour
+                                  shinyjs::disable("ProcessingTrigger")
+                                  WaiterScreen$show()
+                                  on.exit({ shinyjs::enable("ProcessingTrigger")
+                                            WaiterScreen$hide() })
+
+                                  # Trigger functions ds.AugmentData() and ds.UnpackAugmentedDataSet() and assign returns (concatenated lists) to reactive value ReturnMessages
+                                  ReturnMessages(c(dsCCPhosClient::ds.AugmentData(CuratedDataSetName = "CuratedDataSet",
+                                                                                OutputName = "AugmentationOutput",
+                                                                                DataSources = session$userData$CCPConnections()),
+
+                                                   # Make tables from Augmented Data Set directly addressable by unpacking them into R server session
+                                                   dsCCPhosClient::ds.UnpackAugmentedDataSet(AugmentedDataSetName = "AugmentedDataSet",
+                                                                                             DataSources = session$userData$CCPConnections())))
+
+                                  # Trigger function GetServerWorkspaceInfo() and assign return to reactive value ServerWorkspaceInfo in session$userData
+                                  session$userData$ServerWorkspaceInfo(dsCCPhosClient::GetServerWorkspaceInfo(DataSources = session$userData$CCPConnections()))
+
+                                  # Set reactive value Complete TRUE
+                                  Complete(TRUE) }) %>%
+                            bindEvent(input$ProcessingTrigger)
+                    }
+
+                    return(Complete)
 
                  })
 }
