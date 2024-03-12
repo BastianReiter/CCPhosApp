@@ -73,7 +73,7 @@ UIPagePrepare <- function()
             div(class = "active content",
                 style = "height: 24em;",
 
-                ModServerWorkspaceMonitor_UI("ServerWorkspaceMonitor"))),
+                ModServerWorkspaceMonitor_UI("Prepare-ServerWorkspaceMonitor"))),
 
 
         #-----------------------------------------------------------------------
@@ -81,28 +81,22 @@ UIPagePrepare <- function()
         #-----------------------------------------------------------------------
 
 
-        div(class = "ui top attached tabular menu",
-            div(class = "active item", 'data-tab' = "one",
-                "Test1"),
-            div(class = "item", 'data-tab' = "two",
-                "Test2"),
-            div(class = "item", 'data-tab' = "three",
-                "Test3")),
+        div(class = "ui accordion",
 
-        div(class = "ui bottom attached active tab segment", 'data-tab' = "one",
+            div(class = "active title",
+                icon(class = "dropdown icon"),
+                "Data Transformation Monitor"),
 
-        p()
-        ),
+            div(class = "active content",
+                style = "height: 30em;",
 
-        div(class = "ui bottom attached tab segment", 'data-tab' = "two",
+                ModDataTransformationMonitor_UI("DataTransformationMonitor"))),
 
-        p()
-        ),
 
-        div(class = "ui bottom attached tab segment", 'data-tab' = "three",
 
-        p()
-        )
+        # tabset(tabs = list(list(menu = "Validation Reports", content = uiOutput("TabContentValidationReports"), id = "Tab_ValidationReports"),
+        #                    list(menu = "Transformation Monitors", content = uiOutput("TabContentTransformationMonitors"), id = "Tab_TransformationMonitors")),
+        #        active = "Tab_TransformationMonitors")
 
 
 

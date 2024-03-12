@@ -12,15 +12,32 @@ ModServerWorkspaceMonitor_UI <- function(id)
 {
     ns <- NS(id)
 
-    div(id = ns("ServerObjectsContainer"),
-        class = "ui scrollable segment",
-        style = "height: 100%;
-                 overflow: auto;",
+    div(style = "display: grid;
+                 grid-template-columns: 1fr;
+                 grid-gap: 1em;
+                 height: 22em;",
 
-        div(class = "ui top attached label",
-            "Server Workspace"),
 
-        uiOutput(ns("ServerObjects")))
+        div(id = ns("ServerWorkspaceContainer"),
+            class = "ui scrollable segment",
+            style = "height: 100%;
+                     overflow: auto;",
+
+            div(class = "ui top attached label",
+                "Server Workspace"),
+
+            uiOutput(ns("ServerWorkspace"))))
+
+
+        # div(id = ns("ServerObjectDetailsContainer"),
+        #     class = "ui scrollable segment",
+        #     stlye = "height: 100%;
+        #              overflow: auto;",
+        #
+        #     div(class = "ui top attached label",
+        #         "Server Object Details"),
+        #
+        #     uiOutput(ns("ServerObjectDetails"))))
 
 }
 
@@ -40,9 +57,11 @@ ModServerWorkspaceMonitor_Server <- function(id)
     moduleServer(id,
                  function(input, output, session)
                  {
-                      output$ServerObjects <- renderUI({ DataFrameToHtmlTable(DataFrame = session$userData$ServerWorkspaceInfo(),
-                                                                              SemanticTableClass = "ui small very compact selectable celled table",
-                                                                              TurnLogicalIntoIcons = TRUE) })
+                      output$ServerWorkspace <- renderUI({ DataFrameToHtmlTable(DataFrame = session$userData$ServerWorkspaceInfo(),
+                                                                                SemanticTableClass = "ui small very compact selectable celled table",
+                                                                                TurnLogicalIntoIcons = TRUE) })
+
+                      output$ServerObjectDetails <- renderUI({ "- Under construction -" })
                  })
 }
 

@@ -12,13 +12,6 @@ MainServerComponent <- function(CCPCredentials,
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 {
 
-# require(dsCCPhosClient)
-# require(gt)
-# require(shiny)
-# require(shiny.router)
-# require(waiter)
-
-
 # Main server function
 function(input, output, session)
 {
@@ -38,7 +31,10 @@ session$userData$CCPCredentials <- reactiveVal(NULL)
 session$userData$ProjectName <- reactiveVal("None")
 session$userData$ServerWorkspaceInfo <- reactiveVal(NULL)
 
+session$userData$CurationReports <- reactiveVal(NULL)
+
 session$userData$CCPTestData <- NULL
+
 
 # --- Call module: Initialize ---
 # Assigns content to session$userData objects at app start
@@ -46,15 +42,57 @@ ModInitialize(id = "Initialize",
               CCPCredentials,
               CCPTestData)
 
+
+# Initialize menu behavior
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+SelectedMainMenuItem <- reactiveVal("Start")
+
+shinyjs::onclick(id = "MenuItem_Start", expr = SelectedMainMenuItem("Start"))
+shinyjs::onclick(id = "MenuItem_Prepare", expr = SelectedMainMenuItem("Prepare"))
+shinyjs::onclick(id = "MenuItem_Explore", expr = SelectedMainMenuItem("Explore"))
+shinyjs::onclick(id = "MenuItem_Analyze", expr = SelectedMainMenuItem("Analyze"))
+shinyjs::onclick(id = "MenuItem_Export", expr = SelectedMainMenuItem("Export"))
+
+
+# Observers: Main menu item selected
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# - Change main menu item appearance when selected
+
+observe({ shinyjs::toggleCssClass(class = "active",
+                                  id = "MenuItem_Start",
+                                  condition = (SelectedMainMenuItem() == "Start")) })
+
+observe({ shinyjs::toggleCssClass(class = "active",
+                                  id = "MenuItem_Prepare",
+                                  condition = (SelectedMainMenuItem() == "Prepare")) })
+
+observe({ shinyjs::toggleCssClass(class = "active",
+                                  id = "MenuItem_Explore",
+                                  condition = (SelectedMainMenuItem() == "Explore")) })
+
+observe({ shinyjs::toggleCssClass(class = "active",
+                                  id = "MenuItem_Analyze",
+                                  condition = (SelectedMainMenuItem() == "Analzye")) })
+
+observe({ shinyjs::toggleCssClass(class = "active",
+                                  id = "MenuItem_Export",
+                                  condition = (SelectedMainMenuItem() == "Export")) })
+
+
+
+
 # --- Call module: Connection Status ---
 ModConnectionStatus_Server(id = "ConnectionStatus")
 
 
-output$ProjectNameOutput <- renderUI({ h3(style = "color: white;",
-                                          paste0("Project: ", session$userData$ProjectName())) })
+output$ProjectNameOutput <- renderUI({ "" })
+                                        # h3(style = "color: white;",
+                                        #   paste0("Project: ", session$userData$ProjectName())) })
 
+# For testing purposes: Arbitrary text monitor element
+output$TestMonitor <- renderText({ "" })
 
-output$TestMonitor <- renderText({ paste0(names(session$userData$ServerWorkspaceInfo())) })
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -80,12 +118,16 @@ StatusDataAugmented <- ModProcessingTerminal_Server(id = "AugmentData")
 
 SelectedProcessingStep <- reactiveVal("None")
 
-
 observe({ if (is.list(session$userData$CCPConnections())) { StatusConnected(TRUE) }
           else { StatusConnected(FALSE) } })
 
 
-ModServerWorkspaceMonitor_Server("ServerWorkspaceMonitor")
+# --- Call module: Server Workspace Monitor ---
+ModServerWorkspaceMonitor_Server("Prepare-ServerWorkspaceMonitor")
+
+# --- Call module: Data Transformation Monitor ---
+ModDataTransformationMonitor_Server("DataTransformationMonitor")
+
 
 
 MakeStep <- function(IconClass = "",
@@ -93,7 +135,6 @@ MakeStep <- function(IconClass = "",
                      DescriptionText = "")
 {
     div(class = "ui segment StepInaccessible",
-        #style = "min-height: 3em;",
         split_layout(style = "background: none;
                               justify-content: start;
                               align-items: center;
@@ -121,8 +162,7 @@ InitiateStepJS <- function(StepID)
 
 
 ToggleStepState <- function(StepID,
-                            StepState = "Inaccessible",
-                            IconClass = "question")
+                            StepState = "Inaccessible")
 {
     if (StepState == "Inaccessible")
     {
@@ -185,7 +225,6 @@ ToggleTerminal <- function(TerminalID)
 
 
 
-
 InitiateStepJS(StepID = "Step_Connect")
 InitiateStepJS(StepID = "Step_CheckServerRequirements")
 InitiateStepJS(StepID = "Step_LoadData")
@@ -211,7 +250,6 @@ output$Step_CurateData <- renderUI({ MakeStep(IconClass = "wrench",
 output$Step_AugmentData <- renderUI({ MakeStep(IconClass = "magic",
                                                HeaderText = "Data augmentation",
                                                DescriptionText = "Transform into augmented data") })
-
 
 
 
@@ -251,19 +289,31 @@ observe({ if (SelectedProcessingStep() == "CheckServerRequirements") { ToggleTer
 
 observe({ ToggleStepCompletion(StepID = "Step_Connect",
                                StepCompleted = StatusConnected(),
-                               IconClass = "door open") }) %>% bindEvent(StatusConnected())
+                               IconClass = "door open")
+          ToggleStepState(StepID = "Step_CheckServerRequirements",
+                          StepState = "Accessible") }) %>% bindEvent(StatusConnected())
+
 
 observe({ ToggleStepCompletion(StepID = "Step_CheckServerRequirements",
                                StepCompleted = StatusServerRequirementsChecked(),
-                               IconClass = "glasses") }) %>% bindEvent(StatusServerRequirementsChecked())
+                               IconClass = "glasses")
+          ToggleStepState(StepID = "Step_LoadData",
+                          StepState = "Accessible") }) %>% bindEvent(StatusServerRequirementsChecked())
+
 
 observe({ ToggleStepCompletion(StepID = "Step_LoadData",
                                StepCompleted = StatusDataLoaded(),
-                               IconClass = "database") }) %>% bindEvent(StatusDataLoaded())
+                               IconClass = "database")
+          ToggleStepState(StepID = "Step_CurateData",
+                          StepState = "Accessible") }) %>% bindEvent(StatusDataLoaded())
+
 
 observe({ ToggleStepCompletion(StepID = "Step_CurateData",
                                StepCompleted = StatusDataCurated(),
-                               IconClass = "wrench") }) %>% bindEvent(StatusDataCurated())
+                               IconClass = "wrench")
+          ToggleStepState(StepID = "Step_AugmentData",
+                          StepState = "Accessible") }) %>% bindEvent(StatusDataCurated())
+
 
 observe({ ToggleStepCompletion(StepID = "Step_AugmentData",
                                StepCompleted = StatusDataAugmented(),
@@ -271,11 +321,24 @@ observe({ ToggleStepCompletion(StepID = "Step_AugmentData",
 
 
 
+#output$TabContentValidationReports <- renderUI({ "Test A" })
 
 
 
+#output$TabContentTransformationMonitors <- renderUI({ "Test B" })
 
 
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Page 'Explore'
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+# --- Call module: Server Workspace Monitor ---
+ModServerWorkspaceMonitor_Server("Explore-ServerWorkspaceMonitor")
+
+# --- Call module: Univariate Exploration ---
+ModUnivariateExploration_Server("UnivariateExploration")
 
 
 
@@ -289,50 +352,6 @@ observe({ ToggleStepCompletion(StepID = "Step_AugmentData",
 #   })
 # }
 
-
-
-
-
-
-# Run_ds.CurateData <- function(CCPConnections.. = CCPConnections.)
-# {
-#     dsCCPhosClient::ds.CurateData(RawDataSetName = "RawDataSet",
-#                                   OutputName = "CurationOutput",
-#                                   DataSources = CCPConnections..)
-# }
-#
-# observeEvent(eventExpr = input$btn_Run_ds.CurateData,
-#              handlerExpr = {
-#                               Return <- Run_ds.CurateData()
-#                               output$return_Run_ds.CurateData <- renderText({ paste0(Return, collapse = " ")})
-#                            })
-#
-#
-#
-# Site <- reactive({ input$SiteName })
-# MonitorTable <- reactive({ input$MonitorTableName })
-# MonitorData <- reactive({ CurationReport[[Site()]][[MonitorTable()]] })
-#
-# output$TestTable <- render_gt({ tryCatch(
-#                                     if (!is.null(MonitorData()))
-#                                     {
-#                                         MonitorData() %>%
-#                                              gt(groupname_col = "Feature") %>%
-#                                              dsCCPhosClient::gtTheme_CCP(TableAlign = "left", ShowNAs = TRUE, TableWidth = "80%") %>%
-#                                              tab_style(locations = cells_body(rows = (Value != "NA" & IsValueEligible == TRUE & Final > 0)),
-#                                                        style = cell_fill(color = "green")) %>%
-#                                              tab_style(locations = cells_body(rows = (Value != "NA" & IsValueEligible == TRUE & Final == 0)),
-#                                                        style = cell_fill(color = "lightgreen")) %>%
-#                                              tab_style(locations = cells_body(rows = (Value == "NA" | is.na(Value))),
-#                                                        style = cell_fill(color = "gray")) %>%
-#                                              tab_style(locations = cells_body(columns = c(Value, IsValueEligible, Transformed),
-#                                                                               rows = (Value != "NA" & IsValueEligible == FALSE & Transformed > 0 & Final == 0)),
-#                                                        style = cell_fill(color = "red")) %>%
-#                                              tab_style(locations = cells_body(columns = c(Value, IsValueEligible, Raw, Transformed),
-#                                                                               rows = (Value != "NA" & IsValueEligible == FALSE & Raw > 0 & Transformed == 0)),
-#                                                        style = cell_fill(color = "orange"))
-#                                       },
-#                                       error = function(error) { print(paste0("The table can not be printed. Error message: ", error)) }) })
 }
 }
 

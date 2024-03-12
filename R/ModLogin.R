@@ -16,9 +16,17 @@ ModLogin_UI <- function(id)
     ns <- NS(id)
 
     div(class = "ui segment",
-        style = "background: #f9fafb;
+        style = "position: relative;
+                 background: #f9fafb;
                  border-color: rgba(34, 36, 38, 0.15);
                  box-shadow: 0 2px 25px 0 rgba(34, 36, 38, 0.05) inset;",
+
+        div(id = ns("WaiterScreenContainer"),
+            style = "position: absolute;
+                     height: 100%;
+                     width: 100%;
+                     top: 0;
+                     left: 0;"),
 
         #-----------------------------------------------------------------------
         # Connect to CCP
@@ -60,7 +68,8 @@ ModLogin_UI <- function(id)
         br(),br(),
 
         div(style = "display: grid;
-                     grid-template-columns: auto 30em auto;",
+                     grid-template-columns: auto 30em auto;
+                     padding: 0 2em 2em 2em;",
 
             div(),
 
@@ -105,7 +114,11 @@ ModLogin_Server <- function(id)
     moduleServer(id,
                  function(input, output, session)
                  {
-                    #w <- waiter::Waiter$new(id = "ProcessingMonitor")
+                    # Setting up loading screen with waiter package
+                    ns <- session$ns
+                    WaiterScreen <- Waiter$new(id = ns("WaiterScreenContainer"),
+                                               html = spin_3(),
+                                               color = transparent(.5))
 
                     # --- Server logic real CCP connection ---
 
@@ -113,8 +126,8 @@ ModLogin_Server <- function(id)
                                                                         options = list(dom = "t",
                                                                                        editable = TRUE)))
 
-                    observe({
-                              #waiter::Waiter$new(id = "ProcessingMonitor")$show()
+                    observe({ WaiterScreen$show()
+                              on.exit({ WaiterScreen$hide() })
 
                               session$userData$ProjectName(input$ProjectName)
                               session$userData$CCPConnections(dsCCPhosClient::ConnectToCCP(CCPSiteCredentials = session$userData$CCPCredentials()))
@@ -124,7 +137,8 @@ ModLogin_Server <- function(id)
 
                     # --- Server logic virtual CCP connection ---
 
-                    observe({ #waiter::Waiter$new(id = "ProcessingMonitor")$show()
+                    observe({ WaiterScreen$show()
+                              on.exit({ WaiterScreen$hide() })
 
                               session$userData$ProjectName("Virtual")
                               session$userData$CCPConnections(dsCCPhosClient::ConnectToVirtualCCP(CCPTestData = session$userData$CCPTestData,
