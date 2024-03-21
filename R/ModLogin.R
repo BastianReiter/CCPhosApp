@@ -48,9 +48,9 @@ ModLogin_UI <- function(id)
                            button_label = "Open file",
                            accept = c(".csv")),
 
-                dataOutputUI(ns("SiteSpecifications_Output")),
+                dataOutputUI(ns("SiteSpecificationsSave")),
 
-                dataEditUI(ns("SiteSpecifications_Edit")),
+                dataEditUI(ns("SiteSpecificationsTable")),
 
                 br(),
 
@@ -130,18 +130,18 @@ ModLogin_Server <- function(id)
 
                     # Create a reactive expression containing a data frame read from an uploaded csv-file if provided
                     SiteSpecifications_InputData <- reactive({ FilePath <- input$FileInput$datapath
-                                                               if (is.null(FilePath)) { return(NULL) }
+                                                               if (is.null(FilePath)) { return(dsCCPhosClient::CCPSiteSpecifications) }
                                                                else { return(read.csv(file = FilePath)) } })
 
                     # Create a reactive value containing data in the specification's table (initially fed with optional input and then optionally edited)
-                    SiteSpecifications_EditData <- dataEditServer(id = "SiteSpecifications_Edit",
+                    SiteSpecifications_EditData <- dataEditServer(id = "SiteSpecificationsTable",
                                                                   data = SiteSpecifications_InputData,
                                                                   col_names = c("Site name", "Site server URL", "Project name", "Token"),
                                                                   col_stretch = TRUE,
                                                                   col_options = list(Token = "password"))
 
                     # Determine file-saving functionality
-                    dataOutputServer(id = "SiteSpecifications_Output",
+                    dataOutputServer(id = "SiteSpecificationsSave",
                                      data = SiteSpecifications_EditData,
                                      write_fun = "write.csv",
                                      write_args = list(row.names = FALSE))   # Don't write row names in csv-file
