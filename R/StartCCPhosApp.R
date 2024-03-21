@@ -9,10 +9,11 @@
 #' @export
 #'
 #' @author Bastian Reiter
-StartCCPhosApp <- function(CCPCredentials = NULL,
+StartCCPhosApp <- function(CCPSiteSpecifications = NULL,
                            CCPTestData)
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 {
+    require(DataEditR)
     require(dsCCPhosClient)
     require(DSI)
     require(DT)
@@ -37,6 +38,6 @@ StartCCPhosApp <- function(CCPCredentials = NULL,
 
     # Start CCPhos app
     shinyApp(ui = MainUIComponent(),
-             server = MainServerComponent(CCPCredentials,
+             server = MainServerComponent(CCPSiteSpecifications,
                                           CCPTestData))
 }

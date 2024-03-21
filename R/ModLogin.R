@@ -42,7 +42,15 @@ ModLogin_UI <- function(id)
                         "Project name"),
                     text_input(ns("ProjectName"))),
 
-                semantic_DTOutput(ns("TableCredentials")),
+                file_input(input_id = ns("FileInput"),
+                           width = "30%",
+                           label = "Test",
+                           button_label = "Open file",
+                           accept = c(".csv")),
+
+                dataOutputUI(ns("SiteSpecifications_Output")),
+
+                dataEditUI(ns("SiteSpecifications_Edit")),
 
                 br(),
 
@@ -109,8 +117,6 @@ ModLogin_UI <- function(id)
 #' @noRd
 ModLogin_Server <- function(id)
 {
-    require(shinyvalidate)
-
     moduleServer(id,
                  function(input, output, session)
                  {
@@ -122,15 +128,32 @@ ModLogin_Server <- function(id)
 
                     # --- Server logic real CCP connection ---
 
-                    output$TableCredentials <- DT::renderDT(semantic_DT(dsCCPhosClient::CCPSiteCredentials,
-                                                                        options = list(dom = "t",
-                                                                                       editable = TRUE)))
+                    # Create a reactive expression containing a data frame read from an uploaded csv-file if provided
+                    SiteSpecifications_InputData <- reactive({ FilePath <- input$FileInput$datapath
+                                                               if (is.null(FilePath)) { return(NULL) }
+                                                               else { return(read.csv(file = FilePath)) } })
+
+                    # Create a reactive value containing data in the specification's table (initially fed with optional input and then optionally edited)
+                    SiteSpecifications_EditData <- dataEditServer(id = "SiteSpecifications_Edit",
+                                                                  data = SiteSpecifications_InputData,
+                                                                  col_names = c("Site name", "Site server URL", "Project name", "Token"),
+                                                                  col_stretch = TRUE,
+                                                                  col_options = list(Token = "password"))
+
+                    # Determine file-saving functionality
+                    dataOutputServer(id = "SiteSpecifications_Output",
+                                     data = SiteSpecifications_EditData,
+                                     write_fun = "write.csv",
+                                     write_args = list(row.names = FALSE))   # Don't write row names in csv-file
+
 
                     observe({ WaiterScreen$show()
                               on.exit({ WaiterScreen$hide() })
 
-                              session$userData$ProjectName(input$ProjectName)
-                              session$userData$CCPConnections(dsCCPhosClient::ConnectToCCP(CCPSiteCredentials = session$userData$CCPCredentials()))
+                              # Assign Site Specifications (CCP credentials and project names) to session$userData according to input table
+                              session$userData$CCPSiteSpecifications(SiteSpecifications_EditData())
+                              # Trigger dsCCPhosClient::ConnectToCCP() and assign return to session$userData
+                              session$userData$CCPConnections(dsCCPhosClient::ConnectToCCP(CCPSiteSpecifications = session$userData$CCPSiteSpecifications()))
                            }) %>%
                         bindEvent(input$ButtonLogin)
 
@@ -140,7 +163,7 @@ ModLogin_Server <- function(id)
                     observe({ WaiterScreen$show()
                               on.exit({ WaiterScreen$hide() })
 
-                              session$userData$ProjectName("Virtual")
+                              session$userData$CCPSiteSpecifications(NULL)
                               session$userData$CCPConnections(dsCCPhosClient::ConnectToVirtualCCP(CCPTestData = session$userData$CCPTestData,
                                                                                                   NumberOfSites = as.integer(input$NumberOfSites),
                                                                                                   NumberOfPatientsPerSite = as.integer(input$NumberOfPatientsPerSite)))
@@ -148,27 +171,5 @@ ModLogin_Server <- function(id)
                         bindEvent(input$ButtonLoginVirtual)
                  })
 }
-
-
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Module testing
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-LoginApp <- function()
-{
-  ui <- fluidPage(
-    ModProcessingTerminal_UI("Connect")
-  )
-
-  server <- function(input, output, session)
-  {
-      ModProcessingTerminal_Server("Connect")
-  }
-
-  shinyApp(ui, server)
-}
-
-# Run app
-#LoginApp()
 
 

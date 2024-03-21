@@ -80,7 +80,12 @@ ModProcessingTerminal_Server <- function(id)
                                             WaiterScreen$hide() })
 
                                   # Trigger function CheckServerRequirements() and assign return to reactive value ReturnMessages
-                                  ReturnMessages(dsCCPhosClient::CheckServerRequirements(DataSources = session$userData$CCPConnections()))
+                                  ReturnMessages(dsCCPhosClient::CheckServerRequirements(CCPSiteSpecifications = session$userData$CCPSiteSpecifications(),
+                                                                                         DataSources = session$userData$CCPConnections()))
+
+                                  # Trigger function GetServerOpalInfo() and assign return (data.frame) to reactive value ServerOpalInfo in session$userData
+                                  session$userData$ServerOpalInfo(dsCCPhosClient::GetServerOpalInfo(CCPSiteSpecifications = session$userData$CCPSiteSpecifications(),
+                                                                                                    DataSources = session$userData$CCPConnections()))
 
                                   # Set reactive value Complete TRUE
                                   Complete(TRUE)
@@ -99,10 +104,10 @@ ModProcessingTerminal_Server <- function(id)
                                             WaiterScreen$hide() })
 
                                   # Trigger function LoadRawDataSet() and assign return to reactive value ReturnMessages
-                                  ReturnMessages(dsCCPhosClient::LoadRawDataSet(DataSources = session$userData$CCPConnections(),
-                                                                                ProjectName = session$userData$ProjectName()))
+                                  ReturnMessages(dsCCPhosClient::LoadRawDataSet(CCPSiteSpecifications = session$userData$CCPSiteSpecifications(),
+                                                                                DataSources = session$userData$CCPConnections()))
 
-                                  # Trigger function GetServerWorkspaceInfo() and assign return to reactive value ServerWorkspaceInfo in session$userData
+                                  # Trigger function GetServerWorkspaceInfo() and assign return (data.frame) to reactive value ServerWorkspaceInfo in session$userData
                                   session$userData$ServerWorkspaceInfo(dsCCPhosClient::GetServerWorkspaceInfo(DataSources = session$userData$CCPConnections()))
 
                                   # Set reactive value Complete TRUE

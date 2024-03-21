@@ -68,10 +68,15 @@ UIPagePrepare <- function()
 
             div(class = "active title",
                 icon(class = "dropdown icon"),
-                "Server Workspace Monitor"),
+                "Server Monitor"),
 
             div(class = "active content",
-                style = "height: 24em;",
+                style = "display: grid;
+                         grid-template-columns: 1fr 1fr;
+                         grid-gap: 1em;
+                         height: 22em;",
+
+                ModServerOpalMonitor_UI("ServerOpalMonitor"),
 
                 ModServerWorkspaceMonitor_UI("Prepare-ServerWorkspaceMonitor"))),
 

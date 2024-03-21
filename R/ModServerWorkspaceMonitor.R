@@ -12,21 +12,16 @@ ModServerWorkspaceMonitor_UI <- function(id)
 {
     ns <- NS(id)
 
-    div(style = "display: grid;
-                 grid-template-columns: 1fr;
-                 grid-gap: 1em;
-                 height: 22em;",
+    div(id = ns("ServerWorkspaceMonitorContainer"),
+        class = "ui scrollable segment",
+        style = "height: 100%;
+                 overflow: auto;
+                 margin: 0;",
 
+        div(class = "ui top attached label",
+            "Server R Workspace"),
 
-        div(id = ns("ServerWorkspaceContainer"),
-            class = "ui scrollable segment",
-            style = "height: 100%;
-                     overflow: auto;",
-
-            div(class = "ui top attached label",
-                "Server Workspace"),
-
-            uiOutput(ns("ServerWorkspace"))))
+        uiOutput(ns("ServerWorkspaceMonitor")))
 
 
         # div(id = ns("ServerObjectDetailsContainer"),
@@ -57,11 +52,9 @@ ModServerWorkspaceMonitor_Server <- function(id)
     moduleServer(id,
                  function(input, output, session)
                  {
-                      output$ServerWorkspace <- renderUI({ DataFrameToHtmlTable(DataFrame = session$userData$ServerWorkspaceInfo(),
-                                                                                SemanticTableClass = "ui small very compact selectable celled table",
-                                                                                TurnLogicalIntoIcons = TRUE) })
-
-                      output$ServerObjectDetails <- renderUI({ "- Under construction -" })
+                      output$ServerWorkspaceMonitor <- renderUI({ DataFrameToHtmlTable(DataFrame = session$userData$ServerWorkspaceInfo(),
+                                                                                       SemanticTableClass = "ui small very compact selectable celled table",
+                                                                                       TurnLogicalIntoIcons = TRUE) })
                  })
 }
 

@@ -7,7 +7,7 @@
 #'
 #' @noRd
 #' @author Bastian Reiter
-MainServerComponent <- function(CCPCredentials,
+MainServerComponent <- function(CCPSiteSpecifications,
                                 CCPTestData)
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 {
@@ -27,8 +27,8 @@ waiter::waiter_hide()
 
 # Initialize global objects
 session$userData$CCPConnections <- reactiveVal(NULL)
-session$userData$CCPCredentials <- reactiveVal(NULL)
-session$userData$ProjectName <- reactiveVal("None")
+session$userData$CCPSiteSpecifications <- reactiveVal(NULL)
+session$userData$ServerOpalInfo <- reactiveVal(NULL)
 session$userData$ServerWorkspaceInfo <- reactiveVal(NULL)
 
 session$userData$CurationReports <- reactiveVal(NULL)
@@ -39,7 +39,7 @@ session$userData$CCPTestData <- NULL
 # --- Call module: Initialize ---
 # Assigns content to session$userData objects at app start
 ModInitialize(id = "Initialize",
-              CCPCredentials,
+              CCPSiteSpecifications,
               CCPTestData)
 
 
@@ -91,7 +91,7 @@ output$ProjectNameOutput <- renderUI({ "" })
                                         #   paste0("Project: ", session$userData$ProjectName())) })
 
 # For testing purposes: Arbitrary text monitor element
-output$TestMonitor <- renderText({ "" })
+output$TestMonitor <- renderText({ session$userData$CCPSiteSpecifications()[1,1] })
 
 
 
@@ -122,6 +122,9 @@ observe({ if (is.list(session$userData$CCPConnections())) { StatusConnected(TRUE
           else { StatusConnected(FALSE) } })
 
 
+# --- Call module: Server Opal Monitor ---
+ModServerOpalMonitor_Server("ServerOpalMonitor")
+
 # --- Call module: Server Workspace Monitor ---
 ModServerWorkspaceMonitor_Server("Prepare-ServerWorkspaceMonitor")
 
@@ -148,16 +151,27 @@ MakeStep <- function(IconClass = "",
 
 InitiateStepJS <- function(StepID)
 {
-    shinyjs::onevent("hover",
-                     id = StepID,
-                     expr = { shinyjs::toggleCssClass(selector = paste0("#", StepID, " > div"), class = "StepHover") })
+    # Disable mouse hover behavior
+    shinyjs::removeEvent(event = "hover",
+                         id = StepID)
 
-    shinyjs::onclick(id = StepID,
-                     expr = { if (StepID == "Step_CheckServerRequirements") { SelectedProcessingStep("CheckServerRequirements") }
-                              if (StepID == "Step_LoadData") { SelectedProcessingStep("LoadData") }
-                              if (StepID == "Step_CurateData") { SelectedProcessingStep("CurateData") }
-                              if (StepID == "Step_AugmentData") { SelectedProcessingStep("AugmentData") } })
+    # Disable click event
+    shinyjs::removeEvent(event = "click",
+                         id = StepID)
+
+
+    # shinyjs::onevent("hover",
+    #                  id = StepID,
+    #                  expr = { shinyjs::toggleCssClass(selector = paste0("#", StepID, " > div"), class = "StepHover") })
+    #
+    # shinyjs::onclick(id = StepID,
+    #                  expr = { if (StepID == "Step_CheckServerRequirements") { SelectedProcessingStep("CheckServerRequirements") }
+    #                           if (StepID == "Step_LoadData") { SelectedProcessingStep("LoadData") }
+    #                           if (StepID == "Step_CurateData") { SelectedProcessingStep("CurateData") }
+    #                           if (StepID == "Step_AugmentData") { SelectedProcessingStep("AugmentData") } })
 }
+
+
 
 
 
@@ -170,12 +184,32 @@ ToggleStepState <- function(StepID,
         shinyjs::removeCssClass(selector = paste0("#", StepID, " > div"), class = "StepAccessible")
         shinyjs::removeCssClass(selector = paste0("#", StepID, " > div"), class = "StepSelected")
         shinyjs::removeCssClass(selector = paste0("#", StepID, " > div"), class = "StepCompleted")
+
+        # Disable mouse hover behavior
+        shinyjs::removeEvent(event = "hover",
+                             id = StepID)
+
+        # Disable click event
+        shinyjs::removeEvent(event = "click",
+                             id = StepID)
     }
 
     if (StepState == "Accessible")
     {
         shinyjs::removeCssClass(selector = paste0("#", StepID, " > div"), class = "StepInaccessible")
         shinyjs::addCssClass(selector = paste0("#", StepID, " > div"), class = "StepAccessible")
+
+        # Enable mouse hover behavior
+        shinyjs::onevent("hover",
+                     id = StepID,
+                     expr = { shinyjs::toggleCssClass(selector = paste0("#", StepID, " > div"), class = "StepHover") })
+
+        # Enable click event
+        shinyjs::onclick(id = StepID,
+                         expr = { if (StepID == "Step_CheckServerRequirements") { SelectedProcessingStep("CheckServerRequirements") }
+                                  if (StepID == "Step_LoadData") { SelectedProcessingStep("LoadData") }
+                                  if (StepID == "Step_CurateData") { SelectedProcessingStep("CurateData") }
+                                  if (StepID == "Step_AugmentData") { SelectedProcessingStep("AugmentData") } })
     }
 
     if (StepState == "Selected")
@@ -222,14 +256,6 @@ ToggleTerminal <- function(TerminalID)
                          animType = "fade",
                          time = 0.2)
 }
-
-
-
-InitiateStepJS(StepID = "Step_Connect")
-InitiateStepJS(StepID = "Step_CheckServerRequirements")
-InitiateStepJS(StepID = "Step_LoadData")
-InitiateStepJS(StepID = "Step_CurateData")
-InitiateStepJS(StepID = "Step_AugmentData")
 
 
 
@@ -320,6 +346,12 @@ observe({ ToggleStepCompletion(StepID = "Step_AugmentData",
                                IconClass = "magic") }) %>% bindEvent(StatusDataAugmented())
 
 
+
+InitiateStepJS(StepID = "Step_Connect")
+InitiateStepJS(StepID = "Step_CheckServerRequirements")
+InitiateStepJS(StepID = "Step_LoadData")
+InitiateStepJS(StepID = "Step_CurateData")
+InitiateStepJS(StepID = "Step_AugmentData")
 
 #output$TabContentValidationReports <- renderUI({ "Test A" })
 
