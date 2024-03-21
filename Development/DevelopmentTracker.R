@@ -36,10 +36,10 @@ library(devtools)
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Adding package dependencies using usethis::use_package()
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# use_dev_package("dsCCPhosClient", remote = "github::BastianReiter/dsCCPhosClient")
+# use_package("DataEditR")
+# use_dev_package("dsCCPhosClient", remote = "BastianReiter/dsCCPhosClient")
 # use_package("DT")
 # use_package("gt")
-# use_package("rhandsontable")
 # use_package("shiny")
 # use_package("shinyjs")
 # use_package("shiny.router")
