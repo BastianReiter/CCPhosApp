@@ -11,17 +11,18 @@
 #' @param input
 #' @param output
 #' @param session
-#' @param CCPCredentials
+#' @param CCPSiteSpecifications
 #' @param CCPTestData
 #' @noRd
 ModInitialize <- function(id,
-                          CCPCredentials,
+                          CCPSiteSpecifications,
                           CCPTestData)
 {
     moduleServer(id,
                  function(input, output, session)
                  {
-                      if (!is.null(CCPCredentials)) { session$userData$CCPCredentials(CCPCredentials) }
+                      if (!is.null(CCPSiteSpecifications)) { session$userData$CCPSiteSpecifications(CCPSiteSpecifications) }
+                      else { session$userData$CCPSiteSpecifications(as.data.frame(dsCCPhosClient::CCPSiteSpecifications)) }
 
                       if (!is.null(CCPTestData)) { session$userData$CCPTestData <- CCPTestData }
                  })

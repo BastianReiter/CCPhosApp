@@ -9,7 +9,12 @@ library(CCPhosApp)
 
 TestData_Frankfurt <- readRDS("../dsCCPhos/Development/Data/RealData/CCPRealData_Frankfurt.rds")
 
+SiteSpecifications <- dsCCPhosClient::CCPSiteSpecifications
+
 StartCCPhosApp(CCPTestData = TestData_Frankfurt)
+
+
+
 
 
 
@@ -32,27 +37,30 @@ WorkspaceInfo <- GetServerWorkspaceInfo(DataSources = CCPConnections)
 
 
 
-if (interactive()){
-  library(shiny)
-  library(shiny.semantic)
+library(shiny)
+library(datamods)
+library(bslib)
+library(reactable)
 
-  ui <- semanticPage(
-    tabset(tabs =
-             list(
-               list(menu = "First Tab", content = "Tab 1"),
-               list(menu = "Second Tab", content = "Tab 2", id = "second_tab")
-             ),
-           active = "second_tab",
-           id = "exampletabset"
-    ),
-    h2("Active Tab:"),
-    textOutput("activetab")
+ui <- shiny.semantic::semanticPage(
+  tags$h2(i18n("Edit data"), align = "center"),
+  edit_data_ui(id = "id"),
+  verbatimTextOutput("result")
+)
+
+
+server <- function(input, output, session) {
+
+  edited_r <- edit_data_server(
+    id = "id",
+    data_r = reactive(demo_edit)
   )
-  server <- function(input, output) {
-      output$activetab <- renderText(input$exampletabset)
-  }
-  shinyApp(ui, server)
+
+  output$result <- renderPrint({
+    str(edited_r())
+  })
+
 }
 
-
-
+if (interactive())
+  shinyApp(ui, server)

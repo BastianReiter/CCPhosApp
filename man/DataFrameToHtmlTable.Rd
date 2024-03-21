@@ -7,7 +7,8 @@
 DataFrameToHtmlTable(
   DataFrame,
   SemanticTableClass = "ui celled table",
-  RotatedHeaderNames = character()
+  RotatedHeaderNames = character(),
+  TurnLogicalIntoIcons = FALSE
 )
 }
 \arguments{

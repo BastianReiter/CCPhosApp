@@ -32,7 +32,7 @@ ModProcessingTerminal_UI <- function(id,
                     style = "position: absolute;
                              height: 100%;
                              width: 100%;
-                             top: 0;
+                             top: 0.5em;
                              left: 0;"),
 
                 ModMessageMonitor_UI(ns("Monitor"))))
@@ -80,13 +80,18 @@ ModProcessingTerminal_Server <- function(id)
                                             WaiterScreen$hide() })
 
                                   # Trigger function CheckServerRequirements() and assign return to reactive value ReturnMessages
-                                  ReturnMessages(dsCCPhosClient::CheckServerRequirements(DataSources = session$userData$CCPConnections()))
+                                  ReturnMessages(dsCCPhosClient::CheckServerRequirements(CCPSiteSpecifications = session$userData$CCPSiteSpecifications(),
+                                                                                         DataSources = session$userData$CCPConnections()))
+
+                                  # Trigger function GetServerOpalInfo() and assign return (data.frame) to reactive value ServerOpalInfo in session$userData
+                                  session$userData$ServerOpalInfo(dsCCPhosClient::GetServerOpalInfo(CCPSiteSpecifications = session$userData$CCPSiteSpecifications(),
+                                                                                                    DataSources = session$userData$CCPConnections()))
 
                                   # Set reactive value Complete TRUE
-                                  Complete(TRUE) }) %>%
+                                  Complete(TRUE)
+
+                                  }) %>%
                             bindEvent(input$ProcessingTrigger)
-
-
                     }
 
 
@@ -99,15 +104,14 @@ ModProcessingTerminal_Server <- function(id)
                                             WaiterScreen$hide() })
 
                                   # Trigger function LoadRawDataSet() and assign return to reactive value ReturnMessages
-                                  ReturnMessages(dsCCPhosClient::LoadRawDataSet(DataSources = session$userData$CCPConnections(),
-                                                                                ProjectName = session$userData$ProjectName()))
+                                  ReturnMessages(dsCCPhosClient::LoadRawDataSet(CCPSiteSpecifications = session$userData$CCPSiteSpecifications(),
+                                                                                DataSources = session$userData$CCPConnections()))
 
-                                  # Trigger function GetServerWorkspaceInfo() and assign return to reactive value ServerWorkspaceInfo in session$userData
+                                  # Trigger function GetServerWorkspaceInfo() and assign return (data.frame) to reactive value ServerWorkspaceInfo in session$userData
                                   session$userData$ServerWorkspaceInfo(dsCCPhosClient::GetServerWorkspaceInfo(DataSources = session$userData$CCPConnections()))
 
                                   # Set reactive value Complete TRUE
                                   Complete(TRUE)
-
 
                                   }) %>%
                             bindEvent(input$ProcessingTrigger)
@@ -131,11 +135,16 @@ ModProcessingTerminal_Server <- function(id)
                                                    dsCCPhosClient::ds.UnpackCuratedDataSet(CuratedDataSetName = "CuratedDataSet",
                                                                                            DataSources = session$userData$CCPConnections())))
 
+                                  # Trigger function ds.GetCurationReport() and assign return to reactive value CurationReports in session$userData
+                                  session$userData$CurationReports(dsCCPhosClient::ds.GetCurationReport(DataSources = session$userData$CCPConnections()))
+
                                   # Trigger function GetServerWorkspaceInfo() and assign return to reactive value ServerWorkspaceInfo in session$userData
                                   session$userData$ServerWorkspaceInfo(dsCCPhosClient::GetServerWorkspaceInfo(DataSources = session$userData$CCPConnections()))
 
                                   # Set reactive value Complete TRUE
-                                  Complete(TRUE) }) %>%
+                                  Complete(TRUE)
+
+                                  }) %>%
                             bindEvent(input$ProcessingTrigger)
                     }
 
@@ -161,7 +170,9 @@ ModProcessingTerminal_Server <- function(id)
                                   session$userData$ServerWorkspaceInfo(dsCCPhosClient::GetServerWorkspaceInfo(DataSources = session$userData$CCPConnections()))
 
                                   # Set reactive value Complete TRUE
-                                  Complete(TRUE) }) %>%
+                                  Complete(TRUE)
+
+                                  }) %>%
                             bindEvent(input$ProcessingTrigger)
                     }
 

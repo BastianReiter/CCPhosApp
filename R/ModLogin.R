@@ -16,9 +16,17 @@ ModLogin_UI <- function(id)
     ns <- NS(id)
 
     div(class = "ui segment",
-        style = "background: #f9fafb;
+        style = "position: relative;
+                 background: #f9fafb;
                  border-color: rgba(34, 36, 38, 0.15);
                  box-shadow: 0 2px 25px 0 rgba(34, 36, 38, 0.05) inset;",
+
+        div(id = ns("WaiterScreenContainer"),
+            style = "position: absolute;
+                     height: 100%;
+                     width: 100%;
+                     top: 0;
+                     left: 0;"),
 
         #-----------------------------------------------------------------------
         # Connect to CCP
@@ -34,7 +42,15 @@ ModLogin_UI <- function(id)
                         "Project name"),
                     text_input(ns("ProjectName"))),
 
-                semantic_DTOutput(ns("TableCredentials")),
+                file_input(input_id = ns("FileInput"),
+                           width = "30%",
+                           label = "Test",
+                           button_label = "Open file",
+                           accept = c(".csv")),
+
+                dataOutputUI(ns("SiteSpecifications_Output")),
+
+                dataEditUI(ns("SiteSpecifications_Edit")),
 
                 br(),
 
@@ -60,7 +76,8 @@ ModLogin_UI <- function(id)
         br(),br(),
 
         div(style = "display: grid;
-                     grid-template-columns: auto 30em auto;",
+                     grid-template-columns: auto 30em auto;
+                     padding: 0 2em 2em 2em;",
 
             div(),
 
@@ -100,33 +117,53 @@ ModLogin_UI <- function(id)
 #' @noRd
 ModLogin_Server <- function(id)
 {
-    require(shinyvalidate)
-
     moduleServer(id,
                  function(input, output, session)
                  {
-                    #w <- waiter::Waiter$new(id = "ProcessingMonitor")
+                    # Setting up loading screen with waiter package
+                    ns <- session$ns
+                    WaiterScreen <- Waiter$new(id = ns("WaiterScreenContainer"),
+                                               html = spin_3(),
+                                               color = transparent(.5))
 
                     # --- Server logic real CCP connection ---
 
-                    output$TableCredentials <- DT::renderDT(semantic_DT(dsCCPhosClient::CCPSiteCredentials,
-                                                                        options = list(dom = "t",
-                                                                                       editable = TRUE)))
+                    # Create a reactive expression containing a data frame read from an uploaded csv-file if provided
+                    SiteSpecifications_InputData <- reactive({ FilePath <- input$FileInput$datapath
+                                                               if (is.null(FilePath)) { return(NULL) }
+                                                               else { return(read.csv(file = FilePath)) } })
 
-                    observe({
-                              #waiter::Waiter$new(id = "ProcessingMonitor")$show()
+                    # Create a reactive value containing data in the specification's table (initially fed with optional input and then optionally edited)
+                    SiteSpecifications_EditData <- dataEditServer(id = "SiteSpecifications_Edit",
+                                                                  data = SiteSpecifications_InputData,
+                                                                  col_names = c("Site name", "Site server URL", "Project name", "Token"),
+                                                                  col_stretch = TRUE,
+                                                                  col_options = list(Token = "password"))
 
-                              session$userData$ProjectName(input$ProjectName)
-                              session$userData$CCPConnections(dsCCPhosClient::ConnectToCCP(CCPSiteCredentials = session$userData$CCPCredentials()))
+                    # Determine file-saving functionality
+                    dataOutputServer(id = "SiteSpecifications_Output",
+                                     data = SiteSpecifications_EditData,
+                                     write_fun = "write.csv",
+                                     write_args = list(row.names = FALSE))   # Don't write row names in csv-file
+
+
+                    observe({ WaiterScreen$show()
+                              on.exit({ WaiterScreen$hide() })
+
+                              # Assign Site Specifications (CCP credentials and project names) to session$userData according to input table
+                              session$userData$CCPSiteSpecifications(SiteSpecifications_EditData())
+                              # Trigger dsCCPhosClient::ConnectToCCP() and assign return to session$userData
+                              session$userData$CCPConnections(dsCCPhosClient::ConnectToCCP(CCPSiteSpecifications = session$userData$CCPSiteSpecifications()))
                            }) %>%
                         bindEvent(input$ButtonLogin)
 
 
                     # --- Server logic virtual CCP connection ---
 
-                    observe({ #waiter::Waiter$new(id = "ProcessingMonitor")$show()
+                    observe({ WaiterScreen$show()
+                              on.exit({ WaiterScreen$hide() })
 
-                              session$userData$ProjectName("Virtual")
+                              session$userData$CCPSiteSpecifications(NULL)
                               session$userData$CCPConnections(dsCCPhosClient::ConnectToVirtualCCP(CCPTestData = session$userData$CCPTestData,
                                                                                                   NumberOfSites = as.integer(input$NumberOfSites),
                                                                                                   NumberOfPatientsPerSite = as.integer(input$NumberOfPatientsPerSite)))
@@ -134,27 +171,5 @@ ModLogin_Server <- function(id)
                         bindEvent(input$ButtonLoginVirtual)
                  })
 }
-
-
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Module testing
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-LoginApp <- function()
-{
-  ui <- fluidPage(
-    ModProcessingTerminal_UI("Connect")
-  )
-
-  server <- function(input, output, session)
-  {
-      ModProcessingTerminal_Server("Connect")
-  }
-
-  shinyApp(ui, server)
-}
-
-# Run app
-#LoginApp()
 
 

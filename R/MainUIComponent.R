@@ -31,9 +31,10 @@ shiny.semantic::semanticPage(
     # Initiate use of shinyjs functionality
     shinyjs::useShinyjs(),
 
-    # Initiate use of waiter package
+    # Initiate use of waiter functionality
     waiter::useWaiter(),
-    waiter::waiterShowOnLoad(html = spin_fading_circles()),
+    waiter::waiterShowOnLoad(html = spin_3(),
+                             color = transparent(.5)),
 
     #waiter::autoWaiter(),
 
@@ -52,7 +53,7 @@ shiny.semantic::semanticPage(
 
                                              rows_height = c("minmax(100px, 10vh)", "86vh"),
 
-                                             cols_width = c("1fr", "6fr", "1fr")),
+                                             cols_width = c("0.5fr", "6fr", "1fr")),
 
                               # --- Main grid layout for mobile devices ---
                               mobile = list(areas = rbind(c("header", "header", "header"),
@@ -60,7 +61,7 @@ shiny.semantic::semanticPage(
 
                                             rows_height = c("100px", "auto"),
 
-                                            cols_width = c("1fr", "6fr", "1fr"))),
+                                            cols_width = c("1fr", "8fr", "1fr"))),
 
         #container_style = "height: 100vh",
 
@@ -91,37 +92,40 @@ shiny.semantic::semanticPage(
 
 
         #--- LEFT SIDE COLUMN --------------------------------------------------
-        leftside = div(
+        leftside = div(style = "text-align: center;",
+                       div(class = "ui vertical labeled icon menu",
 
-            div(class = "ui fluid vertical menu",
+                           a(id = "MenuItem_Start",
+                             class = "item",
+                             icon("plug"),
+                             "START",
+                             href = route_link("/")),
 
-                a(class = "item",
-                  icon("wrench"),
-                  "START",
-                  href = route_link("/")),
+                           a(id = "MenuItem_Prepare",
+                             class = "item",
+                             icon("utensils"),      # Alternatives: mug hot, box open,
+                             "PREPARE",
+                             href = route_link("prepare")),
 
-                a(class = "item",
-                  icon("wrench"),
-                  "PREPARE",
-                  href = route_link("prepare")),
+                           a(id = "MenuItem_Explore",
+                             class = "item",
+                             icon("tv"),      # Alternatives: binoculars
+                             "EXPLORE",
+                             href = route_link("explore")),
 
-                a(class = "item",
-                   icon("wrench"),
-                   "EXPLORE",
-                   href = route_link("explore")),
+                           a(id = "MenuItem_Analyze",
+                             class = "item",
+                             icon("calculator"),
+                             "ANALYZE",
+                             href = route_link("analyze")),
 
-                a(class = "item",
-                   icon("wrench"),
-                   "ANALYZE",
-                   href = route_link("analyze")),
+                           a(id = "MenuItem_Export",
+                             class = "item",
+                             icon("image"),
+                             "EXPORT",
+                             href = route_link("export"))),
 
-                a(class = "item",
-                   icon("wrench"),
-                   "EXPORT",
-                   href = route_link("export"))),
-
-                textOutput(outputId = "TestMonitor")
-            ),
+                       textOutput(outputId = "TestMonitor")),
 
 
         #--- MAIN PANEL --------------------------------------------------------
@@ -129,32 +133,12 @@ shiny.semantic::semanticPage(
                        style = "height: 100%;
                                 overflow: auto;",
 
-
-
                        # Use shiny.router functionality to enable multi-page UI structure defined in UIPage() functions
                        shiny.router::router_ui(route("/", UIPageStart()),
                                                route("prepare", UIPagePrepare()),
                                                route("explore", UIPageExplore()),
                                                route("analyze", UIPageAnalyze()),
                                                route("export", UIPageExport()))
-
-
-
-
-
-            # textOutput(outputId = "return_Run_ds.CurateData"),
-            #
-            # selectInput(inputId = "SiteName",
-            #             label = "Select Site",
-            #             choices = names(CurationReport)),
-            #
-            # selectInput(inputId = "MonitorTableName",
-            #             label = "Select Table",
-            #             choices = names(CurationReport[[1]])))
-
-            # gt_output(outputId = "TestTable")
-            # tableOutput(outputId = "TestTable")
-            # )
         ),
 
 
