@@ -8,11 +8,15 @@ DataFrameToHtmlTable(
   DataFrame,
   SemanticTableClass = "ui celled table",
   RotatedHeaderNames = character(),
-  TurnLogicalIntoIcons = FALSE
+  TurnLogicalIntoIcons = FALSE,
+  CategoryColumn = NULL,
+  RowColorColumn = NULL
 )
 }
 \arguments{
-\item{RotatedHeaderNames}{}
+\item{CategoryColumn}{\code{string}}
+
+\item{RowColorColumn}{\code{string}}
 }
 \description{
 DataFrameToHtmlTable

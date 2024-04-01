@@ -19,44 +19,44 @@ UIPagePrepare <- function()
             div(class = "active content",
 
                 div(class = "ui segment",
-                        style = "background: #f9fafb;
-                                 border-color: rgba(34, 36, 38, 0.15);
-                                 box-shadow: 0 2px 25px 0 rgba(34, 36, 38, 0.05) inset;
-                                 height: 30em;",
+                    style = "background: #f9fafb;
+                             border-color: rgba(34, 36, 38, 0.15);
+                             box-shadow: 0 2px 25px 0 rgba(34, 36, 38, 0.05) inset;
+                             height: 30em;",
+
+                    div(style = "display: grid;
+                                 height: 100%;
+                                 grid-template-columns: 20em auto;
+                                 background: none;",
 
                         div(style = "display: grid;
-                                     height: 100%;
-                                     grid-template-columns: 20em auto;
-                                     background: none;",
+                                     align-content: center;",
 
-                            div(style = "display: grid;
-                                         align-content: center;",
+                            uiOutput("Step_Connect"),
+                            uiOutput("Step_CheckServerRequirements"),
+                            uiOutput("Step_LoadData"),
+                            uiOutput("Step_CurateData"),
+                            uiOutput("Step_AugmentData")),
 
-                                uiOutput("Step_Connect"),
-                                uiOutput("Step_CheckServerRequirements"),
-                                uiOutput("Step_LoadData"),
-                                uiOutput("Step_CurateData"),
-                                uiOutput("Step_AugmentData")),
+                        div(id = "TerminalContainer",
+                            style = "height: 100%;
+                                     padding: 0 1em 0 2em;",
 
-                            div(id = "TerminalContainer",
-                                style = "height: 100%;
-                                         padding: 0 1em 0 2em;",
+                            shinyjs::hidden(div(id = "Terminal_CheckServerRequirements",
+                                                ModProcessingTerminal_UI("CheckServerRequirements",
+                                                                         ButtonLabel = "Check server requirements"))),
 
-                                shinyjs::hidden(div(id = "Terminal_CheckServerRequirements",
-                                                    ModProcessingTerminal_UI("CheckServerRequirements",
-                                                                             ButtonLabel = "Check server requirements"))),
+                            shinyjs::hidden(div(id = "Terminal_LoadData",
+                                                ModProcessingTerminal_UI("LoadData",
+                                                                         ButtonLabel = "Load data"))),
 
-                                shinyjs::hidden(div(id = "Terminal_LoadData",
-                                                    ModProcessingTerminal_UI("LoadData",
-                                                                             ButtonLabel = "Load data"))),
+                            shinyjs::hidden(div(id = "Terminal_CurateData",
+                                                ModProcessingTerminal_UI("CurateData",
+                                                                         ButtonLabel = "Start data curation"))),
 
-                                shinyjs::hidden(div(id = "Terminal_CurateData",
-                                                    ModProcessingTerminal_UI("CurateData",
-                                                                             ButtonLabel = "Start data curation"))),
-
-                                shinyjs::hidden(div(id = "Terminal_AugmentData",
-                                                    ModProcessingTerminal_UI("AugmentData",
-                                                                             ButtonLabel = "Start data augmentation")))))))),
+                            shinyjs::hidden(div(id = "Terminal_AugmentData",
+                                                ModProcessingTerminal_UI("AugmentData",
+                                                                         ButtonLabel = "Start data augmentation")))))))),
 
 
         #-----------------------------------------------------------------------
@@ -71,14 +71,16 @@ UIPagePrepare <- function()
                 "Server Monitor"),
 
             div(class = "active content",
-                style = "display: grid;
-                         grid-template-columns: 1fr 1fr;
-                         grid-gap: 1em;
-                         height: 22em;",
 
-                ModServerOpalMonitor_UI("ServerOpalMonitor"),
+                div( # Child of 'active content' in accordion has to be a container div. Can not be the grid div directly, this leads to loss of grid structure when accordion functionality is performed.
+                    div(style = "display: grid;
+                                 grid-template-columns: 1fr 1fr;
+                                 grid-gap: 1em;
+                                 height: 22em;",
 
-                ModServerWorkspaceMonitor_UI("Prepare-ServerWorkspaceMonitor"))),
+                        ModServerOpalMonitor_UI("ServerOpalMonitor"),
+
+                        ModServerWorkspaceMonitor_UI("Prepare-ServerWorkspaceMonitor"))))),
 
 
         #-----------------------------------------------------------------------
@@ -93,9 +95,10 @@ UIPagePrepare <- function()
                 "Data Transformation Monitor"),
 
             div(class = "active content",
-                style = "height: 30em;",
 
-                ModDataTransformationMonitor_UI("DataTransformationMonitor"))),
+                div(style = "height: 30em;",
+
+                    ModDataTransformationMonitor_UI("DataTransformationMonitor")))),
 
 
 

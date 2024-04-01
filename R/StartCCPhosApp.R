@@ -10,7 +10,7 @@
 #'
 #' @author Bastian Reiter
 StartCCPhosApp <- function(CCPSiteSpecifications = NULL,
-                           CCPTestData)
+                           CCPTestData = NULL)
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 {
     require(DataEditR)

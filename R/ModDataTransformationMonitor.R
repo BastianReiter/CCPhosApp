@@ -16,13 +16,21 @@ ModDataTransformationMonitor_UI <- function(id)
                  grid-template-columns: 14em auto;
                  grid-gap: 2em;",
 
+
         div(selectInput(inputId = ns("SiteName"),
                         label = "Select Site",
                         choices = ""),
 
             selectInput(inputId = ns("MonitorTableName"),
                         label = "Select Table",
-                        choices = "")),
+                        choices = ""),
+
+            br(), br(),
+
+            toggle(input_id = ns("ShowNonOccurringValues"),
+                   label = "Show non-occurring eligible values",
+                   is_marked = FALSE)),
+
 
         div(style = "position: relative;",
 
@@ -33,12 +41,7 @@ ModDataTransformationMonitor_UI <- function(id)
                          top: 0.5em;
                          left: 0;"),
 
-            gt_output(outputId = ns("TestTable"))))
-
-            #uiOutput(ns("TransformationMonitorTable")))
-
-
-
+            uiOutput(outputId = ns("TransformationMonitorTable"))))
 }
 
 
@@ -54,6 +57,9 @@ ModDataTransformationMonitor_UI <- function(id)
 #' @noRd
 ModDataTransformationMonitor_Server <- function(id)
 {
+    require(dplyr)
+    require(stringr)
+
     moduleServer(id,
                  function(input, output, session)
                  {
@@ -63,11 +69,10 @@ ModDataTransformationMonitor_Server <- function(id)
                                                  html = spin_3(),
                                                  color = transparent(.5))
 
-                      #output$TransformationMonitorTable <- renderUI({})
 
                       observe({ updateSelectInput(session = getDefaultReactiveDomain(),
-                                                      inputId = "SiteName",
-                                                      choices = names(session$userData$CurationReports()))
+                                                  inputId = "SiteName",
+                                                  choices = names(session$userData$CurationReports()))
 
                                 updateSelectInput(session = getDefaultReactiveDomain(),
                                                   inputId = "MonitorTableName",
@@ -76,39 +81,70 @@ ModDataTransformationMonitor_Server <- function(id)
                           bindEvent(session$userData$CurationReports())
 
 
-                      #MonitorData <- reactive({ session$userData$CurationReports()[[input$SiteName]][[input$MonitorTableName]] })
+                      MonitorData <- reactive({ req(session$userData$CurationReports)
+                                                req(input$SiteName)
+                                                req(input$MonitorTableName)
 
-                      output$TestTable <- render_gt({ # Set up loading behaviour
-                                                      shinyjs::disable("SiteName")
-                                                      shinyjs::disable("MonitorTableName")
-                                                      WaiterScreen$show()
+                                                if (!is.null(session$userData$CurationReports()))
+                                                {
+                                                    session$userData$CurationReports()[[input$SiteName]]$Transformation[[input$MonitorTableName]] %>%
+                                                                mutate(CellClass_Value_Raw = case_when(IsOccurring == FALSE & IsEligible_Raw == TRUE ~ "CellClass_Info",
+                                                                                                       IsOccurring == TRUE & IsEligible_Raw == TRUE ~ "CellClass_Success",
+                                                                                                       !is.na(Value_Raw) & IsEligible_Raw == FALSE ~ "CellClass_Failure",
+                                                                                                       is.na(Value_Raw) ~ "CellClass_Grey",
+                                                                                                       TRUE ~ "None"),
+                                                                       CellClass_Value_Transformed = case_when(IsOccurring == TRUE & IsEligible_Transformed == TRUE ~ "CellClass_Success",
+                                                                                                               !is.na(Value_Transformed) & IsEligible_Transformed == FALSE ~ "CellClass_Failure",
+                                                                                                               is.na(Value_Transformed) ~ "CellClass_Grey",
+                                                                                                               TRUE ~ "None"),
+                                                                       CellClass_Value_Final = case_when(!is.na(Value_Final) ~ "CellClass_Success",
+                                                                                                         is.na(Value_Final) ~ "CellClass_Grey",
+                                                                                                         TRUE ~ "None"))
 
-                                                      on.exit({ shinyjs::enable("SiteName")
-                                                                shinyjs::enable("MonitorTableName")
-                                                                WaiterScreen$hide() })
+                                                        # Data <- Data %>%
+                                                        #             select(Feature,
+                                                                    #        Raw,
+                                                                    #        Transformed,
+                                                                    #        Final,
+                                                                    #        RowColor,
+                                                                    #        IsEligible_Raw)
 
-                                                      MonitorData <- session$userData$CurationReports()
+                                                } })
 
-                                                      tryCatch(
-                                                          if (!is.null(MonitorData))
-                                                          {
-                                                              MonitorData[[input$SiteName]]$Transformation[[input$MonitorTableName]] %>%
-                                                                   gt(groupname_col = "Feature") %>%
-                                                                   dsCCPhosClient::gtTheme_CCP(TableAlign = "left", ShowNAs = TRUE, TableWidth = "80%") %>%
-                                                                   tab_style(locations = cells_body(rows = (Value != "NA" & IsValueEligible == TRUE & Final > 0)),
-                                                                             style = cell_fill(color = "green")) %>%
-                                                                   tab_style(locations = cells_body(rows = (Value != "NA" & IsValueEligible == TRUE & Final == 0)),
-                                                                             style = cell_fill(color = "lightgreen")) %>%
-                                                                   tab_style(locations = cells_body(rows = (Value == "NA" | is.na(Value))),
-                                                                             style = cell_fill(color = "gray")) %>%
-                                                                   tab_style(locations = cells_body(columns = c(Value, IsValueEligible, Transformed),
-                                                                                                    rows = (Value != "NA" & IsValueEligible == FALSE & Transformed > 0 & Final == 0)),
-                                                                             style = cell_fill(color = "red")) %>%
-                                                                   tab_style(locations = cells_body(columns = c(Value, IsValueEligible, Raw, Transformed),
-                                                                                                    rows = (Value != "NA" & IsValueEligible == FALSE & Raw > 0 & Transformed == 0)),
-                                                                             style = cell_fill(color = "orange"))
-                                                            },
-                                                            error = function(error) { print(paste0("The table can not be printed. Error message: ", error)) }) })
+
+                      # Filter layer over MonitorData
+                      MonitorDataFilter <- reactive({   req(MonitorData)
+
+                                                        # Filter for occurring values only, if option checked in UI
+                                                        if (input$ShowNonOccurringValues == FALSE)
+                                                        {
+                                                            MonitorData() %>%
+                                                                filter(IsOccurring == TRUE)
+                                                        }
+                                                        else { MonitorData() }
+                                                    })
+
+
+                      output$TransformationMonitorTable <- renderUI({ req(MonitorDataFilter)
+
+                                                                      # Set up loading behaviour
+                                                                      shinyjs::disable("SiteName")
+                                                                      shinyjs::disable("MonitorTableName")
+                                                                      WaiterScreen$show()
+
+                                                                      on.exit({ shinyjs::enable("SiteName")
+                                                                                shinyjs::enable("MonitorTableName")
+                                                                                WaiterScreen$hide() })
+
+                                                                      if (!is.null(MonitorDataFilter()))
+                                                                      {
+                                                                          DataFrameToHtmlTable(DataFrame = MonitorDataFilter(),
+                                                                                               SemanticTableClass = "ui small compact celled structured table",
+                                                                                               CategoryColumn = "Feature",
+                                                                                               CellClassColumns = c("CellClass_Value_Raw",
+                                                                                                                    "CellClass_Value_Transformed",
+                                                                                                                    "CellClass_Value_Final"))
+                                                                      } })
                  })
 }
 
