@@ -40,9 +40,16 @@ ModServerOpalMonitor_Server <- function(id)
     moduleServer(id,
                  function(input, output, session)
                  {
-                      output$ServerOpalMonitor <- renderUI({ DataFrameToHtmlTable(DataFrame = session$userData$ServerOpalInfo(),
-                                                                                  SemanticTableClass = "ui small very compact selectable celled table",
-                                                                                  TurnLogicalIntoIcons = TRUE) })
+                      output$ServerOpalMonitor <- renderUI({  if(!is.null(session$userData$ServerOpalInfo()))
+                                                              {
+                                                                  DataServerOpalInfo <- session$userData$ServerOpalInfo() %>%
+                                                                                            select(-IsAvailableEverywhere,
+                                                                                                   -NotAvailableAt)
+
+                                                                  DataFrameToHtmlTable(DataFrame = DataServerOpalInfo,
+                                                                                       SemanticTableClass = "ui small very compact selectable celled table",
+                                                                                       TurnLogicalIntoIcon = TRUE)
+                                                              } })
                  })
 }
 

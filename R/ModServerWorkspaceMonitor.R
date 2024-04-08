@@ -54,7 +54,7 @@ ModServerWorkspaceMonitor_Server <- function(id)
                  {
                       output$ServerWorkspaceMonitor <- renderUI({ DataFrameToHtmlTable(DataFrame = session$userData$ServerWorkspaceInfo(),
                                                                                        SemanticTableClass = "ui small very compact selectable celled table",
-                                                                                       TurnLogicalIntoIcons = TRUE) })
+                                                                                       TurnLogicalIntoIcon = TRUE) })
                  })
 }
 

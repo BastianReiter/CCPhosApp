@@ -4,7 +4,7 @@
 \alias{StartCCPhosApp}
 \title{StartCCPhosApp}
 \usage{
-StartCCPhosApp(CCPSiteSpecifications = NULL, CCPTestData)
+StartCCPhosApp(CCPSiteSpecifications = NULL, CCPTestData = NULL)
 }
 \arguments{
 \item{CCPTestData}{List | Optional CCP test data}

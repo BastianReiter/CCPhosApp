@@ -34,6 +34,38 @@ div.ui.segment.StepCompleted {  background-color: white;
 
 
 
+tr.TableRowColor_LightBlue { background-color: rgba(5, 73, 150, 0.3);
+                             color: rgba(5, 73, 150, 1); }
+
+tr.TableRowColor_Green { background-color: rgba(20, 235, 31, 0.6);
+                         color: rgba(20, 135, 31, 1); }
+
+tr.TableRowColor_LightGreen { background-color: rgba(20, 235, 31, 0.3);
+                              color: rgba(20, 135, 31, 1); }
+
+tr.TableRowColor_Red { background-color: rgba(142, 30, 57, 0.4);
+                       color: rgba(142, 30, 57, 1); }
+
+tr.TableRowColor_Grey { background-color: rgba(0, 0, 0, 0.05);
+                        color: rgba(0, 0, 0, 0.4); }
+
+
+
+td.CellClass_Info { background-color: rgba(5, 73, 150, 0.3);
+                                      color: rgba(5, 73, 150, 1); }
+
+td.CellClass_Success { background-color: rgba(20, 235, 31, 0.3);
+                       color: rgba(20, 135, 31, 1); }
+
+td.CellClass_Failure { background-color: rgba(142, 30, 57, 0.4);
+                       color: rgba(142, 30, 57, 1); }
+
+td.CellClass_Grey { background-color: rgba(0, 0, 0, 0.05);
+                    color: rgba(0, 0, 0, 0.4); }
+
+
+
+
 
 th.rotate {
   /* Something you can count on */

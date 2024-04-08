@@ -6,13 +6,30 @@
 \usage{
 DataFrameToHtmlTable(
   DataFrame,
-  SemanticTableClass = "ui celled table",
+  CategoryColumn = NULL,
+  CellClassColumns = NULL,
+  ColumnClass = NULL,
+  ColumnLabels = NULL,
   RotatedHeaderNames = character(),
-  TurnLogicalIntoIcons = FALSE
+  RowColorColumn = NULL,
+  SemanticTableClass = "ui celled table",
+  TurnLogicalIntoIcon = FALSE
 )
 }
 \arguments{
-\item{RotatedHeaderNames}{}
+\item{CategoryColumn}{\code{string}}
+
+\item{CellClassColumns}{character vector}
+
+\item{ColumnClass}{Either a single string for all columns or a named character vector to determine table cell classes for specific columns}
+
+\item{ColumnLabels}{named character vector}
+
+\item{RowColorColumn}{\code{string}}
+
+\item{TurnLogicalIntoIcon}{}
+
+\item{ColumnHorizontalAlign}{Either a single string for all columns or a named character vector to determine horizontal content alignment for specific columns}
 }
 \description{
 DataFrameToHtmlTable
