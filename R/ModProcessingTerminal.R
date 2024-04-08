@@ -128,8 +128,8 @@ ModProcessingTerminal_Server <- function(id)
 
                                   # Trigger functions ds.CurateData() and ds.UnpackCuratedDataSet() and assign returns (concatenated lists) to reactive value ReturnMessages
                                   ReturnMessages(c(dsCCPhosClient::ds.CurateData(RawDataSetName = "RawDataSet",
-                                                                               OutputName = "CurationOutput",
-                                                                               DataSources = session$userData$CCPConnections()),
+                                                                                 OutputName = "CurationOutput",
+                                                                                 DataSources = session$userData$CCPConnections()),
 
                                                    # Make tables from Curated Data Set directly addressable by unpacking them into R server session
                                                    dsCCPhosClient::ds.UnpackCuratedDataSet(CuratedDataSetName = "CuratedDataSet",
@@ -159,8 +159,8 @@ ModProcessingTerminal_Server <- function(id)
 
                                   # Trigger functions ds.AugmentData() and ds.UnpackAugmentedDataSet() and assign returns (concatenated lists) to reactive value ReturnMessages
                                   ReturnMessages(c(dsCCPhosClient::ds.AugmentData(CuratedDataSetName = "CuratedDataSet",
-                                                                                OutputName = "AugmentationOutput",
-                                                                                DataSources = session$userData$CCPConnections()),
+                                                                                  OutputName = "AugmentationOutput",
+                                                                                  DataSources = session$userData$CCPConnections()),
 
                                                    # Make tables from Augmented Data Set directly addressable by unpacking them into R server session
                                                    dsCCPhosClient::ds.UnpackAugmentedDataSet(AugmentedDataSetName = "AugmentedDataSet",

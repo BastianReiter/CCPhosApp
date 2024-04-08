@@ -102,7 +102,7 @@ ModDataTransformationMonitor_Server <- function(id)
 
                                 updateSelectInput(session = getDefaultReactiveDomain(),
                                                   inputId = "MonitorTableName",
-                                                  choices = names(session$userData$CurationReports()[[1]]$Transformation))
+                                                  choices = names(session$userData$CurationReports()[[1]]$Transformation$Details))
                                  }) %>%
                           bindEvent(session$userData$CurationReports())
 
@@ -115,7 +115,7 @@ ModDataTransformationMonitor_Server <- function(id)
 
                                                 if (!is.null(session$userData$CurationReports()))
                                                 {
-                                                    session$userData$CurationReports()[[input$SiteName]]$Transformation[[input$MonitorTableName]] %>%
+                                                    session$userData$CurationReports()[[input$SiteName]]$Transformation$Details[[input$MonitorTableName]] %>%
                                                         { if (input$ShowNonOccurringValues == FALSE) { filter(., IsOccurring == TRUE) } else {.} } %>%       # Filter for occurring values only, if option checked in UI
                                                         mutate(CellClass_Value_Raw = case_when(IsOccurring == FALSE & IsEligible_Raw == TRUE ~ "CellClass_Info",
                                                                                                IsOccurring == TRUE & IsEligible_Raw == TRUE ~ "CellClass_Success",
