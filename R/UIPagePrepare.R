@@ -98,7 +98,7 @@ UIPagePrepare <- function()
 
                 div(style = "height: 30em;",
 
-                    ModDataTransformationMonitor_UI("DataTransformationMonitor")))),
+                    ModDataTransformationMonitor_UI("DataTransformationMonitor"))))
 
 
 
