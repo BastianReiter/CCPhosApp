@@ -4,8 +4,8 @@
 #' @param DataFrame
 #' @param CategoryColumn \code{string}
 #' @param CellClassColumns character vector
+#' @param ColContentHorizontalAlign Either a single string for all columns or a named character vector to determine horizontal content alignment for specific columns
 #' @param ColumnClass Either a single string for all columns or a named character vector to determine table cell classes for specific columns
-#' @param ColumnHorizontalAlign Either a single string for all columns or a named character vector to determine horizontal content alignment for specific columns
 #' @param ColumnLabels named character vector
 #' @param RotatedHeaderNames
 #' @param RowColorColumn \code{string}
@@ -18,8 +18,8 @@
 DataFrameToHtmlTable <- function(DataFrame,
                                  CategoryColumn = NULL,
                                  CellClassColumns = NULL,
+                                 ColContentHorizontalAlign = "left",
                                  ColumnClass = NULL,
-                                 ColumnHorizontalAlign = "left",
                                  ColumnLabels = NULL,
                                  RotatedHeaderNames = character(),
                                  RowColorColumn = NULL,
@@ -73,21 +73,21 @@ DataFrameToHtmlTable <- function(DataFrame,
                                             {
                                                 HeaderCellClass <- ""
 
-                                                # If 'ColumnHorizontalAlign' is a single string
-                                                if (length(ColumnHorizontalAlign) == 1 & is.null(names(ColumnHorizontalAlign)))
+                                                # If 'ColContentHorizontalAlign' is a single string
+                                                if (length(ColContentHorizontalAlign) == 1 & is.null(names(ColContentHorizontalAlign)))
                                                 {
                                                     HeaderCellClass <- paste(HeaderCellClass,
-                                                                             case_when(ColumnHorizontalAlign == "right" ~ "right aligned",
-                                                                                       ColumnHorizontalAlign == "center" ~ "center aligned",
+                                                                             case_when(ColContentHorizontalAlign == "right" ~ "right aligned",
+                                                                                       ColContentHorizontalAlign == "center" ~ "center aligned",
                                                                                        .default = ""))
                                                 }
 
-                                                # If 'ColumnHorizontalAlign' is a named vector with current column name in its names
-                                                if (!is.null(names(ColumnHorizontalAlign)) & colname %in% names(ColumnHorizontalAlign))
+                                                # If 'ColContentHorizontalAlign' is a named vector with current column name in its names
+                                                if (!is.null(names(ColContentHorizontalAlign)) & colname %in% names(ColContentHorizontalAlign))
                                                 {
                                                     HeaderCellClass <- paste(HeaderCellClass,
-                                                                             case_when(ColumnHorizontalAlign[colname] == "right" ~ "right aligned",
-                                                                                       ColumnHorizontalAlign[colname] == "center" ~ "center aligned",
+                                                                             case_when(ColContentHorizontalAlign[colname] == "right" ~ "right aligned",
+                                                                                       ColContentHorizontalAlign[colname] == "center" ~ "center aligned",
                                                                                        .default = ""))
                                                 }
 
@@ -166,21 +166,21 @@ DataFrameToHtmlTable <- function(DataFrame,
                     # Set column-wide CSS class determining horizontal alignment, if option is passed
                     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-                    # If 'ColumnHorizontalAlign' is a single string
-                    if (length(ColumnHorizontalAlign) == 1 & is.null(names(ColumnHorizontalAlign)))
+                    # If 'ColContentHorizontalAlign' is a single string
+                    if (length(ColContentHorizontalAlign) == 1 & is.null(names(ColContentHorizontalAlign)))
                     {
                         CellClass <- paste(CellClass,
-                                           case_when(ColumnHorizontalAlign == "right" ~ "right aligned",
-                                                     ColumnHorizontalAlign == "center" ~ "center aligned",
+                                           case_when(ColContentHorizontalAlign == "right" ~ "right aligned",
+                                                     ColContentHorizontalAlign == "center" ~ "center aligned",
                                                      .default = ""))
                     }
 
-                    # If 'ColumnHorizontalAlign' is a named vector with current column name in its names
-                    if (!is.null(names(ColumnHorizontalAlign)) & ColumnName %in% names(ColumnHorizontalAlign))
+                    # If 'ColContentHorizontalAlign' is a named vector with current column name in its names
+                    if (!is.null(names(ColContentHorizontalAlign)) & ColumnName %in% names(ColContentHorizontalAlign))
                     {
                         CellClass <- paste(CellClass,
-                                           case_when(ColumnHorizontalAlign[ColumnName] == "right" ~ "right aligned",
-                                                     ColumnHorizontalAlign[ColumnName] == "center" ~ "center aligned",
+                                           case_when(ColContentHorizontalAlign[ColumnName] == "right" ~ "right aligned",
+                                                     ColContentHorizontalAlign[ColumnName] == "center" ~ "center aligned",
                                                      .default = ""))
                     }
 

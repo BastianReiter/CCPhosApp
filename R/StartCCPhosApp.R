@@ -18,6 +18,7 @@ StartCCPhosApp <- function(CCPSiteSpecifications = NULL,
     require(DSI)
     require(DT)
     require(gt)
+    require(plotly)
     require(shiny)
     require(shinyjs)
     require(shiny.router)
