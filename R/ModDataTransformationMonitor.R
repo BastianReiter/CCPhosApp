@@ -46,7 +46,7 @@ ModDataTransformationMonitor_UI <- function(id)
                          grid-gap: 2em;
                          height: 100%;",
 
-                uiOutput(outputId = ns("EligibilityOverview")),
+                plotlyOutput(outputId = ns("EligibilityOverview")),
 
                 uiOutput(outputId = ns("TransformationTracks")))))
 }
@@ -139,7 +139,7 @@ ModDataTransformationMonitor_Server <- function(id)
                       # Render reactive output: TransformationMonitor_Overview
                       #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-                      output$EligibilityOverview <- renderUI({ req(Data_EligibilityOverview)
+                      output$EligibilityOverview <- renderPlotly({ req(Data_EligibilityOverview)
 
                                                                    # Assign loading behavior
                                                                    LoadingOn()
