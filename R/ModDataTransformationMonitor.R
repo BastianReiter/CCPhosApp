@@ -46,9 +46,9 @@ ModDataTransformationMonitor_UI <- function(id)
                          grid-gap: 2em;
                          height: 100%;",
 
-                plotlyOutput(outputId = ns("EligibilityOverview")),
+                uiOutput(outputId = ns("EligibilityOverview")),
 
-                uiOutput(outputId = ns("TransformationDetails")))))
+                uiOutput(outputId = ns("TransformationTracks")))))
 }
 
 
@@ -139,7 +139,7 @@ ModDataTransformationMonitor_Server <- function(id)
                       # Render reactive output: TransformationMonitor_Overview
                       #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-                      output$EligibilityOverview <- renderPlotly({ req(Data_EligibilityOverview)
+                      output$EligibilityOverview <- renderUI({ req(Data_EligibilityOverview)
 
                                                                    # Assign loading behavior
                                                                    LoadingOn()
@@ -156,28 +156,67 @@ ModDataTransformationMonitor_Server <- function(id)
                                                                                                     y = ~Eligible,
                                                                                                     type = "bar",
                                                                                                     name = "Eligible",
-                                                                                                    color = I(dsCCPhosClient::CCPhosColors$Green)) %>%
+                                                                                                    color = I(dsCCPhosClient::CCPhosColors$Green),
+                                                                                                    showlegend = FALSE) %>%
                                                                                                 add_trace(y = ~Ineligible,
                                                                                                           name = "Ineligible",
                                                                                                           color = I(dsCCPhosClient::CCPhosColors$Red)) %>%
                                                                                                 add_trace(y = ~Missing,
                                                                                                           name = "Missing",
                                                                                                           color = I(dsCCPhosClient::CCPhosColors$MediumGrey)) %>%
-                                                                                                layout(xaxis = list(categoryorder = "array",
+                                                                                                layout(xaxis = list(#side = "top",
+                                                                                                                    title = "",
+                                                                                                                    categoryorder = "array",
                                                                                                                     categoryarray = c("Raw", "Harmonized", "Recoded", "Final")),
-                                                                                                       yaxis = list(title = "Count"),
-                                                                                                       barmode = "stack")
+                                                                                                       yaxis = list(#title = feature,
+                                                                                                                    showticklabels = FALSE),
+                                                                                                       barmode = "stack") %>%
+                                                                                                plotly::config(displayModeBar = FALSE)
                                                                                         })
 
+
+
+
+                                                                   # for (i in 1:length(PlotList))
+                                                                   # {
+                                                                   #    plotlyOutput(outputId = paste0("Plot_", i,),
+                                                                   #                 height = "200px")
+                                                                   #
+                                                                   #
+                                                                   # }
+
+
+                                                                   SubtitleList <- Data_EligibilityOverview() %>%
+                                                                                        arrange(desc(Feature)) %>%
+                                                                                        pull(Feature) %>%
+                                                                                        imap(function(feature, index)
+                                                                                             {
+                                                                                                 FeaturePartition <- 1 / length(Data_EligibilityOverview()$Feature)
+
+                                                                                                 list(text = feature,
+                                                                                                      x = 0,
+                                                                                                      y = FeaturePartition * index,
+                                                                                                      xref = "paper",
+                                                                                                      yref = "paper",
+                                                                                                      xanchor = "center",
+                                                                                                      yanchor = "middle",
+                                                                                                      showarrow = FALSE)
+                                                                                            })
+
                                                                    subplot(PlotList,
-                                                                           nrows = length(Data_EligibilityOverview()$Feature))
+                                                                           nrows = length(Data_EligibilityOverview()$Feature),
+                                                                           #margin = 0.1,
+                                                                           shareX = TRUE,
+                                                                           which_layout = 1) %>%
+                                                                        layout(annotations = SubtitleList)
+
                                                                  })
 
 
 
-                      # Reactive expression: Data for detailed monitor table
+                      # Reactive expression: Data for transformation track table
                       #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                      Data_TransformationDetails <- reactive({ req(session$userData$CurationReports)
+                      Data_TransformationTracks <- reactive({ req(session$userData$CurationReports)
                                                         req(input$SiteName)
                                                         req(input$MonitorTableName)
 
@@ -205,22 +244,22 @@ ModDataTransformationMonitor_Server <- function(id)
                                                       })
 
 
-                      # Render reactive output: TransformationDetails
+                      # Render reactive output: TransformationTracks
                       #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                      output$TransformationDetails <- renderUI({  req(Data_TransformationDetails)
+                      output$TransformationTracks <- renderUI({  req(Data_TransformationTracks)
 
                                                                   # Assign loading behavior
                                                                   LoadingOn()
                                                                   on.exit(LoadingOff())
 
                                                                   # Modify data for rendering purposes
-                                                                  TableData <- Data_TransformationDetails() %>%
+                                                                  TableData <- Data_TransformationTracks() %>%
                                                                                     select(Feature,
-                                                                                           Count_Raw,
                                                                                            Value_Raw,
                                                                                            Value_Harmonized,
                                                                                            Value_Recoded,
                                                                                            Value_Final,
+                                                                                           Count_Raw,
                                                                                            starts_with("CellClass"))
 
                                                                   if (!is.null(TableData))
@@ -232,11 +271,11 @@ ModDataTransformationMonitor_Server <- function(id)
                                                                                                                 "CellClass_Value_Recoded",
                                                                                                                 "CellClass_Value_Final"),
                                                                                            ColContentHorizontalAlign = "center",
-                                                                                           ColumnLabels = c(Count_Raw = "Count",
-                                                                                                            Value_Raw = "Raw",
+                                                                                           ColumnLabels = c(Value_Raw = "Raw",
                                                                                                             Value_Harmonized = "Harmonized",
                                                                                                             Value_Recoded = "Recoded",
-                                                                                                            Value_Final = "Final"),
+                                                                                                            Value_Final = "Final",
+                                                                                                            Count_Raw = "Count"),
                                                                                            SemanticTableClass = "ui small compact celled structured table")
                                                                   } })
                  })

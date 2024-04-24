@@ -15,10 +15,12 @@ StartCCPhosApp <- function(CCPSiteSpecifications = NULL,
 {
     require(DataEditR)
     require(dsCCPhosClient)
+    require(dplyr)
     require(DSI)
     require(DT)
     require(gt)
     require(plotly)
+    require(purrr)
     require(shiny)
     require(shinyjs)
     require(shiny.router)
