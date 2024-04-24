@@ -19,20 +19,22 @@ ModServerWorkspaceMonitor_UI <- function(id)
                  margin: 0;",
 
         div(class = "ui top attached label",
-            "Server R Workspace"),
+            "Server R Session Workspace"),
 
-        uiOutput(ns("ServerWorkspaceMonitor")))
+        div(style = "display: grid;
+                     grid-template-columns: auto auto;
+                     grid-gap: 1em;
+                     margin: 0;",
 
+            div(style = "height: 100%;
+                         overflow: auto;",
 
-        # div(id = ns("ServerObjectDetailsContainer"),
-        #     class = "ui scrollable segment",
-        #     stlye = "height: 100%;
-        #              overflow: auto;",
-        #
-        #     div(class = "ui top attached label",
-        #         "Server Object Details"),
-        #
-        #     uiOutput(ns("ServerObjectDetails"))))
+                uiOutput(ns("WorkspaceObjects"))),
+
+            div(style = "height: 100%;
+                         overflow: auto;",
+
+                uiOutput(ns("ObjectDetails")))))
 
 }
 
@@ -52,32 +54,26 @@ ModServerWorkspaceMonitor_Server <- function(id)
     moduleServer(id,
                  function(input, output, session)
                  {
-                      output$ServerWorkspaceMonitor <- renderUI({ DataFrameToHtmlTable(DataFrame = session$userData$ServerWorkspaceInfo(),
-                                                                                       SemanticTableClass = "ui small very compact selectable celled table",
-                                                                                       TurnLogicalIntoIcon = TRUE) })
+                      output$WorkspaceObjects <- renderUI({ DataWorkspaceOverview <- session$userData$ServerWorkspaceInfo()$Overview
+
+                                                            ServerNames <- names(session$userData$CCPConnections())
+
+                                                            HorizontalAlignArgument <- setNames(object = rep("center", times = length(ServerNames)),
+                                                                                                 nm = ServerNames)
+
+                                                            DataFrameToHtmlTable(DataFrame = DataWorkspaceOverview,
+                                                                                 ColContentHorizontalAlign = HorizontalAlignArgument,
+                                                                                 SemanticTableClass = "ui small very compact selectable celled scrollable table",
+                                                                                 TurnLogicalIntoIcon = TRUE) })
+
+                      output$ObjectDetails <- renderUI({ DataObjectDetails <- session$userData$ServerWorkspaceInfo()$Details[[1]]$ContentOverview
+
+                                                         # HorizontalAlignAttribute <- setNames(object = rep("center", times = length(ServerNames)),
+                                                         #                                      nm = ServerNames)
+
+                                                         DataFrameToHtmlTable(DataFrame = DataObjectDetails,
+                                                                              SemanticTableClass = "ui small very compact celled inverted grey scrollable table",
+                                                                              TurnLogicalIntoIcon = TRUE) })
+
                  })
 }
-
-
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Module testing
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-# ModServerWorkspaceMonitorApp <- function()
-# {
-#   ui <- fluidPage(
-#     ModServerWorkspaceMonitor_UI("Test")
-#   )
-#
-#   server <- function(input, output, session)
-#   {
-#       ModServerWorkspaceMonitor_Server("Test")
-#   }
-#
-#   shinyApp(ui, server)
-# }
-
-# Run app
-#ModServerWorkspaceMonitorApp()
-
-

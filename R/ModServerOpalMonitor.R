@@ -19,7 +19,7 @@ ModServerOpalMonitor_UI <- function(id)
                  margin: 0;",
 
         div(class = "ui top attached label",
-            "Server Opal Monitor"),
+            "Opal Database"),
 
         uiOutput(ns("ServerOpalMonitor")))
 }
@@ -46,8 +46,14 @@ ModServerOpalMonitor_Server <- function(id)
                                                                                             select(-IsAvailableEverywhere,
                                                                                                    -NotAvailableAt)
 
+                                                                  ServerNames <- names(session$userData$CCPConnections())
+
+                                                                  HorizontalAlignArgument <- setNames(object = rep("center", times = length(ServerNames)),
+                                                                                                      nm = ServerNames)
+
                                                                   DataFrameToHtmlTable(DataFrame = DataServerOpalInfo,
-                                                                                       SemanticTableClass = "ui small very compact selectable celled table",
+                                                                                       ColContentHorizontalAlign = HorizontalAlignArgument,
+                                                                                       SemanticTableClass = "ui small very compact celled table",
                                                                                        TurnLogicalIntoIcon = TRUE)
                                                               } })
                  })

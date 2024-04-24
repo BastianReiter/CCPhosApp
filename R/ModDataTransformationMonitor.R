@@ -46,9 +46,9 @@ ModDataTransformationMonitor_UI <- function(id)
                          grid-gap: 2em;
                          height: 100%;",
 
-                uiOutput(outputId = ns("TransformationMonitor_Overview")),
+                plotlyOutput(outputId = ns("EligibilityOverview")),
 
-                uiOutput(outputId = ns("TransformationMonitor_Details")))))
+                uiOutput(outputId = ns("TransformationTracks")))))
 }
 
 
@@ -65,6 +65,8 @@ ModDataTransformationMonitor_UI <- function(id)
 ModDataTransformationMonitor_Server <- function(id)
 {
     require(dplyr)
+    require(plotly)
+    require(purrr)
     require(stringr)
 
     moduleServer(id,
@@ -102,142 +104,179 @@ ModDataTransformationMonitor_Server <- function(id)
 
                                 updateSelectInput(session = getDefaultReactiveDomain(),
                                                   inputId = "MonitorTableName",
-                                                  choices = names(session$userData$CurationReports()[[1]]$Transformation$Details))
+                                                  choices = names(session$userData$CurationReports()[[1]]$Transformation$Monitors))
                                  }) %>%
                           bindEvent(session$userData$CurationReports())
 
 
-                      # Set up monitor data as reactive expression
+
+                      # Reactive expression: Data for eligibility overview
                       #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                      MonitorData <- reactive({ req(session$userData$CurationReports)
-                                                req(input$SiteName)
-                                                req(input$MonitorTableName)
+                      Data_EligibilityOverview <- reactive({ req(session$userData$CurationReports)
+                                                             req(input$SiteName)
+                                                             req(input$MonitorTableName)
 
-                                                if (!is.null(session$userData$CurationReports()))
-                                                {
-                                                    session$userData$CurationReports()[[input$SiteName]]$Transformation$Details[[input$MonitorTableName]] %>%
-                                                        { if (input$ShowNonOccurringValues == FALSE) { filter(., IsOccurring == TRUE) } else {.} } %>%       # Filter for occurring values only, if option checked in UI
-                                                        mutate(CellClass_Value_Raw = case_when(IsOccurring == FALSE & IsEligible_Raw == TRUE ~ "CellClass_Info",
-                                                                                               IsOccurring == TRUE & IsEligible_Raw == TRUE ~ "CellClass_Success",
-                                                                                               !is.na(Value_Raw) & IsEligible_Raw == FALSE ~ "CellClass_Failure",
-                                                                                               is.na(Value_Raw) ~ "CellClass_Grey",
-                                                                                               TRUE ~ "None"),
-                                                               CellClass_Value_Harmonized = case_when(IsOccurring == TRUE & IsEligible_Harmonized == TRUE ~ "CellClass_Success",
-                                                                                                      !is.na(Value_Harmonized) & IsEligible_Harmonized == FALSE ~ "CellClass_Failure",
-                                                                                                      is.na(Value_Harmonized) ~ "CellClass_Grey",
-                                                                                                      TRUE ~ "None"),
-                                                               CellClass_Value_Recoded = case_when(IsOccurring == TRUE & IsEligible_Recoded == TRUE ~ "CellClass_Success",
-                                                                                                   !is.na(Value_Recoded) & IsEligible_Recoded == FALSE ~ "CellClass_Failure",
-                                                                                                   is.na(Value_Recoded) ~ "CellClass_Grey",
-                                                                                                   TRUE ~ "None"),
-                                                               CellClass_Value_Final = case_when(!is.na(Value_Final) ~ "CellClass_Success",
-                                                                                                 is.na(Value_Final) ~ "CellClass_Grey",
-                                                                                                 TRUE ~ "None"))
-                                                }
-                                              })
-
-
-                      # Set up monitor data as reactive expression
-                      #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                      MonitorDataOverview <- reactive({ req(MonitorData)
-
-
-                                                # ValueSet_Raw <- MonitorData() %>%
-                                                #                     select(Feature,
-                                                #                            ends_with("_Raw"))
-                                                #
-                                                # ValueSet_Harmonized <- MonitorData() %>%
-                                                #                             select(Feature,
-                                                #                                    ends_with("_Harmonized")) %>%
-                                                #                             distinct(pick(Feature, Value_Harmonized), .keep_all = TRUE)
-                                                #
-                                                # ValueSet_Recoded <- MonitorData() %>%
-                                                #                         select(Feature,
-                                                #                                ends_with("_Recoded")) %>%
-                                                #                         distinct(pick(Feature, Value_Recoded), .keep_all = TRUE)
-                                                #
-                                                # ValueSet_Final <- MonitorData() %>%
-                                                #                       select(Feature,
-                                                #                              ends_with("_Final")) %>%
-                                                #                       distinct(pick(Feature, Value_Final), .keep_all = TRUE)
-
-
-
-                                              })
-
-
+                                                             if (!is.null(session$userData$CurationReports()))
+                                                             {
+                                                                 # - Restructure eligibility overview table to meet requirements of plot function
+                                                                 # - Create separate data frames for each 'Feature' value
+                                                                 # - Columns in final object:
+                                                                 #   - 'Feature': contains names of features
+                                                                 #   - 'data': plot data for feature-specific plot
+                                                                 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                                                                 session$userData$CurationReports()[[input$SiteName]]$Transformation$EligibilityOverviews[[input$MonitorTableName]] %>%
+                                                                     select(-ends_with("_Proportional")) %>%
+                                                                     pivot_longer(cols = c(Raw, Harmonized, Recoded, Final),
+                                                                                  names_to = "Stage",
+                                                                                  values_to = "Count") %>%
+                                                                     pivot_wider(names_from = "Eligibility",
+                                                                                 values_from = "Count") %>%
+                                                                     nest(.by = Feature)      # 'Split' the whole table into smaller data frames for each 'Feature' value
+                                                             }
+                                                           })
 
 
                       # Render reactive output: TransformationMonitor_Overview
                       #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                      output$TransformationMonitor_Overview <- renderUI({ req(MonitorData)
 
-                                                                          # Assign loading behavior
-                                                                          LoadingOn()
-                                                                          on.exit(LoadingOff())
+                      output$EligibilityOverview <- renderPlotly({ req(Data_EligibilityOverview)
+
+                                                                   # Assign loading behavior
+                                                                   LoadingOn()
+                                                                   on.exit(LoadingOff())
+
+                                                                   # Create list of (empty) plotlyOutput objects with an assigned Output ID
+                                                                   PlotList <- Data_EligibilityOverview()$Feature %>%
+                                                                                    map(function(feature)
+                                                                                        {
+                                                                                            PlotData <- as.data.frame(filter(Data_EligibilityOverview(), Feature == feature)$data[[1]])
+
+                                                                                            plot_ly(data = PlotData,      # Must be a data.frame, not a tibble!
+                                                                                                    x = ~Stage,
+                                                                                                    y = ~Eligible,
+                                                                                                    type = "bar",
+                                                                                                    name = "Eligible",
+                                                                                                    color = I(dsCCPhosClient::CCPhosColors$Green),
+                                                                                                    showlegend = FALSE) %>%
+                                                                                                add_trace(y = ~Ineligible,
+                                                                                                          name = "Ineligible",
+                                                                                                          color = I(dsCCPhosClient::CCPhosColors$Red)) %>%
+                                                                                                add_trace(y = ~Missing,
+                                                                                                          name = "Missing",
+                                                                                                          color = I(dsCCPhosClient::CCPhosColors$MediumGrey)) %>%
+                                                                                                layout(xaxis = list(#side = "top",
+                                                                                                                    title = "",
+                                                                                                                    categoryorder = "array",
+                                                                                                                    categoryarray = c("Raw", "Harmonized", "Recoded", "Final")),
+                                                                                                       yaxis = list(#title = feature,
+                                                                                                                    showticklabels = FALSE),
+                                                                                                       barmode = "stack") %>%
+                                                                                                plotly::config(displayModeBar = FALSE)
+                                                                                        })
 
 
 
-                                                                        })
+
+                                                                   # for (i in 1:length(PlotList))
+                                                                   # {
+                                                                   #    plotlyOutput(outputId = paste0("Plot_", i,),
+                                                                   #                 height = "200px")
+                                                                   #
+                                                                   #
+                                                                   # }
 
 
-                      # Render reactive output: TransformationMonitor_Details
+                                                                   SubtitleList <- Data_EligibilityOverview() %>%
+                                                                                        arrange(desc(Feature)) %>%
+                                                                                        pull(Feature) %>%
+                                                                                        imap(function(feature, index)
+                                                                                             {
+                                                                                                 FeaturePartition <- 1 / length(Data_EligibilityOverview()$Feature)
+
+                                                                                                 list(text = feature,
+                                                                                                      x = 0,
+                                                                                                      y = FeaturePartition * index,
+                                                                                                      xref = "paper",
+                                                                                                      yref = "paper",
+                                                                                                      xanchor = "center",
+                                                                                                      yanchor = "middle",
+                                                                                                      showarrow = FALSE)
+                                                                                            })
+
+                                                                   subplot(PlotList,
+                                                                           nrows = length(Data_EligibilityOverview()$Feature),
+                                                                           #margin = 0.1,
+                                                                           shareX = TRUE,
+                                                                           which_layout = 1) %>%
+                                                                        layout(annotations = SubtitleList)
+
+                                                                 })
+
+
+
+                      # Reactive expression: Data for transformation track table
                       #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                      output$TransformationMonitor_Details <- renderUI({  req(MonitorData)
+                      Data_TransformationTracks <- reactive({ req(session$userData$CurationReports)
+                                                        req(input$SiteName)
+                                                        req(input$MonitorTableName)
 
-                                                                          # Assign loading behavior
-                                                                          LoadingOn()
-                                                                          on.exit(LoadingOff())
+                                                        if (!is.null(session$userData$CurationReports()))
+                                                        {
+                                                            session$userData$CurationReports()[[input$SiteName]]$Transformation$Monitors[[input$MonitorTableName]] %>%
+                                                                { if (input$ShowNonOccurringValues == FALSE) { filter(., IsOccurring == TRUE) } else {.} } %>%       # Filter for occurring values only, if option checked in UI
+                                                                mutate(CellClass_Value_Raw = case_when(IsOccurring == FALSE & IsEligible_Raw == TRUE ~ "CellClass_Info",
+                                                                                                       IsOccurring == TRUE & IsEligible_Raw == TRUE ~ "CellClass_Success",
+                                                                                                       !is.na(Value_Raw) & IsEligible_Raw == FALSE ~ "CellClass_Failure",
+                                                                                                       is.na(Value_Raw) ~ "CellClass_Grey",
+                                                                                                       TRUE ~ "None"),
+                                                                       CellClass_Value_Harmonized = case_when(IsOccurring == TRUE & IsEligible_Harmonized == TRUE ~ "CellClass_Success",
+                                                                                                              !is.na(Value_Harmonized) & IsEligible_Harmonized == FALSE ~ "CellClass_Failure",
+                                                                                                              is.na(Value_Harmonized) ~ "CellClass_Grey",
+                                                                                                              TRUE ~ "None"),
+                                                                       CellClass_Value_Recoded = case_when(IsOccurring == TRUE & IsEligible_Recoded == TRUE ~ "CellClass_Success",
+                                                                                                           !is.na(Value_Recoded) & IsEligible_Recoded == FALSE ~ "CellClass_Failure",
+                                                                                                           is.na(Value_Recoded) ~ "CellClass_Grey",
+                                                                                                           TRUE ~ "None"),
+                                                                       CellClass_Value_Final = case_when(!is.na(Value_Final) ~ "CellClass_Success",
+                                                                                                         is.na(Value_Final) ~ "CellClass_Grey",
+                                                                                                         TRUE ~ "None"))
+                                                        }
+                                                      })
 
-                                                                          # Modify data for rendering purposes
-                                                                          TableData <- MonitorData() %>%
-                                                                                            select(Feature,
-                                                                                                   Count_Raw,
-                                                                                                   Value_Raw,
-                                                                                                   Value_Harmonized,
-                                                                                                   Value_Recoded,
-                                                                                                   Value_Final,
-                                                                                                   starts_with("CellClass"))
 
-                                                                          if (!is.null(TableData))
-                                                                          {
-                                                                              DataFrameToHtmlTable(DataFrame = TableData,
-                                                                                                   CategoryColumn = "Feature",
-                                                                                                   CellClassColumns = c("CellClass_Value_Raw",
-                                                                                                                        "CellClass_Value_Harmonized",
-                                                                                                                        "CellClass_Value_Recoded",
-                                                                                                                        "CellClass_Value_Final"),
-                                                                                                   ColumnHorizontalAlign = "center",
-                                                                                                   ColumnLabels = c(Count_Raw = "Count",
-                                                                                                                    Value_Raw = "Raw",
-                                                                                                                    Value_Harmonized = "Harmonized",
-                                                                                                                    Value_Recoded = "Recoded",
-                                                                                                                    Value_Final = "Final"),
-                                                                                                   SemanticTableClass = "ui small compact celled structured table")
-                                                                          } })
+                      # Render reactive output: TransformationTracks
+                      #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                      output$TransformationTracks <- renderUI({  req(Data_TransformationTracks)
+
+                                                                  # Assign loading behavior
+                                                                  LoadingOn()
+                                                                  on.exit(LoadingOff())
+
+                                                                  # Modify data for rendering purposes
+                                                                  TableData <- Data_TransformationTracks() %>%
+                                                                                    select(Feature,
+                                                                                           Value_Raw,
+                                                                                           Value_Harmonized,
+                                                                                           Value_Recoded,
+                                                                                           Value_Final,
+                                                                                           Count_Raw,
+                                                                                           starts_with("CellClass"))
+
+                                                                  if (!is.null(TableData))
+                                                                  {
+                                                                      DataFrameToHtmlTable(DataFrame = TableData,
+                                                                                           CategoryColumn = "Feature",
+                                                                                           CellClassColumns = c("CellClass_Value_Raw",
+                                                                                                                "CellClass_Value_Harmonized",
+                                                                                                                "CellClass_Value_Recoded",
+                                                                                                                "CellClass_Value_Final"),
+                                                                                           ColContentHorizontalAlign = "center",
+                                                                                           ColumnLabels = c(Value_Raw = "Raw",
+                                                                                                            Value_Harmonized = "Harmonized",
+                                                                                                            Value_Recoded = "Recoded",
+                                                                                                            Value_Final = "Final",
+                                                                                                            Count_Raw = "Count"),
+                                                                                           SemanticTableClass = "ui small compact celled structured table")
+                                                                  } })
                  })
 }
-
-
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Module testing
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-# ModDataTransformationMonitorApp <- function()
-# {
-#   ui <- fluidPage(
-#     ModDataTransformationMonitor_UI("Test")
-#   )
-#
-#   server <- function(input, output, session)
-#   {
-#       ModDataTransformationMonitor_Server("Test")
-#   }
-#
-#   shinyApp(ui, server)
-# }
-
-# Run app
-#ModDataTransformationMonitorApp()
-
-
