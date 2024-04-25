@@ -199,7 +199,7 @@ ModDataTransformationMonitor_Server <- function(id)
                                                                PlotOutputList <- Data_EligibilityOverview()$Feature %>%
                                                                                       imap(function(feature, index)
                                                                                            {
-                                                                                              div(div(class = "ui small blue ribbon label",
+                                                                                              div(div(class = "ui small grey ribbon label",
                                                                                                       feature),   # Plot label
                                                                                                   plotlyOutput(outputId = ns(paste0("PlotEligibility_", index)),
                                                                                                                height = "120px"))

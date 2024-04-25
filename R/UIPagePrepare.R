@@ -12,9 +12,7 @@ UIPagePrepare <- function()
 
         div(class = "ui accordion",      # Note: For this to work extra JS script is necessary (see MainUIComponent())
 
-            div(class = "active title",
-                style = "padding: 0.5em 1em;
-                         background: linear-gradient(0deg, rgba(255,255,255,0) 0%, rgba(5,73,150,0.1) 95%, rgba(255,255,255,0) 100%);",
+            div(class = "active title AccordionHeader",
                 icon(class = "dropdown icon"),
                 "Processing Terminal"),
 
@@ -69,7 +67,7 @@ UIPagePrepare <- function()
 
         div(class = "ui accordion",      # Note: For this to work extra JS script is necessary (see MainUIComponent())
 
-            div(class = "active title",
+            div(class = "active title AccordionHeader",
                 icon(class = "dropdown icon"),
                 "Server Monitor"),
 
@@ -95,7 +93,7 @@ UIPagePrepare <- function()
 
         div(class = "ui accordion",
 
-            div(class = "active title",
+            div(class = "active title AccordionHeader",
                 icon(class = "dropdown icon"),
                 "Data Transformation Monitor"),
 
