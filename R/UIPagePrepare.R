@@ -13,6 +13,8 @@ UIPagePrepare <- function()
         div(class = "ui accordion",      # Note: For this to work extra JS script is necessary (see MainUIComponent())
 
             div(class = "active title",
+                # style = "padding: 0 1em;
+                #          background-color: #eeeeee;",
                 icon(class = "dropdown icon"),
                 "Processing Terminal"),
 
@@ -60,7 +62,8 @@ UIPagePrepare <- function()
 
 
         #-----------------------------------------------------------------------
-        div(class = "ui divider"),
+        div(class = "ui divider",
+            style = "margin: 1.5em 0;"),
         #-----------------------------------------------------------------------
 
 
@@ -84,7 +87,8 @@ UIPagePrepare <- function()
 
 
         #-----------------------------------------------------------------------
-        div(class = "ui divider"),
+        div(class = "ui divider",
+            style = "margin: 1.5em 0;"),
         #-----------------------------------------------------------------------
 
 
