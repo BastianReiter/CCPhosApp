@@ -64,20 +64,34 @@ ModProcessingTerminal_Server <- function(id)
                     observe({ shinyjs::showElement(id = "Monitor", anim = TRUE, animType = "fade") }) %>%
                         bindEvent(ReturnMessages())
 
-                    # Setting up loading screen with waiter package
+
+                    # Setting up loading behavior
+                    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                     ns <- session$ns
                     WaiterScreen <- Waiter$new(id = ns("WaiterScreenContainer"),
                                                html = spin_3(),
                                                color = transparent(.5))
 
+                    LoadingOn <- function()
+                    {
+                        shinyjs::disable("ProcessingTrigger")
+                        WaiterScreen$show()
+                    }
+
+                    LoadingOff <- function()
+                    {
+                        shinyjs::enable("ProcessingTrigger")
+                        WaiterScreen$hide()
+                    }
+
+
+                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
                     if (id == "CheckServerRequirements")
                     {
-                        observe({ # Set up loading behaviour
-                                  shinyjs::disable("ProcessingTrigger")
-                                  WaiterScreen$show()
-                                  on.exit({ shinyjs::enable("ProcessingTrigger")
-                                            WaiterScreen$hide() })
+                        observe({ # Assign loading behavior
+                                  LoadingOn()
+                                  on.exit(LoadingOff())
 
                                   # Trigger function CheckServerRequirements() and assign return to reactive value ReturnMessages
                                   ReturnMessages(dsCCPhosClient::CheckServerRequirements(CCPSiteSpecifications = session$userData$CCPSiteSpecifications(),
@@ -97,11 +111,9 @@ ModProcessingTerminal_Server <- function(id)
 
                     if (id == "LoadData")
                     {
-                        observe({ # Set up loading behaviour
-                                  shinyjs::disable("ProcessingTrigger")
-                                  WaiterScreen$show()
-                                  on.exit({ shinyjs::enable("ProcessingTrigger")
-                                            WaiterScreen$hide() })
+                        observe({ # Assign loading behavior
+                                  LoadingOn()
+                                  on.exit(LoadingOff())
 
                                   # Trigger function LoadRawDataSet() and assign return to reactive value ReturnMessages
                                   ReturnMessages(dsCCPhosClient::LoadRawDataSet(CCPSiteSpecifications = session$userData$CCPSiteSpecifications(),
@@ -120,11 +132,9 @@ ModProcessingTerminal_Server <- function(id)
 
                     if (id == "CurateData")
                     {
-                        observe({ # Set up loading behaviour
-                                  shinyjs::disable("ProcessingTrigger")
-                                  WaiterScreen$show()
-                                  on.exit({ shinyjs::enable("ProcessingTrigger")
-                                            WaiterScreen$hide() })
+                        observe({ # Assign loading behavior
+                                  LoadingOn()
+                                  on.exit(LoadingOff())
 
                                   # Trigger functions ds.CurateData() and ds.UnpackCuratedDataSet() and assign returns (concatenated lists) to reactive value ReturnMessages
                                   ReturnMessages(c(dsCCPhosClient::ds.CurateData(RawDataSetName = "RawDataSet",
@@ -151,11 +161,9 @@ ModProcessingTerminal_Server <- function(id)
 
                     if (id == "AugmentData")
                     {
-                        observe({ # Set up loading behaviour
-                                  shinyjs::disable("ProcessingTrigger")
-                                  WaiterScreen$show()
-                                  on.exit({ shinyjs::enable("ProcessingTrigger")
-                                            WaiterScreen$hide() })
+                        observe({ # Assign loading behavior
+                                  LoadingOn()
+                                  on.exit(LoadingOff())
 
                                   # Trigger functions ds.AugmentData() and ds.UnpackAugmentedDataSet() and assign returns (concatenated lists) to reactive value ReturnMessages
                                   ReturnMessages(c(dsCCPhosClient::ds.AugmentData(CuratedDataSetName = "CuratedDataSet",

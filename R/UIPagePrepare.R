@@ -13,8 +13,8 @@ UIPagePrepare <- function()
         div(class = "ui accordion",      # Note: For this to work extra JS script is necessary (see MainUIComponent())
 
             div(class = "active title",
-                # style = "padding: 0 1em;
-                #          background-color: #eeeeee;",
+                style = "padding: 0.5em 1em;
+                         background: linear-gradient(0deg, rgba(255,255,255,0) 0%, rgba(5,73,150,0.1) 95%, rgba(255,255,255,0) 100%);",
                 icon(class = "dropdown icon"),
                 "Processing Terminal"),
 
@@ -83,7 +83,8 @@ UIPagePrepare <- function()
 
                         ModServerOpalMonitor_UI("ServerOpalMonitor"),
 
-                        ModServerWorkspaceMonitor_UI("Prepare-ServerWorkspaceMonitor"))))),
+                        ModServerWorkspaceMonitor_UI("Prepare-ServerWorkspaceMonitor",
+                                                     ShowObjectDetailTable = FALSE))))),
 
 
         #-----------------------------------------------------------------------
