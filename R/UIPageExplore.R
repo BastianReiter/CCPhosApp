@@ -10,7 +10,9 @@ UIPageExplore <- function()
            "Data exploration"),
 
 
-        ModServerWorkspaceMonitor_UI("Explore-ServerWorkspaceMonitor"),
+        div(style = "height: 26em;",
+
+            ModServerWorkspaceMonitor_UI("Explore-ServerWorkspaceMonitor")),
 
 
         #-----------------------------------------------------------------------

@@ -21,7 +21,7 @@ ModServerOpalMonitor_UI <- function(id)
         div(class = "ui top attached label",
             "Opal Database"),
 
-        uiOutput(ns("ServerOpalMonitor")))
+        DTOutput(ns("ServerOpalMonitor")))
 }
 
 
@@ -40,22 +40,26 @@ ModServerOpalMonitor_Server <- function(id)
     moduleServer(id,
                  function(input, output, session)
                  {
-                      output$ServerOpalMonitor <- renderUI({  if(!is.null(session$userData$ServerOpalInfo()))
-                                                              {
-                                                                  DataServerOpalInfo <- session$userData$ServerOpalInfo() %>%
-                                                                                            select(-IsAvailableEverywhere,
-                                                                                                   -NotAvailableAt)
+                      output$ServerOpalMonitor <- renderDT({  req(session$userData$ServerOpalInfo())
 
-                                                                  ServerNames <- names(session$userData$CCPConnections())
+                                                              DataServerOpalInfo <- session$userData$ServerOpalInfo() %>%
+                                                                                        select(-IsAvailableEverywhere,
+                                                                                               -NotAvailableAt) %>%
+                                                                                        ConvertLogicalToIcon()
 
-                                                                  HorizontalAlignArgument <- setNames(object = rep("center", times = length(ServerNames)),
-                                                                                                      nm = ServerNames)
-
-                                                                  DataFrameToHtmlTable(DataFrame = DataServerOpalInfo,
-                                                                                       ColContentHorizontalAlign = HorizontalAlignArgument,
-                                                                                       SemanticTableClass = "ui small very compact celled table",
-                                                                                       TurnLogicalIntoIcon = TRUE)
-                                                              } })
+                                                              DT::datatable(data = DataServerOpalInfo,
+                                                                            class = "ui small compact table",
+                                                                            editable = FALSE,
+                                                                            escape = FALSE,
+                                                                            filter = "none",
+                                                                            options = list(info = FALSE,
+                                                                                           ordering = FALSE,
+                                                                                           paging = FALSE,
+                                                                                           searching = FALSE),
+                                                                            rownames = FALSE,
+                                                                            selection = list(mode = "none"),
+                                                                            style = "semanticui")
+                                                            })
                  })
 }
 

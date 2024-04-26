@@ -15,7 +15,7 @@ body { background: linear-gradient(to bottom, #ededed 20%, white 50%, white 60%,
 
 
 .ui.accordion .AccordionHeader { padding: 0.5em 1em !important;
-                                 background: linear-gradient(0deg, rgba(255,255,255,0) 0%, rgba(5,73,150,0.5) 95%, rgba(255,255,255,0) 100%); }
+                                 background: linear-gradient(0deg, rgba(255,255,255,0) 0%, rgba(5,73,150,0.3) 90%, rgba(255,255,255,0) 100%); }
 
 
 
@@ -68,6 +68,9 @@ td.CellClass_Failure { background-color: rgba(142, 30, 57, 0.4);
 td.CellClass_Grey { background-color: rgba(0, 0, 0, 0.05);
                     color: rgba(0, 0, 0, 0.4); }
 
+
+
+tr.TableRowSelected { background-color: yellow; }
 
 
 

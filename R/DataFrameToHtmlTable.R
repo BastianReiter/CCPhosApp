@@ -1,8 +1,8 @@
 
 #' DataFrameToHtmlTable
 #'
-#' @param TableID \code{string} Used to tidentify the table object in the DOM
 #' @param DataFrame \code{data.frame} or \code{tibble}
+#' @param TableID \code{string} Used to tidentify the table object in the DOM
 #' @param CategoryColumn \code{string}
 #' @param CellClassColumns character vector
 #' @param ColContentHorizontalAlign Either a single string for all columns or a named character vector to determine horizontal content alignment for specific columns
@@ -13,11 +13,11 @@
 #' @param SemanticTableClass
 #' @param TurnLogicalIntoIcon
 #'
-#' @return
+#' @return HTML code
 #' @export
 #' @author Bastian Reiter
-DataFrameToHtmlTable <- function(TableID = NULL,
-                                 DataFrame,
+DataFrameToHtmlTable <- function(DataFrame,
+                                 TableID = NULL,
                                  CategoryColumn = NULL,
                                  CellClassColumns = NULL,
                                  ColContentHorizontalAlign = "left",
@@ -134,7 +134,7 @@ DataFrameToHtmlTable <- function(TableID = NULL,
         {
             # Add a subheader-row for current category
             StringsTableRows <- c(StringsTableRows,
-                                  paste0("tags$tr(tags$th(style = 'background-color: #d0d0d0;
+                                  paste0("tags$tr(tags$th(style = 'background-color: #767676;
                                                                    color: white;',
                                                           colspan = '",
                                          ncol(DataFrame) - length(HiddenColumns),   # Number of columns that subheader-row is spanning over

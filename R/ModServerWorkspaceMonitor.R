@@ -28,20 +28,18 @@ ModServerWorkspaceMonitor_UI <- function(id,
             "Server R Session Workspace"),
 
         div(style = "display: grid;
-                     grid-template-columns: auto auto;
+                     grid-template-columns: 3fr 1fr;
                      grid-gap: 1em;
                      margin: 0;",
 
-            div(style = "height: 100%;
-                         overflow: auto;",
+            div(style = "height: 100%;",
 
-                uiOutput(ns("WorkspaceObjects"))),
+                DTOutput(ns("WorkspaceObjects"))),
 
             div(style = paste(DisplayObjectDetails,
-                              "height: 100%;
-                               overflow: auto;"),
+                              "height: 100%;"),
 
-                uiOutput(ns("ObjectDetails")))))
+                DTOutput(ns("ObjectDetails")))))
 
 }
 
@@ -63,68 +61,74 @@ ModServerWorkspaceMonitor_Server <- function(id)
                  {
                       ns <- session$ns
 
-                      output$WorkspaceObjects <- renderUI({ DataWorkspaceOverview <- session$userData$ServerWorkspaceInfo()$Overview
+                      output$WorkspaceObjects <- renderDT({ req(session$userData$ServerWorkspaceInfo())
 
-                                                            ServerNames <- names(session$userData$CCPConnections())
+                                                            DataWorkspaceOverview <- session$userData$ServerWorkspaceInfo()$Overview %>%
+                                                                                          ConvertLogicalToIcon()
 
-                                                            HorizontalAlignArgument <- setNames(object = rep("center", times = length(ServerNames)),
-                                                                                                nm = ServerNames)
-
-                                                            DataFrameToHtmlTable(TableID = ns("TableWorkspaceObjects"),
-                                                                                 DataFrame = DataWorkspaceOverview,
-                                                                                 ColContentHorizontalAlign = HorizontalAlignArgument,
-                                                                                 SemanticTableClass = "ui small very compact celled scrollable table",
-                                                                                 TurnLogicalIntoIcon = TRUE) })
-
-                      output$ObjectDetails <- renderUI({ DataObjectDetails <- session$userData$ServerWorkspaceInfo()$Details[[1]]$ContentOverview
-
-                                                         # HorizontalAlignAttribute <- setNames(object = rep("center", times = length(ServerNames)),
-                                                         #                                      nm = ServerNames)
-
-                                                         DataFrameToHtmlTable(TableID = ns("TableObjectDetails"),
-                                                                              DataFrame = DataObjectDetails,
-                                                                              SemanticTableClass = "ui small very compact celled inverted grey scrollable table",
-                                                                              TurnLogicalIntoIcon = TRUE) })
+                                                            DT::datatable(data = DataWorkspaceOverview,
+                                                                          class = "ui small compact selectable table",
+                                                                          editable = FALSE,
+                                                                          escape = FALSE,
+                                                                          filter = "none",
+                                                                          options = list(info = FALSE,
+                                                                                         ordering = FALSE,
+                                                                                         paging = FALSE,
+                                                                                         searching = FALSE),
+                                                                          rownames = FALSE,
+                                                                          selection = list(mode = "single",
+                                                                                           target = "row"),
+                                                                          style = "semanticui")
+                                                          })
 
 
-                      #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                      # Object selection behavior
-                      #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                      SelectedObjectName <- reactive({ req(session$userData$ServerWorkspaceInfo())
+                                                       req(input$WorkspaceObjects_rows_selected)
 
-                      # SelectedObjectName <- reactiveVal({"None"})
-                      #
-                      #
-                      #
-                      #
-                      # ToggleTableRowState <- function(TableID,
-                      #                                 RowID,
-                      #                                 StepState = "Native")
-                      #                   {
-                      #                       if (StepState == "Native")
-                      #                       {
-                      #                           shinyjs::removeCssClass(selector = paste0("#", TableID, " > div"), class = "TableRowNative")
-                      #                           shinyjs::addCssClass(selector = paste0("#", StepID, " > div"), class = "TableRowSelected")
-                      #
-                      #                           # Enable mouse hover behavior
-                      #                           shinyjs::onevent("hover",
-                      #                                        id = StepID,
-                      #                                        expr = { shinyjs::toggleCssClass(selector = paste0("#", StepID, " > div"), class = "StepHover") })
-                      #
-                      #                           # Enable click event
-                      #                           shinyjs::onclick(id = StepID,
-                      #                                            expr = { if (StepID == "Step_CheckServerRequirements") { SelectedProcessingStep("CheckServerRequirements") }
-                      #                                                     if (StepID == "Step_LoadData") { SelectedProcessingStep("LoadData") }
-                      #                                                     if (StepID == "Step_CurateData") { SelectedProcessingStep("CurateData") }
-                      #                                                     if (StepID == "Step_AugmentData") { SelectedProcessingStep("AugmentData") } })
-                      #                       }
-                      #
-                      #                       if (StepState == "Selected")
-                      #                       {
-                      #                           shinyjs::removeCssClass(selector = paste0("#", StepID, " > div"), class = "StepInaccessible")
-                      #                           shinyjs::removeCssClass(selector = paste0("#", StepID, " > div"), class = "StepAccessible")
-                      #                           shinyjs::addCssClass(selector = paste0("#", StepID, " > div"), class = "StepSelected")
-                      #                       }
-                      #                   }
+                                                       # Get the index of the selected row using DT functionality
+                                                       RowIndex <- input$WorkspaceObjects_rows_selected
+
+                                                       # Returning name of object selected in table
+                                                       session$userData$ServerWorkspaceInfo()$Overview$Object[RowIndex]
+                                                     })
+
+
+                      DataObjectDetails <- reactive({ req(session$userData$ServerWorkspaceInfo())
+                                                      req(SelectedObjectName())
+
+                                                      session$userData$ServerWorkspaceInfo()$Details[[SelectedObjectName()]]$ContentOverview
+                                                    })
+
+
+                      output$ObjectDetails <- renderDT({ req(DataObjectDetails())
+
+                                                         DT::datatable(data = DataObjectDetails(),
+                                                                           class = "ui small compact inverted selectable table",
+                                                                           editable = FALSE,
+                                                                           escape = FALSE,
+                                                                           filter = "none",
+                                                                           options = list(info = FALSE,
+                                                                                          ordering = FALSE,
+                                                                                          paging = FALSE,
+                                                                                          searching = FALSE,
+                                                                                          layout = list(top = NULL)),
+                                                                           rownames = FALSE,
+                                                                           selection = list(mode = "single",
+                                                                                            target = "row"),
+                                                                           style = "semanticui")
+                                                      })
+
+
+                      SelectedElementName <- reactive({ req(DataObjectDetails())
+                                                        req(input$ObjectDetails_row_selected)
+
+                                                        # Get the index of the selected row using DT functionality
+                                                        RowIndex <- input$ObjectDetails_rows_selected
+
+                                                        # Returning name of element selected in table
+                                                        DataObjectDetails$Element[RowIndex]
+                                                      })
+
 
                  })
 }

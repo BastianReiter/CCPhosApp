@@ -355,10 +355,9 @@ InitiateStepJS(StepID = "Step_LoadData")
 InitiateStepJS(StepID = "Step_CurateData")
 InitiateStepJS(StepID = "Step_AugmentData")
 
+
+
 #output$TabContentValidationReports <- renderUI({ "Test A" })
-
-
-
 #output$TabContentTransformationMonitors <- renderUI({ "Test B" })
 
 
