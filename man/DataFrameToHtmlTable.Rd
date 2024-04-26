@@ -6,8 +6,10 @@
 \usage{
 DataFrameToHtmlTable(
   DataFrame,
+  TableID = NULL,
   CategoryColumn = NULL,
   CellClassColumns = NULL,
+  ColContentHorizontalAlign = "left",
   ColumnClass = NULL,
   ColumnLabels = NULL,
   RotatedHeaderNames = character(),
@@ -17,9 +19,15 @@ DataFrameToHtmlTable(
 )
 }
 \arguments{
+\item{DataFrame}{\code{data.frame} or \code{tibble}}
+
+\item{TableID}{\code{string} Used to tidentify the table object in the DOM}
+
 \item{CategoryColumn}{\code{string}}
 
 \item{CellClassColumns}{character vector}
+
+\item{ColContentHorizontalAlign}{Either a single string for all columns or a named character vector to determine horizontal content alignment for specific columns}
 
 \item{ColumnClass}{Either a single string for all columns or a named character vector to determine table cell classes for specific columns}
 
@@ -28,8 +36,9 @@ DataFrameToHtmlTable(
 \item{RowColorColumn}{\code{string}}
 
 \item{TurnLogicalIntoIcon}{}
-
-\item{ColumnHorizontalAlign}{Either a single string for all columns or a named character vector to determine horizontal content alignment for specific columns}
+}
+\value{
+HTML code
 }
 \description{
 DataFrameToHtmlTable

@@ -1,7 +1,8 @@
 
 #' DataFrameToHtmlTable
 #'
-#' @param DataFrame
+#' @param DataFrame \code{data.frame} or \code{tibble}
+#' @param TableID \code{string} Used to tidentify the table object in the DOM
 #' @param CategoryColumn \code{string}
 #' @param CellClassColumns character vector
 #' @param ColContentHorizontalAlign Either a single string for all columns or a named character vector to determine horizontal content alignment for specific columns
@@ -12,10 +13,11 @@
 #' @param SemanticTableClass
 #' @param TurnLogicalIntoIcon
 #'
-#' @return
+#' @return HTML code
 #' @export
 #' @author Bastian Reiter
 DataFrameToHtmlTable <- function(DataFrame,
+                                 TableID = NULL,
                                  CategoryColumn = NULL,
                                  CellClassColumns = NULL,
                                  ColContentHorizontalAlign = "left",
@@ -27,6 +29,7 @@ DataFrameToHtmlTable <- function(DataFrame,
                                  TurnLogicalIntoIcon = FALSE)
 {
     # For testing purposes only
+    # TableID <- NULL
     # DataFrame <- dsCCPhos::Meta_FeatureNames
     # DataFrame <- DataFrame %>% mutate(CellClass_TableName_Curated = "Success")
     # SemanticTableClass = "ui celled table"
@@ -46,6 +49,12 @@ DataFrameToHtmlTable <- function(DataFrame,
     {
         return("")
     }
+
+
+    # If no explicit TableID is passed, assign it a random sample of letters
+    TableID <- ifelse(is.null(TableID),
+                      paste0(sample(LETTERS, 9, TRUE), collapse = ""),
+                      TableID)
 
 
     # If there are special purpose columns, don't render their content in the table
@@ -125,7 +134,7 @@ DataFrameToHtmlTable <- function(DataFrame,
         {
             # Add a subheader-row for current category
             StringsTableRows <- c(StringsTableRows,
-                                  paste0("tags$tr(tags$th(style = 'background-color: #d0d0d0;
+                                  paste0("tags$tr(tags$th(style = 'background-color: #767676;
                                                                    color: white;',
                                                           colspan = '",
                                          ncol(DataFrame) - length(HiddenColumns),   # Number of columns that subheader-row is spanning over
@@ -202,7 +211,10 @@ DataFrameToHtmlTable <- function(DataFrame,
 
                     StringsTableRowCells <- c(StringsTableRowCells,
                                               paste0("tags$td(",
-                                                     "class = '", CellClass, "', ",   # Add td CSS class
+                                                     #--- Add td CSS class, if one is defined ---
+                                                     ifelse(CellClass != "",
+                                                            paste0("class = '", CellClass, "', "),
+                                                            ""),
                                                      #--- Turn logical cell value into icon if option is passed ---
                                                      ifelse(TurnLogicalIntoIcon == TRUE,
                                                             case_when(CellValue == TRUE ~ "icon(class = 'small green check')",
@@ -237,7 +249,7 @@ DataFrameToHtmlTable <- function(DataFrame,
                               ")")
 
     # Concatenate all substrings into one string
-    HtmlCallString <- paste0("tags$table(class = '", SemanticTableClass, "', ",
+    HtmlCallString <- paste0("tags$table(id = '", TableID, "', class = '", SemanticTableClass, "', ",
                              StringTableHead,
                              ", ",
                              StringTableBody,

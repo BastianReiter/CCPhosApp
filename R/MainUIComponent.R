@@ -30,6 +30,9 @@ shiny.semantic::semanticPage(
 
     # Initiate use of shinyjs functionality
     shinyjs::useShinyjs(),
+    # shinyjs::extendShinyjs(script = "CCPhosJS.js",
+    #                        functions = c("HoverTableRow",
+    #                                      "SelectTableRow")),
 
     # Initiate use of waiter functionality
     waiter::useWaiter(),

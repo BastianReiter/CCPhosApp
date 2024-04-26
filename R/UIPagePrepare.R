@@ -12,7 +12,7 @@ UIPagePrepare <- function()
 
         div(class = "ui accordion",      # Note: For this to work extra JS script is necessary (see MainUIComponent())
 
-            div(class = "active title",
+            div(class = "active title AccordionHeader",
                 icon(class = "dropdown icon"),
                 "Processing Terminal"),
 
@@ -60,13 +60,14 @@ UIPagePrepare <- function()
 
 
         #-----------------------------------------------------------------------
-        div(class = "ui divider"),
+        div(class = "ui divider",
+            style = "margin: 1.5em 0;"),
         #-----------------------------------------------------------------------
 
 
         div(class = "ui accordion",      # Note: For this to work extra JS script is necessary (see MainUIComponent())
 
-            div(class = "active title",
+            div(class = "active title AccordionHeader",
                 icon(class = "dropdown icon"),
                 "Server Monitor"),
 
@@ -80,17 +81,19 @@ UIPagePrepare <- function()
 
                         ModServerOpalMonitor_UI("ServerOpalMonitor"),
 
-                        ModServerWorkspaceMonitor_UI("Prepare-ServerWorkspaceMonitor"))))),
+                        ModServerWorkspaceMonitor_UI("Prepare-ServerWorkspaceMonitor",
+                                                     ShowObjectDetailTable = FALSE))))),
 
 
         #-----------------------------------------------------------------------
-        div(class = "ui divider"),
+        div(class = "ui divider",
+            style = "margin: 1.5em 0;"),
         #-----------------------------------------------------------------------
 
 
         div(class = "ui accordion",
 
-            div(class = "active title",
+            div(class = "active title AccordionHeader",
                 icon(class = "dropdown icon"),
                 "Data Transformation Monitor"),
 

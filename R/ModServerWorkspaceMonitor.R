@@ -7,10 +7,16 @@
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 #' @param id
+#' @param ShowObjectDetailTable
 #' @noRd
-ModServerWorkspaceMonitor_UI <- function(id)
+ModServerWorkspaceMonitor_UI <- function(id,
+                                         ShowObjectDetailTable = TRUE)
 {
     ns <- NS(id)
+
+    DisplayObjectDetails <- ifelse(ShowObjectDetailTable == TRUE,
+                                   "display: block;",
+                                   "display: none;")
 
     div(id = ns("ServerWorkspaceMonitorContainer"),
         class = "ui scrollable segment",
@@ -22,19 +28,18 @@ ModServerWorkspaceMonitor_UI <- function(id)
             "Server R Session Workspace"),
 
         div(style = "display: grid;
-                     grid-template-columns: auto auto;
+                     grid-template-columns: 3fr 1fr;
                      grid-gap: 1em;
                      margin: 0;",
 
-            div(style = "height: 100%;
-                         overflow: auto;",
+            div(style = "height: 100%;",
 
-                uiOutput(ns("WorkspaceObjects"))),
+                DTOutput(ns("WorkspaceObjects"))),
 
-            div(style = "height: 100%;
-                         overflow: auto;",
+            div(style = paste(DisplayObjectDetails,
+                              "height: 100%;"),
 
-                uiOutput(ns("ObjectDetails")))))
+                DTOutput(ns("ObjectDetails")))))
 
 }
 
@@ -54,26 +59,76 @@ ModServerWorkspaceMonitor_Server <- function(id)
     moduleServer(id,
                  function(input, output, session)
                  {
-                      output$WorkspaceObjects <- renderUI({ DataWorkspaceOverview <- session$userData$ServerWorkspaceInfo()$Overview
+                      ns <- session$ns
 
-                                                            ServerNames <- names(session$userData$CCPConnections())
+                      output$WorkspaceObjects <- renderDT({ req(session$userData$ServerWorkspaceInfo())
 
-                                                            HorizontalAlignArgument <- setNames(object = rep("center", times = length(ServerNames)),
-                                                                                                 nm = ServerNames)
+                                                            DataWorkspaceOverview <- session$userData$ServerWorkspaceInfo()$Overview %>%
+                                                                                          ConvertLogicalToIcon()
 
-                                                            DataFrameToHtmlTable(DataFrame = DataWorkspaceOverview,
-                                                                                 ColContentHorizontalAlign = HorizontalAlignArgument,
-                                                                                 SemanticTableClass = "ui small very compact selectable celled scrollable table",
-                                                                                 TurnLogicalIntoIcon = TRUE) })
+                                                            DT::datatable(data = DataWorkspaceOverview,
+                                                                          class = "ui small compact selectable table",
+                                                                          editable = FALSE,
+                                                                          escape = FALSE,
+                                                                          filter = "none",
+                                                                          options = list(info = FALSE,
+                                                                                         ordering = FALSE,
+                                                                                         paging = FALSE,
+                                                                                         searching = FALSE),
+                                                                          rownames = FALSE,
+                                                                          selection = list(mode = "single",
+                                                                                           target = "row"),
+                                                                          style = "semanticui")
+                                                          })
 
-                      output$ObjectDetails <- renderUI({ DataObjectDetails <- session$userData$ServerWorkspaceInfo()$Details[[1]]$ContentOverview
 
-                                                         # HorizontalAlignAttribute <- setNames(object = rep("center", times = length(ServerNames)),
-                                                         #                                      nm = ServerNames)
+                      SelectedObjectName <- reactive({ req(session$userData$ServerWorkspaceInfo())
+                                                       req(input$WorkspaceObjects_rows_selected)
 
-                                                         DataFrameToHtmlTable(DataFrame = DataObjectDetails,
-                                                                              SemanticTableClass = "ui small very compact celled inverted grey scrollable table",
-                                                                              TurnLogicalIntoIcon = TRUE) })
+                                                       # Get the index of the selected row using DT functionality
+                                                       RowIndex <- input$WorkspaceObjects_rows_selected
+
+                                                       # Returning name of object selected in table
+                                                       session$userData$ServerWorkspaceInfo()$Overview$Object[RowIndex]
+                                                     })
+
+
+                      DataObjectDetails <- reactive({ req(session$userData$ServerWorkspaceInfo())
+                                                      req(SelectedObjectName())
+
+                                                      session$userData$ServerWorkspaceInfo()$Details[[SelectedObjectName()]]$ContentOverview
+                                                    })
+
+
+                      output$ObjectDetails <- renderDT({ req(DataObjectDetails())
+
+                                                         DT::datatable(data = DataObjectDetails(),
+                                                                           class = "ui small compact inverted selectable table",
+                                                                           editable = FALSE,
+                                                                           escape = FALSE,
+                                                                           filter = "none",
+                                                                           options = list(info = FALSE,
+                                                                                          ordering = FALSE,
+                                                                                          paging = FALSE,
+                                                                                          searching = FALSE,
+                                                                                          layout = list(top = NULL)),
+                                                                           rownames = FALSE,
+                                                                           selection = list(mode = "single",
+                                                                                            target = "row"),
+                                                                           style = "semanticui")
+                                                      })
+
+
+                      SelectedElementName <- reactive({ req(DataObjectDetails())
+                                                        req(input$ObjectDetails_row_selected)
+
+                                                        # Get the index of the selected row using DT functionality
+                                                        RowIndex <- input$ObjectDetails_rows_selected
+
+                                                        # Returning name of element selected in table
+                                                        DataObjectDetails$Element[RowIndex]
+                                                      })
+
 
                  })
 }
