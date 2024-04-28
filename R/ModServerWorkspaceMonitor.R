@@ -103,32 +103,33 @@ ModServerWorkspaceMonitor_Server <- function(id)
                       output$ObjectDetails <- renderDT({ req(DataObjectDetails())
 
                                                          DT::datatable(data = DataObjectDetails(),
-                                                                           class = "ui small compact inverted selectable table",
-                                                                           editable = FALSE,
-                                                                           escape = FALSE,
-                                                                           filter = "none",
-                                                                           options = list(info = FALSE,
-                                                                                          ordering = FALSE,
-                                                                                          paging = FALSE,
-                                                                                          searching = FALSE,
-                                                                                          layout = list(top = NULL)),
-                                                                           rownames = FALSE,
-                                                                           selection = list(mode = "single",
-                                                                                            target = "row"),
-                                                                           style = "semanticui")
+                                                                       class = "ui small compact inverted selectable table",
+                                                                       editable = FALSE,
+                                                                       escape = FALSE,
+                                                                       filter = "none",
+                                                                       options = list(info = FALSE,
+                                                                                      ordering = FALSE,
+                                                                                      paging = FALSE,
+                                                                                      searching = FALSE,
+                                                                                      layout = list(top = NULL)),
+                                                                       rownames = FALSE,
+                                                                       selection = list(mode = "single",
+                                                                                        target = "row"),
+                                                                       style = "semanticui")
                                                       })
 
 
                       SelectedElementName <- reactive({ req(DataObjectDetails())
-                                                        req(input$ObjectDetails_row_selected)
+                                                        req(input$ObjectDetails_rows_selected)
 
                                                         # Get the index of the selected row using DT functionality
                                                         RowIndex <- input$ObjectDetails_rows_selected
 
                                                         # Returning name of element selected in table
-                                                        DataObjectDetails$Element[RowIndex]
+                                                        DataObjectDetails()$Element[RowIndex]
                                                       })
 
-
+                      return(list(Object = SelectedObjectName,
+                                  Element = SelectedElementName))
                  })
 }

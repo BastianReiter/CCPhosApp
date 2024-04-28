@@ -12,38 +12,41 @@ ModUnivariateExploration_UI <- function(id)
 {
     ns <- NS(id)
 
+    div(class = "ui scrollable segment",
+        style = "height: 100%;
+                 overflow: auto;",
+
+        div(class = "ui top attached label",
+            "Univariate Exploration"),
+
     div(style = "display: grid;
-                 grid-template-columns: 14em auto;
+                 grid-template-columns: 14em auto auto;
                  grid-gap: 2em;",
 
-    # Left column
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    div(selectInput(inputId = ns("TableName"),
-                    label = "Select Table",
-                    choices = "ADS_Patients"),
+        # Left column
+        #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        div(toggle(input_id = ns("AutoUpdate"),
+                   label = "Auto-update rendering",
+                   is_marked = FALSE),
 
-        br(),
-
-        selectInput(inputId = ns("FeatureName"),
-                    label = "Select Feature",
-                    choices = "PatientAgeAtDiagnosis"),
-
-        br(),
-
-        action_button(input_id = ns("ExploreButton"),
-                      label = "Explore")),
-
-    # Middle column
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            action_button(input_id = ns("UpdateButton"),
+                          class = "ui icon button",
+                          label = icon(class = "sync alternate"))),
 
 
-    # Right column
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    div(div(uiOutput(ns("StatisticsTable"))),
+        # Middle column
+        #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-        br(),br(),
+        div(),
 
-        div(plotOutput(ns("StatisticsPlot")))))
+
+        # Right column
+        #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        div(div(uiOutput(ns("StatisticsTable"))),
+
+            br(),br(),
+
+            div(plotOutput(ns("StatisticsPlot"))))))
 }
 
 
@@ -57,25 +60,68 @@ ModUnivariateExploration_UI <- function(id)
 #' @param output
 #' @param session
 #' @noRd
-ModUnivariateExploration_Server <- function(id)
+ModUnivariateExploration_Server <- function(id,
+                                            ObjectSelection)
 {
     moduleServer(id,
                  function(input, output, session)
                  {
-                      observe({ SampleStatistics <- dsCCPhosClient::ds.GetSampleStatistics(TableName = input$TableName,
-                                                                                           MetricFeatureName = input$FeatureName,
-                                                                                           DataSources = session$userData$CCPConnections())
-                                output$StatisticsTable <- renderUI({ DataFrameToHtmlTable(DataFrame = SampleStatistics,
-                                                                                          SemanticTableClass = "ui small very compact selectable celled table") })
+                      #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                      # Setting up loading behavior
+                      #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                      ns <- session$ns
+                      WaiterScreen <- CreateWaiterScreen(ID = ns("WaiterScreenContainer"))
 
-                                output$StatisticsPlot <- renderPlot({ dsCCPhosClient::MakeBoxPlot(SampleStatistics = SampleStatistics,
-                                                                                                  AxisTitle_y = "Patient age at diagnosis",
-                                                                                                  FillPalette = c("All" = CCPhosColors$MediumGrey,
-                                                                                                                  "SiteA" = CCPhosColors$Primary,
-                                                                                                                  "SiteB" = CCPhosColors$Secondary,
-                                                                                                                  "SiteC" = CCPhosColors$Tertiary)) })
-                                }) %>%
-                          bindEvent(input$ExploreButton)
+                      LoadingOn <- function()
+                      {
+                          shinyjs::disable("AutoUpdate")
+                          shinyjs::disable("UpdateButton")
+                          WaiterScreen$show()
+                      }
+
+                      LoadingOff <- function()
+                      {
+                          shinyjs::enable("AutoUpdate")
+                          shinyjs::enable("UpdateButton")
+                          WaiterScreen$hide()
+                      }
+                      #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+                      # Create reactive expression that returns an expression triggering output rendering (by being bound to observe expression below)
+                      TriggerUpdate <- reactive({ if (input$AutoUpdate == TRUE) { ObjectSelection$Element() } else { input$UpdateButton } })
+
+
+                      observe({ req(session$userData$CCPConnections())
+                                req(ObjectSelection)
+
+                                LoadingOn()
+                                on.exit(LoadingOff())
+
+                                # if (input$AutoUpdate == TRUE)
+                                # {
+                                    SampleStatistics <- dsCCPhosClient::ds.GetSampleStatistics(TableName = ObjectSelection$Object(),
+                                                                                               MetricFeatureName = ObjectSelection$Element(),
+                                                                                               DataSources = session$userData$CCPConnections())
+
+                                    output$StatisticsTable <- renderUI({ DataFrameToHtmlTable(DataFrame = SampleStatistics,
+                                                                                              SemanticTableClass = "ui small very compact selectable celled table") })
+
+                                    output$StatisticsPlot <- renderPlot({ dsCCPhosClient::MakeBoxPlot(SampleStatistics = SampleStatistics,
+                                                                                                      AxisTitle_y = "Patient age at diagnosis",
+                                                                                                      FillPalette = c("All" = CCPhosColors$MediumGrey,
+                                                                                                                      "SiteA" = CCPhosColors$Primary,
+                                                                                                                      "SiteB" = CCPhosColors$Secondary,
+                                                                                                                      "SiteC" = CCPhosColors$Tertiary)) })
+                                # }
+                                # else
+                                # {
+                                #     output$StatisticsTable <- renderUI({ NULL })
+                                #     output$StatisticsPlot <- renderUI({ NULL })
+                                # }
+
+                              }) %>%
+                          bindEvent({ TriggerUpdate() })
 
                  })
 }
