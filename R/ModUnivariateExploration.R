@@ -19,34 +19,30 @@ ModUnivariateExploration_UI <- function(id)
         div(class = "ui top attached label",
             "Univariate Exploration"),
 
-    div(style = "display: grid;
-                 grid-template-columns: 14em auto auto;
-                 grid-gap: 2em;",
+        div(style = "display: grid;
+                     grid-template-columns: 14em auto auto;
+                     grid-gap: 2em;",
 
-        # Left column
-        #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        div(toggle(input_id = ns("AutoUpdate"),
-                   label = "Auto-update rendering",
-                   is_marked = FALSE),
+            # Left column
+            #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            div(toggle(input_id = ns("AutoUpdate"),
+                       label = "Auto-update rendering",
+                       is_marked = FALSE),
 
-            action_button(input_id = ns("UpdateButton"),
-                          class = "ui icon button",
-                          label = icon(class = "sync alternate"))),
-
-
-        # Middle column
-        #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-        div(),
+                action_button(input_id = ns("UpdateButton"),
+                              class = "ui icon button",
+                              label = icon(class = "sync alternate"))),
 
 
-        # Right column
-        #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        div(div(uiOutput(ns("StatisticsTable"))),
+            # Middle column
+            #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-            br(),br(),
+            div(uiOutput(ns("StatisticsTable"))),
 
-            div(plotOutput(ns("StatisticsPlot"))))))
+
+            # Right column
+            #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            div(plotOutput(ns("StatisticsPlot")))))
 }
 
 

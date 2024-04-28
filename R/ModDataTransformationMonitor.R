@@ -29,11 +29,7 @@ ModDataTransformationMonitor_UI <- function(id)
 
             toggle(input_id = ns("ShowNonOccurringValues"),
                    label = "Show non-occurring eligible values",
-                   is_marked = FALSE),
-
-            br(),
-
-            textOutput(outputId = ns("TestBox"))),
+                   is_marked = FALSE)),
 
 
         div(style = "position: relative;",
@@ -92,10 +88,7 @@ ModDataTransformationMonitor_Server <- function(id)
                       # Setting up loading behavior
                       #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                       ns <- session$ns
-                      #WaiterScreen <- CreateWaiterScreen(ID = ns("WaiterScreenContainer"))
-                      WaiterScreen <- Waiter$new(id = ns("WaiterScreenContainer"),
-                                               html = spin_3(),
-                                               color = transparent(.5))
+                      WaiterScreen <- CreateWaiterScreen(ID = ns("WaiterScreenContainer"))
 
                       LoadingOn <- function()
                       {
@@ -112,7 +105,7 @@ ModDataTransformationMonitor_Server <- function(id)
                           shinyjs::enable("ShowNonOccurringValues")
                           WaiterScreen$hide()
                       }
-                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                      #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
                       # Update input elements when data changes
@@ -129,7 +122,7 @@ ModDataTransformationMonitor_Server <- function(id)
 
 
 
-                      output$TestBox <- renderText({ paste0(names(session$userData$CurationReports()), collapse = ", ")  })
+                      #output$TestBox <- renderText({ paste0(names(session$userData$CurationReports()), collapse = ", ")  })
 
 
                       # Reactive expression: Data for eligibility overview

@@ -26,7 +26,7 @@ ConvertLogicalToIcon <- function(DataFrame)
 #' @param ID \code{string}
 #'
 #' @return Waiter object
-#' @export
+#' @noRd
 CreateWaiterScreen <- function(ID)
 {
     waiter::Waiter$new(id = ID,

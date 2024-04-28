@@ -10,37 +10,38 @@
 #' @param ShowObjectDetailTable
 #' @noRd
 ModServerWorkspaceMonitor_UI <- function(id,
-                                         ShowObjectDetailTable = TRUE)
+                                         ShowObjectDetailsTable = TRUE)
 {
     ns <- NS(id)
 
-    DisplayObjectDetails <- ifelse(ShowObjectDetailTable == TRUE,
-                                   "display: block;",
-                                   "display: none;")
-
     div(id = ns("ServerWorkspaceMonitorContainer"),
-        class = "ui scrollable segment",
-        style = "height: 100%;
-                 overflow: auto;
-                 margin: 0;",
+        class = "ui segment",
+        style = paste("height: 100%;",
+                      ifelse(ShowObjectDetailsTable == TRUE, "", "overflow: auto;"),
+                      "margin: 0;"),
 
         div(class = "ui top attached label",
             "Server R Session Workspace"),
 
-        div(style = "display: grid;
-                     grid-template-columns: 3fr 1fr;
-                     grid-gap: 1em;
-                     margin: 0;",
+        div(style = paste("display: grid;",
+                          ifelse(ShowObjectDetailsTable == TRUE, "grid-template-columns: 5fr 2fr;", "grid-template-columns: 1fr;"),
+                          "grid-gap: 1em;
+                           margin: 0;
+                           height: 100%;"),
 
-            div(style = "height: 100%;",
+            div(style = ifelse(ShowObjectDetailsTable == TRUE,
+                               "height: calc(100% - 30px); overflow: auto;",
+                               "height: 100%;"),
 
-                DTOutput(ns("WorkspaceObjects"))),
+                DTOutput(ns("WorkspaceObjects"),
+                         width = "calc(100% - 14px)")),      # Width calculation necessary to avoid false overflow rendering (vertical scroll bar is approx. 14 px wide)
 
-            div(style = paste(DisplayObjectDetails,
-                              "height: 100%;"),
+            div(style = paste(ifelse(ShowObjectDetailsTable == TRUE, "display: block;", "display: none;"),
+                              "height: calc(100% - 30px);
+                               overflow: auto;"),
 
-                DTOutput(ns("ObjectDetails")))))
-
+                DTOutput(ns("ObjectDetails"),
+                         width = "calc(100% - 14px)"))))
 }
 
 
@@ -67,7 +68,7 @@ ModServerWorkspaceMonitor_Server <- function(id)
                                                                                           ConvertLogicalToIcon()
 
                                                             DT::datatable(data = DataWorkspaceOverview,
-                                                                          class = "ui small compact selectable table",
+                                                                          class = "ui small compact scrollable selectable table",
                                                                           editable = FALSE,
                                                                           escape = FALSE,
                                                                           filter = "none",
@@ -103,7 +104,7 @@ ModServerWorkspaceMonitor_Server <- function(id)
                       output$ObjectDetails <- renderDT({ req(DataObjectDetails())
 
                                                          DT::datatable(data = DataObjectDetails(),
-                                                                       class = "ui small compact inverted selectable table",
+                                                                       class = "ui small compact inverted scrollable selectable table",
                                                                        editable = FALSE,
                                                                        escape = FALSE,
                                                                        filter = "none",
