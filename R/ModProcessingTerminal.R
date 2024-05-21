@@ -64,11 +64,11 @@ ModProcessingTerminal_Server <- function(id)
                     observe({ shinyjs::showElement(id = "Monitor", anim = TRUE, animType = "fade") }) %>%
                         bindEvent(ReturnMessages())
 
-                    # Setting up loading screen with waiter package
+                    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                    # Setting up loading behavior with waiter package functionality
+                    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                     ns <- session$ns
-                    WaiterScreen <- Waiter$new(id = ns("WaiterScreenContainer"),
-                                               html = spin_3(),
-                                               color = transparent(.5))
+                    WaiterScreen <- CreateWaiterScreen(ID = ns("WaiterScreenContainer"))
 
 
                     if (id == "CheckServerRequirements")

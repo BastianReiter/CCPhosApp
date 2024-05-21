@@ -43,8 +43,7 @@ ModServerOpalMonitor_Server <- function(id)
                       output$ServerOpalMonitor <- renderDT({  req(session$userData$ServerOpalInfo())
 
                                                               DataServerOpalInfo <- session$userData$ServerOpalInfo() %>%
-                                                                                        select(-IsAvailableEverywhere,
-                                                                                               -NotAvailableAt) %>%
+                                                                                        select(-NotAvailableAt) %>%
                                                                                         ConvertLogicalToIcon()
 
                                                               DT::datatable(data = DataServerOpalInfo,

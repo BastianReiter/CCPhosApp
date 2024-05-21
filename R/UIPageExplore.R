@@ -20,5 +20,7 @@ UIPageExplore <- function()
         #-----------------------------------------------------------------------
 
 
-        ModUnivariateExploration_UI("UnivariateExploration"))
+        div(style = "height: 40em;",
+
+            ModUnivariateExploration_UI("UnivariateExploration")))
 }

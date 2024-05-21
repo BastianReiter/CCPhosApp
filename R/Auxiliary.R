@@ -18,3 +18,18 @@ ConvertLogicalToIcon <- function(DataFrame)
     }
     else { return(NULL) }
 }
+
+
+
+#' CreateWaiterScreen
+#'
+#' @param ID \code{string}
+#'
+#' @return Waiter object
+#' @noRd
+CreateWaiterScreen <- function(ID)
+{
+    waiter::Waiter$new(id = ID,
+                       html = spin_3(),
+                       color = transparent(.5))
+}

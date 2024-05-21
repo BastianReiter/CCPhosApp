@@ -368,10 +368,13 @@ InitiateStepJS(StepID = "Step_AugmentData")
 
 
 # --- Call module: Server Workspace Monitor ---
-ModServerWorkspaceMonitor_Server("Explore-ServerWorkspaceMonitor")
+Selection <- ModServerWorkspaceMonitor_Server("Explore-ServerWorkspaceMonitor")
+SelectedObject <- Selection$Object
+SelectedElement <- Selection$Element
 
 # --- Call module: Univariate Exploration ---
-ModUnivariateExploration_Server("UnivariateExploration")
+ModUnivariateExploration_Server("UnivariateExploration",
+                                Selection)
 
 
 

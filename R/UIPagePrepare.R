@@ -79,10 +79,14 @@ UIPagePrepare <- function()
                                  grid-gap: 1em;
                                  height: 22em;",
 
-                        ModServerOpalMonitor_UI("ServerOpalMonitor"),
+                        div(style = "height: 100%;
+                                     overflow: auto;",
+                            ModServerOpalMonitor_UI("ServerOpalMonitor")),
 
-                        ModServerWorkspaceMonitor_UI("Prepare-ServerWorkspaceMonitor",
-                                                     ShowObjectDetailTable = FALSE))))),
+                        div(style = "height: 100%;
+                                     overflow: auto;",
+                            ModServerWorkspaceMonitor_UI("Prepare-ServerWorkspaceMonitor",
+                                                         ShowObjectDetailsTable = FALSE)))))),
 
 
         #-----------------------------------------------------------------------

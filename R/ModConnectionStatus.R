@@ -29,6 +29,10 @@ ModConnectionStatus_UI <- function(id)
                  # Status Text
                  textOutput(ns("StatusText")),
 
+                 # Button for switching back to console session
+                 action_button(ns("ConsoleButton"),
+                               label = "Back to Console"),
+
                  # Logout Button
                  action_button(ns("LogoutButton"),
                                label = "Logout"))
@@ -56,9 +60,21 @@ ModConnectionStatus_Server <- function(id)
                       output$StatusText <- renderText({ if (is.list(session$userData$CCPConnections())) { "Connected to CCP" }
                                                         else { "No connection established" } })
 
-                      observe({ if (is.list(session$userData$CCPConnections())) { shinyjs::enable("LogoutButton") }
-                                else { shinyjs::disable("LogoutButton") } })
+                      observe({ if (is.list(session$userData$CCPConnections()))
+                                {
+                                    shinyjs::enable("ConsoleButton")
+                                    shinyjs::enable("LogoutButton")
+                                }
+                                else
+                                {
+                                    shinyjs::disable("ConsoleButton")
+                                    shinyjs::disable("LogoutButton")
+                                } })
 
+
+                      # Switch console button functionality
+
+                      # Logout button functionality
                       observe({ DSI::datashield.logout(session$userData$CCPConnections())
                                 session$userData$CCPConnections(NULL) }) %>%
                           bindEvent(input$LogoutButton)

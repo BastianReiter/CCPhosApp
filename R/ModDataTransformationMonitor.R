@@ -84,12 +84,11 @@ ModDataTransformationMonitor_Server <- function(id)
     moduleServer(id,
                  function(input, output, session)
                  {
+                      #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                       # Setting up loading behavior
                       #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                       ns <- session$ns
-                      WaiterScreen <- Waiter$new(id = ns("WaiterScreenContainer"),
-                                                 html = spin_3(),
-                                                 color = transparent(.5))
+                      WaiterScreen <- CreateWaiterScreen(ID = ns("WaiterScreenContainer"))
 
                       LoadingOn <- function()
                       {
@@ -106,6 +105,7 @@ ModDataTransformationMonitor_Server <- function(id)
                           shinyjs::enable("ShowNonOccurringValues")
                           WaiterScreen$hide()
                       }
+                      #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
                       # Update input elements when data changes
@@ -122,12 +122,12 @@ ModDataTransformationMonitor_Server <- function(id)
 
 
 
-                      #output$TestBox <- renderText({ length(PlotList_EligibilityOverview())  })
+                      #output$TestBox <- renderText({ paste0(names(session$userData$CurationReports()), collapse = ", ")  })
 
 
                       # Reactive expression: Data for eligibility overview
                       #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                      Data_EligibilityOverview <- reactive({ req(session$userData$CurationReports)
+                      Data_EligibilityOverview <- reactive({ req(session$userData$CurationReports())
                                                              req(input$SiteName)
                                                              req(input$MonitorTableName)
 
@@ -151,7 +151,7 @@ ModDataTransformationMonitor_Server <- function(id)
                                                            })
 
                       # List of plotly-objects to be assigned to output
-                      PlotList_EligibilityOverview <- reactive({ req(Data_EligibilityOverview)
+                      PlotList_EligibilityOverview <- reactive({ req(Data_EligibilityOverview())
 
                                                                  Data_EligibilityOverview()$Feature %>%
                                                                       map(function(feature)
@@ -189,7 +189,7 @@ ModDataTransformationMonitor_Server <- function(id)
                       #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
                       # Dynamically create empty UI elements to be filled further down
-                      output$EligibilityOverview <- renderUI({ req(Data_EligibilityOverview)
+                      output$EligibilityOverview <- renderUI({ req(Data_EligibilityOverview())
 
                                                                # Assign loading behavior
                                                                LoadingOn()
@@ -228,7 +228,7 @@ ModDataTransformationMonitor_Server <- function(id)
 
                       # Reactive expression: Data for transformation track table
                       #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                      Data_TransformationTracks <- reactive({ req(session$userData$CurationReports)
+                      Data_TransformationTracks <- reactive({ req(session$userData$CurationReports())
                                                               req(input$SiteName)
                                                               req(input$MonitorTableName)
 
@@ -258,7 +258,7 @@ ModDataTransformationMonitor_Server <- function(id)
 
                       # Render reactive output: TransformationTracks
                       #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                      output$TransformationTracks <- renderUI({  req(Data_TransformationTracks)
+                      output$TransformationTracks <- renderUI({  req(Data_TransformationTracks())
 
                                                                   # Assign loading behavior
                                                                   LoadingOn()

@@ -66,8 +66,6 @@ shiny.semantic::semanticPage(
 
                                             cols_width = c("1fr", "8fr", "1fr"))),
 
-        #container_style = "height: 100vh",
-
         area_styles = list(header = "padding: 10px 2em;
                                      background: rgb(5,73,150);
                                      background: linear-gradient(90deg, rgba(5,73,150,1) 8%, rgba(255,255,255,1) 100%);
@@ -101,7 +99,7 @@ shiny.semantic::semanticPage(
                            a(id = "MenuItem_Start",
                              class = "item",
                              icon("plug"),
-                             "START",
+                             "CONNECT",
                              href = route_link("/")),
 
                            a(id = "MenuItem_Prepare",
