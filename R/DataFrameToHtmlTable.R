@@ -11,6 +11,7 @@
 #' @param RotatedHeaderNames
 #' @param RowColorColumn \code{string}
 #' @param SemanticTableClass
+#' @param TableStyle A \code{string} containing CSS style elements
 #' @param TurnLogicalIntoIcon
 #'
 #' @return HTML code
@@ -26,6 +27,7 @@ DataFrameToHtmlTable <- function(DataFrame,
                                  RotatedHeaderNames = character(),
                                  RowColorColumn = NULL,
                                  SemanticTableClass = "ui celled table",
+                                 TableStyle = "",
                                  TurnLogicalIntoIcon = FALSE)
 {
     # For testing purposes only
@@ -49,6 +51,10 @@ DataFrameToHtmlTable <- function(DataFrame,
     {
         return("")
     }
+
+
+    # Convert object passed to 'DataFrame' argument (e.g. tibble) to data.frame
+    DataFrame <- as.data.frame(DataFrame)
 
 
     # If no explicit TableID is passed, assign it a random sample of letters
@@ -249,7 +255,9 @@ DataFrameToHtmlTable <- function(DataFrame,
                               ")")
 
     # Concatenate all substrings into one string
-    HtmlCallString <- paste0("tags$table(id = '", TableID, "', class = '", SemanticTableClass, "', ",
+    HtmlCallString <- paste0("tags$table(id = '", TableID,
+                                     "', class = '", SemanticTableClass,
+                                     "', style = '", TableStyle, "', ",
                              StringTableHead,
                              ", ",
                              StringTableBody,

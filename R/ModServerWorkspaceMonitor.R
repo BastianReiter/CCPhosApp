@@ -97,7 +97,7 @@ ModServerWorkspaceMonitor_Server <- function(id)
                       DataObjectDetails <- reactive({ req(session$userData$ServerWorkspaceInfo())
                                                       req(SelectedObjectName())
 
-                                                      session$userData$ServerWorkspaceInfo()$Details[[SelectedObjectName()]]$ContentOverview
+                                                      session$userData$ServerWorkspaceInfo()$Details[[SelectedObjectName()]]$Structure
                                                     })
 
 
