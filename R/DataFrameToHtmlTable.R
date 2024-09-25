@@ -7,12 +7,14 @@
 #' @param CellClassColumns character vector
 #' @param ColContentHorizontalAlign Either a single string for all columns or a named character vector to determine horizontal content alignment for specific columns
 #' @param ColumnClass Either a single string for all columns or a named character vector to determine table cell classes for specific columns
-#' @param ColumnLabels named character vector
-#' @param RotatedHeaderNames
+#' @param ColumnLabels named \code{vector}
+#' @param ColumnIcons named \code{vector}
+#' @param RotatedHeaderNames \code{vector}
 #' @param RowColorColumn \code{string}
-#' @param SemanticTableClass
+#' @param SemanticTableClass \code{string}
 #' @param TableStyle A \code{string} containing CSS style elements
-#' @param TurnLogicalIntoIcon
+#' @param TurnLogicalIntoIcon \code{logical}
+#' @param TurnColorValuesIntoDots \code{logical}
 #'
 #' @return HTML code
 #' @export
@@ -24,11 +26,13 @@ DataFrameToHtmlTable <- function(DataFrame,
                                  ColContentHorizontalAlign = "left",
                                  ColumnClass = NULL,
                                  ColumnLabels = NULL,
+                                 ColumnIcons = NULL,
                                  RotatedHeaderNames = character(),
                                  RowColorColumn = NULL,
                                  SemanticTableClass = "ui celled table",
                                  TableStyle = "",
-                                 TurnLogicalIntoIcon = FALSE)
+                                 TurnLogicalIntoIcon = FALSE,
+                                 TurnColorValuesIntoDots = FALSE)
 {
     # For testing purposes only
     # TableID <- NULL
@@ -76,6 +80,9 @@ DataFrameToHtmlTable <- function(DataFrame,
         CategoryValues <- unique(DataFrame[[CategoryColumn]])
     }
 
+    # Define set of colors that are available for colored icons (taken from Semantic UI)
+    AvailableColors <- c("red", "orange", "yellow", "olive", "green", "teal", "blue", "violet", "purple", "pink", "brown", "grey", "black")
+
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # Table Header: Get collection of th-elements as character-vector
@@ -109,13 +116,18 @@ DataFrameToHtmlTable <- function(DataFrame,
                                                 # If optional 'RotatedHeaderNames' is passed
                                                 if (colname %in% RotatedHeaderNames) { HeaderCellClass <- paste(HeaderCellClass, "rotate") }
 
+                                                # Put naive column name in span tag
+                                                ColLabel <- paste0("span('", colname, "')")
 
                                                 # Replace column label if passed in ColumnLabels
-                                                if (colname %in% names(ColumnLabels)) { colname <- ColumnLabels[colname] }
+                                                if (colname %in% names(ColumnLabels)) { ColLabel <- paste0("span('", ColumnLabels[colname], "')") }
+
+                                                # Replace column label with icon if passed in ColumnIcons
+                                                if (colname %in% names(ColumnIcons)) { ColLabel <- paste0("icon(class = '", ColumnIcons[colname], "')") }
 
                                                 paste0("tags$th(",
                                                        "class = '", HeaderCellClass, "', ",   # Add th CSS class
-                                                       "div(span('", colname, "')))")
+                                                       "div(", ColLabel, "))")
                                             }
                                             else { return(NA) }
                                          })
@@ -222,11 +234,13 @@ DataFrameToHtmlTable <- function(DataFrame,
                                                             paste0("class = '", CellClass, "', "),
                                                             ""),
                                                      #--- Turn logical cell value into icon if option is passed ---
-                                                     ifelse(TurnLogicalIntoIcon == TRUE,
+                                                     ifelse(TurnLogicalIntoIcon == TRUE & CellValue %in% c(TRUE, FALSE),
                                                             case_when(CellValue == TRUE ~ "icon(class = 'small green check')",
-                                                                      CellValue == FALSE ~ "icon(class = 'small red times')",
-                                                                      TRUE ~ paste0("'", CellValue, "'")),
-                                                            paste0("'", CellValue, "'")),
+                                                                      CellValue == FALSE ~ "icon(class = 'small red times')"),
+                                                     #--- Turn color string cell value into colored dot icon if option is passed ---
+                                                            ifelse(TurnColorValuesIntoDots == TRUE & CellValue %in% AvailableColors,
+                                                                   paste0("icon(class = 'small ", CellValue, " circle')"),
+                                                                   paste0("'", CellValue, "'"))),
                                                      #--- Add optional icon to value as determined by cell class ---
                                                      ifelse(CellIcon != "None",
                                                             paste0(", HTML('&ensp;'), ", CellIcon),      # Add two spaces before icon

@@ -28,10 +28,11 @@ waiter::waiter_hide()
 # Initialize global objects
 session$userData$CCPConnections <- reactiveVal(NULL)
 session$userData$CCPSiteSpecifications <- reactiveVal(NULL)
+session$userData$Checkpoints <- reactiveVal(NULL)
+session$userData$CurationReports <- reactiveVal(NULL)
+session$userData$RDSTableCheck <- reactiveVal(NULL)
 session$userData$ServerOpalInfo <- reactiveVal(NULL)
 session$userData$ServerWorkspaceInfo <- reactiveVal(NULL)
-
-session$userData$CurationReports <- reactiveVal(NULL)
 
 session$userData$CCPTestData <- NULL
 
@@ -91,8 +92,8 @@ output$ProjectNameOutput <- renderUI({ "" })
                                         #   paste0("Project: ", session$userData$ProjectName())) })
 
 # For testing purposes: Arbitrary text monitor element
-output$TestMonitor <- renderText({ #session$userData$CCPSiteSpecifications()[1,1]
-                                    ""
+output$TestMonitor <- renderText({ ""
+
                                  })
 
 
@@ -124,8 +125,14 @@ observe({ if (is.list(session$userData$CCPConnections())) { StatusConnected(TRUE
           else { StatusConnected(FALSE) } })
 
 
+# --- Call module: Server Checkpoints ---
+ModCheckpoints_Server("Checkpoints")
+
 # --- Call module: Server Opal Monitor ---
 ModServerOpalMonitor_Server("ServerOpalMonitor")
+
+# --- Call module: RDS Table Monitor ---
+ModRDSTableMonitor_Server("RDSTableMonitor")
 
 # --- Call module: Server Workspace Monitor ---
 ModServerWorkspaceMonitor_Server("Prepare-ServerWorkspaceMonitor")

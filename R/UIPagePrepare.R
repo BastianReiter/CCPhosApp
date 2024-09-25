@@ -65,28 +65,130 @@ UIPagePrepare <- function()
         #-----------------------------------------------------------------------
 
 
-        div(class = "ui accordion",      # Note: For this to work extra JS script is necessary (see MainUIComponent())
+        div(class = "ui accordion",      # Note: For this to work an extra JS script is necessary (see MainUIComponent())
 
             div(class = "active title AccordionHeader",
                 icon(class = "dropdown icon"),
-                "Server Monitor"),
+                "Checkpoints"),
 
             div(class = "active content",
 
                 div( # Child of 'active content' in accordion has to be a container div. Can not be the grid div directly, this leads to loss of grid structure when accordion functionality is performed.
                     div(style = "display: grid;
-                                 grid-template-columns: 1fr 1fr;
-                                 grid-gap: 1em;
-                                 height: 22em;",
+                                 grid-template-columns: 4fr 1fr;
+                                 grid-gap: 2em;
+                                 height: 11em;",
 
                         div(style = "height: 100%;
-                                     overflow: auto;",
-                            ModServerOpalMonitor_UI("ServerOpalMonitor")),
+                                     overflow: auto;
+                                     margin: 0;",
 
-                        div(style = "height: 100%;
-                                     overflow: auto;",
-                            ModServerWorkspaceMonitor_UI("Prepare-ServerWorkspaceMonitor",
-                                                         ShowObjectDetailsTable = FALSE)))))),
+                            ModCheckpoints_UI("Checkpoints")),
+
+                        div(style = "display: grid;
+                                     align-items: center;
+                                     margin-right: 1em;",
+
+                            action_button("ButtonModifyConnections",
+                                          label = "Modify Connections")))))),
+
+
+        #-----------------------------------------------------------------------
+        div(class = "ui divider",
+            style = "margin: 1.5em 0;"),
+        #-----------------------------------------------------------------------
+
+
+        div(class = "ui accordion",      # Note: For this to work an extra JS script is necessary (see MainUIComponent())
+
+            div(class = "active title AccordionHeader",
+                icon(class = "dropdown icon"),
+                "Opal Database Monitor"),
+
+            div(class = "active content",
+
+                div(style = "height: 11em;
+                             overflow: auto;
+                             margin: 0;",
+
+                    ModServerOpalMonitor_UI("ServerOpalMonitor")))),
+
+
+        #-----------------------------------------------------------------------
+        div(class = "ui divider",
+            style = "margin: 1.5em 0;"),
+        #-----------------------------------------------------------------------
+
+
+        div(class = "ui accordion",      # Note: For this to work an extra JS script is necessary (see MainUIComponent())
+
+            div(class = "active title AccordionHeader",
+                icon(class = "dropdown icon"),
+                "Server R Session Workspace"),
+
+            div(class = "active content",
+
+                div(style = "height: 20em;
+                             overflow: auto;
+                             margin: 0;",
+
+                    ModServerWorkspaceMonitor_UI("Prepare-ServerWorkspaceMonitor",
+                                                 ShowObjectDetailsTable = FALSE)))),
+
+
+        #-----------------------------------------------------------------------
+        div(class = "ui divider",
+            style = "margin: 1.5em 0;"),
+        #-----------------------------------------------------------------------
+
+
+        div(class = "ui accordion",      # Note: For this to work an extra JS script is necessary (see MainUIComponent())
+
+            div(class = "active title AccordionHeader",
+                icon(class = "dropdown icon"),
+                "Raw Data Set Table Check"),
+
+            div(class = "active content",
+
+                div(style = "height: 30em;
+                             overflow: auto;
+                             margin: 0;",
+
+                    ModRDSTableMonitor_UI("RDSTableMonitor")))),
+
+
+        # #-----------------------------------------------------------------------
+        # div(class = "ui divider",
+        #     style = "margin: 1.5em 0;"),
+        # #-----------------------------------------------------------------------
+        #
+        #
+        # div(class = "ui accordion",      # Note: For this to work an extra JS script is necessary (see MainUIComponent())
+        #
+        #     div(class = "active title AccordionHeader",
+        #         icon(class = "dropdown icon"),
+        #         "Server R Session Workspace"),
+        #
+        #     div(class = "active content",
+        #
+        #         div( # Child of 'active content' in accordion has to be a container div. Can not be the grid div directly, this leads to loss of grid structure when accordion functionality is performed.
+        #             div(style = "display: grid;
+        #                          grid-template-columns: 1fr 1fr;
+        #                          grid-gap: 2em;
+        #                          height: 22em;",
+        #
+        #                 div(style = "height: 100%;
+        #                              overflow: auto;
+        #                              margin: 0;",
+        #
+        #                     tabset(tabs = list(list(menu = "Opal", content = ModServerOpalMonitor_UI("ServerOpalMonitor"), id = "Tab_ServerOpalMonitor"),
+        #                                        list(menu = "RDS Tables", content = ModRDSTableMonitor_UI("RDSTableMonitor"), id = "Tab_RDSTableMonitor")),
+        #                            active = "Tab_ServerOpalMonitor")),
+        #
+        #                 div(style = "height: 100%;
+        #                              overflow: auto;",
+        #                     ModServerWorkspaceMonitor_UI("Prepare-ServerWorkspaceMonitor",
+        #                                                  ShowObjectDetailsTable = FALSE)))))),
 
 
         #-----------------------------------------------------------------------

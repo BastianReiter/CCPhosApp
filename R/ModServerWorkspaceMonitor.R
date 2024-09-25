@@ -15,13 +15,14 @@ ModServerWorkspaceMonitor_UI <- function(id,
     ns <- NS(id)
 
     div(id = ns("ServerWorkspaceMonitorContainer"),
-        class = "ui segment",
+        class = paste(ifelse(ShowObjectDetailsTable == TRUE, "ui segment", "")),
         style = paste("height: 100%;",
                       ifelse(ShowObjectDetailsTable == TRUE, "", "overflow: auto;"),
                       "margin: 0;"),
 
-        div(class = "ui top attached label",
-            "Server R Session Workspace"),
+        div(class = ifelse(ShowObjectDetailsTable == TRUE, "ui top attached label", ""),
+            style = ifelse(ShowObjectDetailsTable == TRUE, "", "display: none;"),
+            ifelse(ShowObjectDetailsTable == TRUE, "Server R Session Workspace", "")),
 
         div(style = paste("display: grid;",
                           ifelse(ShowObjectDetailsTable == TRUE, "grid-template-columns: 5fr 2fr;", "grid-template-columns: 1fr;"),

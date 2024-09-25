@@ -105,7 +105,7 @@ ModDataTransformationMonitor_Server <- function(id)
                           shinyjs::enable("ShowNonOccurringValues")
                           WaiterScreen$hide()
                       }
-                      #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                      #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
                       # Update input elements when data changes
@@ -150,6 +150,32 @@ ModDataTransformationMonitor_Server <- function(id)
                                                              }
                                                            })
 
+
+                      #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                      # Render reactive output: Plots for eligibility overview
+                      #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+                      # Dynamically create empty UI elements to be filled further down
+                      output$EligibilityOverview <- renderUI({ req(Data_EligibilityOverview())
+
+                                                               # Assign loading behavior
+                                                               LoadingOn()
+                                                               on.exit(LoadingOff())
+
+                                                               # Create list of divs with (empty) plotlyOutput objects with an assigned Output ID for plots
+                                                               PlotOutputList <- Data_EligibilityOverview()$Feature %>%
+                                                                                      imap(function(feature, index)
+                                                                                           {
+                                                                                              div(div(class = "ui small grey ribbon label",
+                                                                                                      feature),   # Plot label
+                                                                                                  plotlyOutput(outputId = ns(paste0("PlotEligibility_", index)),
+                                                                                                               height = "120px"))
+                                                                                           })
+
+                                                               # Convert into tagList for html output
+                                                               do.call(tagList, PlotOutputList)
+                                                             })
+
                       # List of plotly-objects to be assigned to output
                       PlotList_EligibilityOverview <- reactive({ req(Data_EligibilityOverview())
 
@@ -184,32 +210,6 @@ ModDataTransformationMonitor_Server <- function(id)
                                                                           })
                                                                })
 
-
-                      # Render reactive output: Plots for eligibility overview
-                      #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-                      # Dynamically create empty UI elements to be filled further down
-                      output$EligibilityOverview <- renderUI({ req(Data_EligibilityOverview())
-
-                                                               # Assign loading behavior
-                                                               LoadingOn()
-                                                               on.exit(LoadingOff())
-
-                                                               # Create list of divs with (empty) plotlyOutput objects with an assigned Output ID for plots
-                                                               PlotOutputList <- Data_EligibilityOverview()$Feature %>%
-                                                                                      imap(function(feature, index)
-                                                                                           {
-                                                                                              div(div(class = "ui small grey ribbon label",
-                                                                                                      feature),   # Plot label
-                                                                                                  plotlyOutput(outputId = ns(paste0("PlotEligibility_", index)),
-                                                                                                               height = "120px"))
-                                                                                           })
-
-                                                               # Convert into tagList for html output
-                                                               do.call(tagList, PlotOutputList)
-                                                             })
-
-
                       # For now, each output element must be assigned explicitly
                       output[["PlotEligibility_1"]] <- renderPlotly({ req(PlotList_EligibilityOverview); PlotList_EligibilityOverview()[[1]] })
                       output[["PlotEligibility_2"]] <- renderPlotly({ req(PlotList_EligibilityOverview); PlotList_EligibilityOverview()[[2]] })
@@ -226,6 +226,7 @@ ModDataTransformationMonitor_Server <- function(id)
 
 
 
+                      #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                       # Reactive expression: Data for transformation track table
                       #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                       Data_TransformationTracks <- reactive({ req(session$userData$CurationReports())
@@ -258,7 +259,7 @@ ModDataTransformationMonitor_Server <- function(id)
 
                       # Render reactive output: TransformationTracks
                       #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                      output$TransformationTracks <- renderUI({  req(Data_TransformationTracks())
+                      output$TransformationTracks <- renderUI({   req(Data_TransformationTracks())
 
                                                                   # Assign loading behavior
                                                                   LoadingOn()

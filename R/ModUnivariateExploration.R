@@ -25,7 +25,7 @@ ModUnivariateExploration_UI <- function(id)
                      grid-template-areas: 'head head'
                                           'options1 featureinfo'
                                           'options2 statistics';
-                     grid-template-rows: 3em 1fr 1fr;
+                     grid-template-rows: 3em 14em auto;
                      grid-template-columns: 1fr 4fr;",
 
 
@@ -54,18 +54,18 @@ ModUnivariateExploration_UI <- function(id)
             # Options concerning feature selection
             #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-            div(style = "grid-area: options1;
-                         padding: 10px;",
-
-                selectInput(inputId = ns("SelectTable"),
-                            label = "Table",
-                            choices = ""),
-
-                br(),
-
-                selectInput(inputId = ns("SelectFeature"),
-                            label = "Feature",
-                            choices = "")),
+            # div(style = "grid-area: options1;
+            #              padding: 10px;",
+            #
+            #     selectInput(inputId = ns("SelectTable"),
+            #                 label = "Table",
+            #                 choices = ""),
+            #
+            #     br(),
+            #
+            #     selectInput(inputId = ns("SelectFeature"),
+            #                 label = "Feature",
+            #                 choices = "")),
 
 
             # Options concerning statistics display
@@ -74,9 +74,11 @@ ModUnivariateExploration_UI <- function(id)
             div(style = "grid-area: options2;
                          padding: 10px;",
 
-                selectInput(inputId = ns("SelectMaxNumberCategories"),
-                            label = "Number of distinct categories",
-                            choices = "")),
+                slider_input(input_id = ns("SliderMaxNumberCategories"),
+                             value = 6,
+                             min = 1,
+                             max = 10,
+                             step = 1)),
 
 
             # Feature Info row
@@ -86,12 +88,13 @@ ModUnivariateExploration_UI <- function(id)
                          padding: 10px;",
 
                 div(style = "display: grid;
-                             grid-template-columns: 2fr 1fr;
+                             grid-template-columns: auto auto;
                              grid-gap: 1em;",
 
-                    DTOutput(ns("FeatureInfoTable")))),
+                    DTOutput(ns("FeatureInfoTable")),
 
-                    #plotlyOutput(ns("FeatureInfoPlot")))),
+                    plotOutput(ns("FeatureInfoPlot"),
+                               width = "80%"))),
 
 
             # Statistics Row
@@ -100,12 +103,13 @@ ModUnivariateExploration_UI <- function(id)
                          padding: 10px;",
 
                 div(style = "display: grid;
-                             grid-template-columns: 2fr 1fr;
-                             grid-gap: 1em;",
+                             grid-template-rows: auto auto;
+                             grid-gap: 2em;",
 
-                    DTOutput(ns("StatisticsTable"))))))
+                    DTOutput(ns("StatisticsTable")),
 
-                    #plotlyOutput(ns("StatisticsPlot"))))))
+                    plotOutput(ns("StatisticsPlot"),
+                               width = "80%")))))
 }
 
 
@@ -123,6 +127,7 @@ ModUnivariateExploration_Server <- function(id,
                                             ObjectSelection)
 {
     require(DT)
+    require(plotly)
 
     moduleServer(id,
                  function(input, output, session)
@@ -150,7 +155,12 @@ ModUnivariateExploration_Server <- function(id,
 
 
                       # Create reactive expression that returns an expression triggering output rendering (by being bound to various expressions below)
-                      TriggerUpdate <- reactive({ if (input$AutoUpdate == TRUE) { ObjectSelection$Element() } else { input$UpdateButton } })
+                      TriggerUpdate <- reactive({ if (input$AutoUpdate == TRUE)
+                                                  {
+                                                      list(ObjectSelection$Element(),
+                                                           input$SliderMaxNumberCategories)
+                                                  }
+                                                  else { input$UpdateButton } })
 
 
                       # Render selection info label (header)
@@ -232,7 +242,7 @@ ModUnivariateExploration_Server <- function(id,
                                                     return(dsCCPhosClient::ds.GetFrequencyTable(DataSources = session$userData$CCPConnections(),
                                                                                                 TableName = ObjectSelection$Object(),
                                                                                                 FeatureName = ObjectSelection$Element(),
-                                                                                                MaxNumberCategories = 10))
+                                                                                                MaxNumberCategories = input$SliderMaxNumberCategories))
                                                 }
                                                 else { return(NULL) }
 
@@ -291,36 +301,56 @@ ModUnivariateExploration_Server <- function(id,
                                                          }) %>% bindEvent({ TriggerUpdate() })
 
 
-                      # output$StatisticsPlot <- renderPlotly({ req(Statistics())
-                      #
-                      #                                         if (FeatureType() %in% c("character", "logical"))
-                      #                                         {
-                      #                                             plot_ly(data = as.data.frame(Statistics()$AbsoluteFrequencies),      # Must be a data.frame, not a tibble!
-                      #                                                     x = ~Stage,
-                      #                                                     y = ~Eligible,
-                      #                                                     type = "bar",
-                      #                                                     name = "Eligible",
-                      #                                                     color = I(dsCCPhosClient::CCPhosColors$Green),
-                      #                                                     showlegend = FALSE) %>%
-                      #                                                 add_trace(y = ~Ineligible,
-                      #                                                           name = "Ineligible",
-                      #                                                           color = I(dsCCPhosClient::CCPhosColors$Red)) %>%
-                      #                                                 add_trace(y = ~Missing,
-                      #                                                           name = "Missing",
-                      #                                                           color = I(dsCCPhosClient::CCPhosColors$MediumGrey)) %>%
-                      #                                                 layout(font = list(size = 11,
-                      #                                                                    color = I(dsCCPhosClient::CCPhosColors$DarkGrey)),
-                      #                                                        xaxis = list(#side = "top",
-                      #                                                                     title = "",
-                      #                                                                     categoryorder = "array",
-                      #                                                                     categoryarray = c("Raw", "Harmonized", "Recoded", "Final")),
-                      #                                                        yaxis = list(title = "",
-                      #                                                                     showticklabels = FALSE),
-                      #                                                        barmode = "stack") %>%
-                      #                                                 plotly::config(displayModeBar = FALSE)
-                      #                                         }
-                      #
-                      #                                       })
+                      output$StatisticsPlot <- renderPlot({ req(FeatureType())
+                                                              req(Statistics())
+
+                                                              if (FeatureType() %in% c("double", "integer", "numeric"))
+                                                              {
+                                                                  Plot <- dsCCPhosClient::MakeBoxPlot(SampleStatistics = Statistics())
+                                                              }
+
+                                                              if (FeatureType() %in% c("character", "logical"))
+                                                              {
+                                                                  PlotData <- Statistics()$AbsoluteFrequencies %>%
+                                                                                  pivot_longer(cols = -Site,
+                                                                                               names_to = "Value",
+                                                                                               values_to = "AbsoluteFrequency") %>%
+                                                                                  filter(Site != "All")
+
+                                                                  Plot <- dsCCPhosClient::MakeColumnPlot(DataFrame = PlotData,
+                                                                                                         XFeature = Value,
+                                                                                                         YFeature = AbsoluteFrequency,
+                                                                                                         GroupingFeature = Site)
+
+
+                                                                  # Plot <- plot_ly(data = as.data.frame(Statistics()$AbsoluteFrequencies),      # Must be a data.frame, not a tibble!
+                                                                  #                 x = ~Stage,
+                                                                  #                 y = ~Eligible,
+                                                                  #                 type = "bar",
+                                                                  #                 name = "Eligible",
+                                                                  #                 color = I(dsCCPhosClient::CCPhosColors$Green),
+                                                                  #                 showlegend = FALSE) %>%
+                                                                  #             add_trace(y = ~Ineligible,
+                                                                  #                       name = "Ineligible",
+                                                                  #                       color = I(dsCCPhosClient::CCPhosColors$Red)) %>%
+                                                                  #             add_trace(y = ~Missing,
+                                                                  #                       name = "Missing",
+                                                                  #                       color = I(dsCCPhosClient::CCPhosColors$MediumGrey)) %>%
+                                                                  #             layout(font = list(size = 11,
+                                                                  #                                color = I(dsCCPhosClient::CCPhosColors$DarkGrey)),
+                                                                  #                    xaxis = list(#side = "top",
+                                                                  #                                 title = "",
+                                                                  #                                 categoryorder = "array",
+                                                                  #                                 categoryarray = c("Raw", "Harmonized", "Recoded", "Final")),
+                                                                  #                    yaxis = list(title = "",
+                                                                  #                                 showticklabels = FALSE),
+                                                                  #                    barmode = "stack") %>%
+                                                                  #             plotly::config(displayModeBar = FALSE)
+                                                              }
+
+                                                              return(Plot)
+
+                                                            })
 
 
                       # observe({ req(session$userData$CCPConnections())

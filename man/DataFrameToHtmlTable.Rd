@@ -12,10 +12,13 @@ DataFrameToHtmlTable(
   ColContentHorizontalAlign = "left",
   ColumnClass = NULL,
   ColumnLabels = NULL,
+  ColumnIcons = NULL,
   RotatedHeaderNames = character(),
   RowColorColumn = NULL,
   SemanticTableClass = "ui celled table",
-  TurnLogicalIntoIcon = FALSE
+  TableStyle = "",
+  TurnLogicalIntoIcon = FALSE,
+  TurnColorValuesIntoDots = FALSE
 )
 }
 \arguments{
@@ -31,11 +34,21 @@ DataFrameToHtmlTable(
 
 \item{ColumnClass}{Either a single string for all columns or a named character vector to determine table cell classes for specific columns}
 
-\item{ColumnLabels}{named character vector}
+\item{ColumnLabels}{named \code{vector}}
+
+\item{ColumnIcons}{named \code{vector}}
+
+\item{RotatedHeaderNames}{\code{vector}}
 
 \item{RowColorColumn}{\code{string}}
 
-\item{TurnLogicalIntoIcon}{}
+\item{SemanticTableClass}{\code{string}}
+
+\item{TableStyle}{A \code{string} containing CSS style elements}
+
+\item{TurnLogicalIntoIcon}{\code{logical}}
+
+\item{TurnColorValuesIntoDots}{\code{logical}}
 }
 \value{
 HTML code
