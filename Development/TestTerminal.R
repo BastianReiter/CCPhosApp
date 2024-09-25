@@ -7,19 +7,29 @@
 
 library(CCPhosApp)
 
-#TestData_Frankfurt <- readRDS("../dsCCPhos/Development/Data/RealData/CCPRealData_Frankfurt.rds")
+
 TestData <- readRDS("../dsCCPhos/Development/Data/TestData/CCPTestData.rds")
-
-#SiteSpecifications <- dsCCPhosClient::CCPSiteSpecifications
-
-
-
 
 StartCCPhosApp(CCPTestData = TestData)
 
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+#TestData_Frankfurt <- readRDS("../dsCCPhos/Development/Data/RealData/CCPRealData_Frankfurt.rds")
+#TestData_WithEmptyTables <- readRDS("../dsCCPhos/Development/Data/TestData/CCPTestData_WithEmptyTables.rds")
+
+#SiteSpecifications <- dsCCPhosClient::CCPSiteSpecifications
 
 
 

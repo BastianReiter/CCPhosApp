@@ -117,6 +117,8 @@ ModLogin_UI <- function(id)
 #' @noRd
 ModLogin_Server <- function(id)
 {
+    require(dplyr)
+
     moduleServer(id,
                  function(input, output, session)
                  {
@@ -152,8 +154,18 @@ ModLogin_Server <- function(id)
 
                               # Assign Site Specifications (CCP credentials and project names) to session$userData according to input table
                               session$userData$CCPSiteSpecifications(SiteSpecifications_EditData())
+
                               # Trigger dsCCPhosClient::ConnectToCCP() and assign return to session$userData
                               session$userData$CCPConnections(dsCCPhosClient::ConnectToCCP(CCPSiteSpecifications = session$userData$CCPSiteSpecifications()))
+
+                              # Initiate 'Checkpoints' data frame ...
+                              Checkpoints <- session$userData$CCPSiteSpecifications() %>%
+                                                  select(SiteName) %>%
+                                                  mutate(ConnectionStatus = case_when(SiteName %in% names(session$userData$CCPConnections()) ~ "green",
+                                                                                      TRUE ~ "red"))
+
+                              # ... and assign it to session$userData object
+                              session$userData$Checkpoints(Checkpoints)
                            }) %>%
                         bindEvent(input$ButtonLogin)
 
@@ -163,10 +175,29 @@ ModLogin_Server <- function(id)
                     observe({ WaiterScreen$show()
                               on.exit({ WaiterScreen$hide() })
 
-                              session$userData$CCPSiteSpecifications(NULL)
-                              session$userData$CCPConnections(dsCCPhosClient::ConnectToVirtualCCP(CCPTestData = session$userData$CCPTestData,
-                                                                                                  NumberOfSites = as.integer(input$NumberOfSites),
-                                                                                                  NumberOfPatientsPerSite = as.integer(input$NumberOfPatientsPerSite)))
+                              # Trigger function that returns connections object
+                              Connections <- dsCCPhosClient::ConnectToVirtualCCP(CCPTestData = session$userData$CCPTestData,
+                                                                                 NumberOfSites = as.integer(input$NumberOfSites),
+                                                                                 NumberOfPatientsPerSite = as.integer(input$NumberOfPatientsPerSite))
+
+                              # Assign connections to session$userData object
+                              session$userData$CCPConnections(Connections)
+
+                              # Assign virtual site specifications to session$userData object
+                              session$userData$CCPSiteSpecifications(data.frame(SiteName = names(Connections),
+                                                                                URL = "Virtual",
+                                                                                ProjectName = "Virtual",
+                                                                                Token = "Virtual"))
+
+                              # Initiate 'Checkpoints' data frame ...
+                              Checkpoints <- session$userData$CCPSiteSpecifications() %>%
+                                                  select(SiteName) %>%
+                                                  mutate(CheckConnection = case_when(SiteName %in% names(session$userData$CCPConnections()) ~ "green",
+                                                                                     TRUE ~ "red"))
+
+                              # ... and assign it to session$userData object
+                              session$userData$Checkpoints(Checkpoints)
+
                            }) %>%
                         bindEvent(input$ButtonLoginVirtual)
                  })

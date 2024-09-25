@@ -70,24 +70,46 @@ ModProcessingTerminal_Server <- function(id)
                     ns <- session$ns
                     WaiterScreen <- CreateWaiterScreen(ID = ns("WaiterScreenContainer"))
 
+                    LoadingOn <- function()
+                    {
+                        shinyjs::disable("ProcessingTrigger")
+                        WaiterScreen$show()
+                    }
+
+                    LoadingOff <- function()
+                    {
+                        shinyjs::enable("ProcessingTrigger")
+                        WaiterScreen$hide()
+                    }
+
 
                     if (id == "CheckServerRequirements")
                     {
-                        observe({ # Set up loading behaviour
-                                  shinyjs::disable("ProcessingTrigger")
-                                  WaiterScreen$show()
-                                  on.exit({ shinyjs::enable("ProcessingTrigger")
-                                            WaiterScreen$hide() })
+                        observe({ # Assign loading behavior
+                                  LoadingOn()
+                                  on.exit(LoadingOff())
 
-                                  # Trigger function CheckServerRequirements() and assign return to reactive value ReturnMessages
-                                  ReturnMessages(dsCCPhosClient::CheckServerRequirements(CCPSiteSpecifications = session$userData$CCPSiteSpecifications(),
-                                                                                         DataSources = session$userData$CCPConnections()))
+                                  # Trigger function CheckServerRequirements() and save returned list
+                                  ServerCheck <- dsCCPhosClient::CheckServerRequirements(CCPSiteSpecifications = session$userData$CCPSiteSpecifications(),
+                                                                                         DataSources = session$userData$CCPConnections())
+
+                                  # Assign 'Messages' to reactive value ReturnMessages
+                                  ReturnMessages(ServerCheck$Messages)
+
+                                  # Update 'Checkpoints' data frame ...
+                                  Checkpoints <- session$userData$Checkpoints() %>%
+                                                      left_join(select(ServerCheck$PackageAvailability, c(SiteName, CheckPackageAvailability)), by = join_by(SiteName)) %>%
+                                                      left_join(ServerCheck$VersionOfdsCCPhos, by = join_by(SiteName)) %>%
+                                                      left_join(select(ServerCheck$FunctionAvailability, c(SiteName, CheckFunctionAvailability)), by = join_by(SiteName)) %>%
+                                                      left_join(select(ServerCheck$OpalTableAvailability, c(SiteName, CheckOpalTableAvailability)), by = join_by(SiteName))
+
+                                  # ... and reassign it to session$userData object
+                                  session$userData$Checkpoints(Checkpoints)
 
                                   # Trigger function GetServerOpalInfo() and assign return (data.frame) to reactive value ServerOpalInfo in session$userData
-                                  session$userData$ServerOpalInfo(dsCCPhosClient::GetServerOpalInfo(CCPSiteSpecifications = session$userData$CCPSiteSpecifications(),
-                                                                                                    DataSources = session$userData$CCPConnections()))
+                                  session$userData$ServerOpalInfo(ServerCheck$OpalTableAvailability)
 
-                                  # Set reactive value Complete TRUE
+                                  # Set reactive value 'Complete' TRUE
                                   Complete(TRUE)
 
                                   }) %>%
@@ -97,15 +119,26 @@ ModProcessingTerminal_Server <- function(id)
 
                     if (id == "LoadData")
                     {
-                        observe({ # Set up loading behaviour
-                                  shinyjs::disable("ProcessingTrigger")
-                                  WaiterScreen$show()
-                                  on.exit({ shinyjs::enable("ProcessingTrigger")
-                                            WaiterScreen$hide() })
+                        observe({ # Assign loading behavior
+                                  LoadingOn()
+                                  on.exit(LoadingOff())
 
                                   # Trigger function LoadRawDataSet() and assign return to reactive value ReturnMessages
                                   ReturnMessages(dsCCPhosClient::LoadRawDataSet(CCPSiteSpecifications = session$userData$CCPSiteSpecifications(),
                                                                                 DataSources = session$userData$CCPConnections()))
+
+                                  # Trigger function ds.CheckRDSTables() and save returned list
+                                  RDSTableCheck <- dsCCPhosClient::ds.CheckRDSTables(DataSources = session$userData$CCPConnections())
+
+                                  # Assign to session$userData object
+                                  session$userData$RDSTableCheck(RDSTableCheck)
+
+                                  # Update 'Checkpoints' data frame ...
+                                  Checkpoints <- session$userData$Checkpoints() %>%
+                                                      left_join(select(RDSTableCheck$TableStatus, c(SiteName, CheckRDSTables)), by = join_by(SiteName))
+
+                                  # # ... and reassign it to session$userData object
+                                  session$userData$Checkpoints(Checkpoints)
 
                                   # Trigger function GetServerWorkspaceInfo() and assign return (data.frame) to reactive value ServerWorkspaceInfo in session$userData
                                   session$userData$ServerWorkspaceInfo(dsCCPhosClient::GetServerWorkspaceInfo(DataSources = session$userData$CCPConnections()))
@@ -120,26 +153,34 @@ ModProcessingTerminal_Server <- function(id)
 
                     if (id == "CurateData")
                     {
-                        observe({ # Set up loading behaviour
-                                  shinyjs::disable("ProcessingTrigger")
-                                  WaiterScreen$show()
-                                  on.exit({ shinyjs::enable("ProcessingTrigger")
-                                            WaiterScreen$hide() })
+                        observe({ # Assign loading behavior
+                                  LoadingOn()
+                                  on.exit(LoadingOff())
 
-                                  # Trigger functions ds.CurateData() and ds.UnpackCuratedDataSet() and assign returns (concatenated lists) to reactive value ReturnMessages
-                                  ReturnMessages(c(dsCCPhosClient::ds.CurateData(RawDataSetName = "RawDataSet",
-                                                                                 OutputName = "CurationOutput",
-                                                                                 DataSources = session$userData$CCPConnections()),
+                                  # Trigger function ds.CurateData() and save return
+                                  Curation <- dsCCPhosClient::ds.CurateData(RawDataSetName = "RawDataSet",
+                                                                            OutputName = "CurationOutput",
+                                                                            DataSources = session$userData$CCPConnections())
 
-                                                   # Make tables from Curated Data Set directly addressable by unpacking them into R server session
-                                                   dsCCPhosClient::ds.UnpackCuratedDataSet(CuratedDataSetName = "CuratedDataSet",
-                                                                                           DataSources = session$userData$CCPConnections())))
+                                  # Assign returned messages (concatenated lists) to reactive value ReturnMessages
+                                  ReturnMessages(Curation$Messages)
 
-                                  # Trigger function ds.GetCurationReport() and assign return to reactive value CurationReports in session$userData
-                                  session$userData$CurationReports(dsCCPhosClient::ds.GetCurationReport(DataSources = session$userData$CCPConnections()))
+                                  # Update 'Checkpoints' data frame ...
+                                  Checkpoints <- session$userData$Checkpoints() %>%
+                                                      left_join(Curation$CurationCompletionCheck, by = join_by(SiteName))
+
+                                  # # ... and reassign it to session$userData object
+                                  session$userData$Checkpoints(Checkpoints)
+
+                                  # Make tables from Curated Data Set directly addressable by unpacking them into R server session
+                                  dsCCPhosClient::ds.UnpackCuratedDataSet(CuratedDataSetName = "CuratedDataSet",
+                                                                          DataSources = session$userData$CCPConnections())
 
                                   # Trigger function GetServerWorkspaceInfo() and assign return to reactive value ServerWorkspaceInfo in session$userData
                                   session$userData$ServerWorkspaceInfo(dsCCPhosClient::GetServerWorkspaceInfo(DataSources = session$userData$CCPConnections()))
+
+                                  # Trigger function ds.GetCurationReport() and assign return to reactive value CurationReports in session$userData
+                                  session$userData$CurationReports(dsCCPhosClient::ds.GetCurationReport(DataSources = session$userData$CCPConnections()))
 
                                   # Set reactive value Complete TRUE
                                   Complete(TRUE)
@@ -151,20 +192,28 @@ ModProcessingTerminal_Server <- function(id)
 
                     if (id == "AugmentData")
                     {
-                        observe({ # Set up loading behaviour
-                                  shinyjs::disable("ProcessingTrigger")
-                                  WaiterScreen$show()
-                                  on.exit({ shinyjs::enable("ProcessingTrigger")
-                                            WaiterScreen$hide() })
+                        observe({ # Assign loading behavior
+                                  LoadingOn()
+                                  on.exit(LoadingOff())
 
-                                  # Trigger functions ds.AugmentData() and ds.UnpackAugmentedDataSet() and assign returns (concatenated lists) to reactive value ReturnMessages
-                                  ReturnMessages(c(dsCCPhosClient::ds.AugmentData(CuratedDataSetName = "CuratedDataSet",
-                                                                                  OutputName = "AugmentationOutput",
-                                                                                  DataSources = session$userData$CCPConnections()),
+                                  # Trigger function ds.AugmentData() and save return
+                                  Augmentation <- dsCCPhosClient::ds.AugmentData(CuratedDataSetName = "CuratedDataSet",
+                                                                                 OutputName = "AugmentationOutput",
+                                                                                 DataSources = session$userData$CCPConnections())
 
-                                                   # Make tables from Augmented Data Set directly addressable by unpacking them into R server session
-                                                   dsCCPhosClient::ds.UnpackAugmentedDataSet(AugmentedDataSetName = "AugmentedDataSet",
-                                                                                             DataSources = session$userData$CCPConnections())))
+                                  # Assign returned messages (concatenated lists) to reactive value ReturnMessages
+                                  ReturnMessages(Augmentation$Messages)
+
+                                  # Update 'Checkpoints' data frame ...
+                                  Checkpoints <- session$userData$Checkpoints() %>%
+                                                      left_join(Augmentation$AugmentationCompletionCheck, by = join_by(SiteName))
+
+                                  # # ... and reassign it to session$userData object
+                                  session$userData$Checkpoints(Checkpoints)
+
+                                  # Make tables from Augmented Data Set directly addressable by unpacking them into R server session
+                                  dsCCPhosClient::ds.UnpackAugmentedDataSet(AugmentedDataSetName = "AugmentedDataSet",
+                                                                            DataSources = session$userData$CCPConnections())
 
                                   # Trigger function GetServerWorkspaceInfo() and assign return to reactive value ServerWorkspaceInfo in session$userData
                                   session$userData$ServerWorkspaceInfo(dsCCPhosClient::GetServerWorkspaceInfo(DataSources = session$userData$CCPConnections()))
