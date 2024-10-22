@@ -179,8 +179,8 @@ ModProcessingTerminal_Server <- function(id)
                                   # Trigger function GetServerWorkspaceInfo() and assign return to reactive value ServerWorkspaceInfo in session$userData
                                   session$userData$ServerWorkspaceInfo(dsCCPhosClient::GetServerWorkspaceInfo(DataSources = session$userData$CCPConnections()))
 
-                                  # Trigger function ds.GetCurationReport() and assign return to reactive value CurationReports in session$userData
-                                  session$userData$CurationReports(dsCCPhosClient::ds.GetCurationReport(DataSources = session$userData$CCPConnections()))
+                                  # Trigger function ds.GetCurationReport() and assign return to reactive value 'CurationReport' in session$userData
+                                  session$userData$CurationReport(dsCCPhosClient::ds.GetCurationReport(DataSources = session$userData$CCPConnections()))
 
                                   # Set reactive value Complete TRUE
                                   Complete(TRUE)

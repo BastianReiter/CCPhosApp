@@ -157,6 +157,27 @@ UIPagePrepare <- function()
                     ModRDSTableMonitor_UI("RDSTableMonitor")))),
 
 
+        #-----------------------------------------------------------------------
+        div(class = "ui divider",
+            style = "margin: 1.5em 0;"),
+        #-----------------------------------------------------------------------
+
+
+        div(class = "ui accordion",      # Note: For this to work an extra JS script is necessary (see MainUIComponent())
+
+            div(class = "active title AccordionHeader",
+                icon(class = "dropdown icon"),
+                "Curation Report"),
+
+            div(class = "active content",
+
+                div(style = "height: 20em;
+                             overflow: auto;
+                             margin: 0;",
+
+                    ModCurationReport_UI("CurationReport")))),
+
+
         # #-----------------------------------------------------------------------
         # div(class = "ui divider",
         #     style = "margin: 1.5em 0;"),

@@ -200,6 +200,10 @@ ModUnivariateExploration_Server <- function(id,
                       # Render table containing info about data availability in selected feature
                       output$FeatureInfoTable <- renderDT({  req(FeatureInfo())
 
+                                                             # Assign loading behavior
+                                                             LoadingOn()
+                                                             on.exit(LoadingOff())
+
                                                              # Restructure table data for table displaying purposes ('Count (Proportion %)')
                                                              TableData <- FeatureInfo() %>%
                                                                               mutate("N Valid" = paste0(N_Valid, " (", round(ValidProportion * 100, 0), "%)"),
@@ -251,6 +255,10 @@ ModUnivariateExploration_Server <- function(id,
 
                       output$StatisticsTable <- renderDT({  req(Statistics())
 
+                                                            # Assign loading behavior
+                                                            LoadingOn()
+                                                            on.exit(LoadingOff())
+
                                                             TableData <- data.frame()
 
                                                             if (FeatureType() %in% c("double", "integer", "numeric"))
@@ -301,8 +309,12 @@ ModUnivariateExploration_Server <- function(id,
                                                          }) %>% bindEvent({ TriggerUpdate() })
 
 
-                      output$StatisticsPlot <- renderPlot({ req(FeatureType())
+                      output$StatisticsPlot <- renderPlot({   req(FeatureType())
                                                               req(Statistics())
+
+                                                              # Assign loading behavior
+                                                              LoadingOn()
+                                                              on.exit(LoadingOff())
 
                                                               if (FeatureType() %in% c("double", "integer", "numeric"))
                                                               {
