@@ -25,7 +25,6 @@ StartCCPhosApp <- function(CCPSiteSpecifications = NULL,
     require(shinyjs)
     require(shiny.router)
     require(shiny.semantic)
-    require(shinyvalidate)
     require(stringr)
     require(waiter)
 
