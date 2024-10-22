@@ -29,7 +29,7 @@ waiter::waiter_hide()
 session$userData$CCPConnections <- reactiveVal(NULL)
 session$userData$CCPSiteSpecifications <- reactiveVal(NULL)
 session$userData$Checkpoints <- reactiveVal(NULL)
-session$userData$CurationReports <- reactiveVal(NULL)
+session$userData$CurationReport <- reactiveVal(NULL)
 session$userData$RDSTableCheck <- reactiveVal(NULL)
 session$userData$ServerOpalInfo <- reactiveVal(NULL)
 session$userData$ServerWorkspaceInfo <- reactiveVal(NULL)
@@ -131,11 +131,14 @@ ModCheckpoints_Server("Checkpoints")
 # --- Call module: Server Opal Monitor ---
 ModServerOpalMonitor_Server("ServerOpalMonitor")
 
+# --- Call module: Server Workspace Monitor ---
+ModServerWorkspaceMonitor_Server("Prepare-ServerWorkspaceMonitor")
+
 # --- Call module: RDS Table Monitor ---
 ModRDSTableMonitor_Server("RDSTableMonitor")
 
-# --- Call module: Server Workspace Monitor ---
-ModServerWorkspaceMonitor_Server("Prepare-ServerWorkspaceMonitor")
+# --- Call module: Data Curation Monitor ---
+ModCurationReport_Server("CurationReport")
 
 # --- Call module: Data Transformation Monitor ---
 ModDataTransformationMonitor_Server("DataTransformationMonitor")
