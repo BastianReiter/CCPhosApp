@@ -48,6 +48,7 @@ ModRDSTableMonitor_Server <- function(id)
 {
     require(dplyr)
     require(purrr)
+    require(stringr)
 
     moduleServer(id,
                  function(input, output, session)
@@ -63,11 +64,16 @@ ModRDSTableMonitor_Server <- function(id)
                                                             TableData <- session$userData$RDSTableCheck()$TableStatus %>%
                                                                               select(-CheckRDSTables)
 
+                                                            # For HTML table, create vector of column labels with shortened table names to save some horizontal space
+                                                            ColumnLabels <- str_remove(colnames(TableData), "RDS_") %>% set_names(colnames(TableData))
+                                                            ColumnLabels[1] <- "Site"
+
                                                             if (!is.null(TableData))
                                                             {
                                                                DataFrameToHtmlTable(DataFrame = TableData,
                                                                                     ColContentHorizontalAlign = "center",
-                                                                                    ColumnLabels = c(SiteName = "Site"),
+                                                                                    ColumnLabels = ColumnLabels,
+                                                                                    ColumnMaxWidth = 14,
                                                                                     SemanticTableClass = "ui small compact celled structured table",
                                                                                     TurnColorValuesIntoDots = TRUE)
                                                             }
@@ -129,6 +135,8 @@ ModRDSTableMonitor_Server <- function(id)
                       output[["FeatureStatus_10"]] <- renderUI({ req(TableList_FeatureStatus); TableList_FeatureStatus()[[10]] })
                       output[["FeatureStatus_11"]] <- renderUI({ req(TableList_FeatureStatus); TableList_FeatureStatus()[[11]] })
                       output[["FeatureStatus_12"]] <- renderUI({ req(TableList_FeatureStatus); TableList_FeatureStatus()[[12]] })
+                      output[["FeatureStatus_13"]] <- renderUI({ req(TableList_FeatureStatus); TableList_FeatureStatus()[[13]] })
+                      output[["FeatureStatus_14"]] <- renderUI({ req(TableList_FeatureStatus); TableList_FeatureStatus()[[14]] })
 
                  })
 }
