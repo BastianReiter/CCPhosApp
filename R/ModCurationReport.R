@@ -50,6 +50,7 @@ ModCurationReport_Server <- function(id)
                                                                DataFrameToHtmlTable(DataFrame = as.data.frame(TableData),
                                                                                     ColContentHorizontalAlign = "center",
                                                                                     ColumnLabels = c(SiteName = "Site"),
+                                                                                    ColumnMaxWidth = 14,
                                                                                     SemanticTableClass = "ui small compact celled structured table")
                                                             }
                                                          })

@@ -11,8 +11,10 @@ DataFrameToHtmlTable(
   CellClassColumns = NULL,
   ColContentHorizontalAlign = "left",
   ColumnClass = NULL,
-  ColumnLabels = NULL,
   ColumnIcons = NULL,
+  ColumnLabels = NULL,
+  ColumnLabelsLineBreak = FALSE,
+  ColumnMaxWidth = 1000,
   RotatedHeaderNames = character(),
   RowColorColumn = NULL,
   SemanticTableClass = "ui celled table",
@@ -34,9 +36,13 @@ DataFrameToHtmlTable(
 
 \item{ColumnClass}{Either a single string for all columns or a named character vector to determine table cell classes for specific columns}
 
+\item{ColumnIcons}{named \code{vector}}
+
 \item{ColumnLabels}{named \code{vector}}
 
-\item{ColumnIcons}{named \code{vector}}
+\item{ColumnLabelsLineBreak}{\code{logical} Indicating whether column labels should span across two lines}
+
+\item{ColumnMaxWidth}{\code{integer} Maximum width of columns in character spaces}
 
 \item{RotatedHeaderNames}{\code{vector}}
 

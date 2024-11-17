@@ -7,8 +7,10 @@
 #' @param CellClassColumns character vector
 #' @param ColContentHorizontalAlign Either a single string for all columns or a named character vector to determine horizontal content alignment for specific columns
 #' @param ColumnClass Either a single string for all columns or a named character vector to determine table cell classes for specific columns
-#' @param ColumnLabels named \code{vector}
 #' @param ColumnIcons named \code{vector}
+#' @param ColumnLabels named \code{vector}
+#' @param ColumnLabelsLineBreak \code{logical} Indicating whether column labels should span across two lines
+#' @param ColumnMaxWidth \code{integer} Maximum width of columns in character spaces
 #' @param RotatedHeaderNames \code{vector}
 #' @param RowColorColumn \code{string}
 #' @param SemanticTableClass \code{string}
@@ -25,8 +27,10 @@ DataFrameToHtmlTable <- function(DataFrame,
                                  CellClassColumns = NULL,
                                  ColContentHorizontalAlign = "left",
                                  ColumnClass = NULL,
-                                 ColumnLabels = NULL,
                                  ColumnIcons = NULL,
+                                 ColumnLabels = NULL,
+                                 ColumnLabelsLineBreak = FALSE,
+                                 ColumnMaxWidth = 1000,
                                  RotatedHeaderNames = character(),
                                  RowColorColumn = NULL,
                                  SemanticTableClass = "ui celled table",
@@ -49,6 +53,8 @@ DataFrameToHtmlTable <- function(DataFrame,
     require(dplyr)
     require(shiny)
     require(shiny.semantic)
+    require(stringr)
+
 
     # If DataFrame is empty return empty string
     if (is.null(DataFrame))
@@ -116,14 +122,36 @@ DataFrameToHtmlTable <- function(DataFrame,
                                                 # If optional 'RotatedHeaderNames' is passed
                                                 if (colname %in% RotatedHeaderNames) { HeaderCellClass <- paste(HeaderCellClass, "rotate") }
 
-                                                # Put naive column name in span tag
-                                                ColLabel <- paste0("span('", colname, "')")
-
-                                                # Replace column label if passed in ColumnLabels
-                                                if (colname %in% names(ColumnLabels)) { ColLabel <- paste0("span('", ColumnLabels[colname], "')") }
+                                                # Define ColLabel
+                                                ColLabel <- ""
 
                                                 # Replace column label with icon if passed in ColumnIcons
-                                                if (colname %in% names(ColumnIcons)) { ColLabel <- paste0("icon(class = '", ColumnIcons[colname], "')") }
+                                                if (colname %in% names(ColumnIcons))
+                                                {
+                                                    ColLabel <- paste0("icon(class = '", ColumnIcons[colname], "')")
+                                                }
+                                                else
+                                                {
+                                                    # Define ColLabelText
+                                                    ColLabelText <- colname
+
+                                                    # Replace column label text if passed in ColumnLabels
+                                                    if (colname %in% names(ColumnLabels)) { ColLabelText <- ColumnLabels[colname] }
+
+                                                    if (ColumnLabelsLineBreak == FALSE)
+                                                    {
+                                                        # Truncate ColLabelText if required
+                                                        if (!is.null(ColumnMaxWidth) & str_length(ColLabelText) > ColumnMaxWidth) { ColLabelText <- str_trunc(ColLabelText, ColumnMaxWidth, "right") }
+                                                    }
+                                                    else
+                                                    {
+                                                        if (str_length(ColLabelText) <= ColumnMaxWidth * 2) { ColLabelText <- paste0(substr(ColLabelText, 1, ColumnMaxWidth), " ", substr(ColLabelText, ColumnMaxWidth + 1, ColumnMaxWidth * 2)) }
+                                                        else if (str_length(ColLabelText) > ColumnMaxWidth * 2) { ColLabelText <- paste0(substr(ColLabelText, 1, ColumnMaxWidth), " ", str_trunc(substr(ColLabelText, ColumnMaxWidth + 1, ColumnMaxWidth * 2), ColumnMaxWidth, "right")) }
+                                                    }
+
+                                                    # Put ColLabelText in span tag
+                                                    ColLabel <- paste0("span('", ColLabelText, "')")
+                                                }
 
                                                 paste0("tags$th(",
                                                        "class = '", HeaderCellClass, "', ",   # Add th CSS class

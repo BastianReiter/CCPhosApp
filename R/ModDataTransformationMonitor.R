@@ -223,6 +223,14 @@ ModDataTransformationMonitor_Server <- function(id)
                       output[["PlotEligibility_10"]] <- renderPlotly({ req(PlotList_EligibilityOverview); PlotList_EligibilityOverview()[[10]] })
                       output[["PlotEligibility_11"]] <- renderPlotly({ req(PlotList_EligibilityOverview); PlotList_EligibilityOverview()[[11]] })
                       output[["PlotEligibility_12"]] <- renderPlotly({ req(PlotList_EligibilityOverview); PlotList_EligibilityOverview()[[12]] })
+                      output[["PlotEligibility_13"]] <- renderPlotly({ req(PlotList_EligibilityOverview); PlotList_EligibilityOverview()[[13]] })
+                      output[["PlotEligibility_14"]] <- renderPlotly({ req(PlotList_EligibilityOverview); PlotList_EligibilityOverview()[[14]] })
+                      output[["PlotEligibility_15"]] <- renderPlotly({ req(PlotList_EligibilityOverview); PlotList_EligibilityOverview()[[15]] })
+                      output[["PlotEligibility_16"]] <- renderPlotly({ req(PlotList_EligibilityOverview); PlotList_EligibilityOverview()[[16]] })
+                      output[["PlotEligibility_17"]] <- renderPlotly({ req(PlotList_EligibilityOverview); PlotList_EligibilityOverview()[[17]] })
+                      output[["PlotEligibility_18"]] <- renderPlotly({ req(PlotList_EligibilityOverview); PlotList_EligibilityOverview()[[18]] })
+                      output[["PlotEligibility_19"]] <- renderPlotly({ req(PlotList_EligibilityOverview); PlotList_EligibilityOverview()[[19]] })
+                      output[["PlotEligibility_20"]] <- renderPlotly({ req(PlotList_EligibilityOverview); PlotList_EligibilityOverview()[[20]] })
 
 
 
