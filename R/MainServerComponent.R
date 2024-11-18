@@ -92,7 +92,9 @@ output$ProjectNameOutput <- renderUI({ "" })
                                         #   paste0("Project: ", session$userData$ProjectName())) })
 
 # For testing purposes: Arbitrary text monitor element
-output$TestMonitor <- renderText({ ""
+output$TestMonitor <- renderText({
+                                    #req(session$userData$CCPSiteSpecifications())
+                                    #paste(names(session$userData$CCPSiteSpecifications()), collapse = ", ")
 
                                  })
 
