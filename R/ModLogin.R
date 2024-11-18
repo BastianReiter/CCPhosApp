@@ -155,8 +155,11 @@ ModLogin_Server <- function(id)
                               # Assign Site Specifications (CCP credentials and project names) to session$userData according to input table
                               session$userData$CCPSiteSpecifications(SiteSpecifications_EditData())
 
-                              # Trigger dsCCPhosClient::ConnectToCCP() and assign return to session$userData
-                              session$userData$CCPConnections(dsCCPhosClient::ConnectToCCP(CCPSiteSpecifications = session$userData$CCPSiteSpecifications()))
+                              # Trigger dsCCPhosClient::ConnectToCCP() ...
+                              Connections <- dsCCPhosClient::ConnectToCCP(CCPSiteSpecifications = session$userData$CCPSiteSpecifications())
+
+                              # ... and assign return to session$userData
+                              session$userData$CCPConnections(Connections)
 
                               # Initiate 'Checkpoints' data frame ...
                               Checkpoints <- session$userData$CCPSiteSpecifications() %>%
@@ -166,6 +169,7 @@ ModLogin_Server <- function(id)
 
                               # ... and assign it to session$userData object
                               session$userData$Checkpoints(Checkpoints)
+
                            }) %>%
                         bindEvent(input$ButtonLogin)
 

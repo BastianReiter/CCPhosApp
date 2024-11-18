@@ -4,6 +4,7 @@
 #' Launch Shiny app
 #'
 #' @param CCPConnections List of DSConnection objects
+#' @param CCPSiteSpecifications
 #' @param CCPTestData List | Optional CCP test data
 #'
 #' @export
