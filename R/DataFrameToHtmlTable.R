@@ -8,7 +8,7 @@
 #' @param ColContentHorizontalAlign Either a single string for all columns or a named character vector to determine horizontal content alignment for specific columns
 #' @param ColumnClass Either a single string for all columns or a named character vector to determine table cell classes for specific columns
 #' @param ColumnIcons named \code{vector}
-#' @param ColumnLabels named \code{vector}
+#' @param ColumnLabels named \code{vector} with names being original table column names and elements being displayed column labels
 #' @param ColumnLabelsLineBreak \code{logical} Indicating whether column labels should span across two lines
 #' @param ColumnMaxWidth \code{integer} Maximum width of columns in character spaces
 #' @param RotatedHeaderNames \code{vector}

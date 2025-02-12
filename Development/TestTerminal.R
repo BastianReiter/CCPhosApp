@@ -10,7 +10,13 @@ library(CCPhosApp)
 
 TestData <- readRDS("../dsCCPhos/Development/Data/TestData/CCPTestData.rds")
 
-StartCCPhosApp(CCPTestData = TestData)
+#RDSTableCheck <- readRDS(file = "C:/Users/Basti/Desktop/RDSTableCheck.RDS")
+
+#CurationReport <- readRDS(file = "C:/Users/Basti/Desktop/CurationReport_10000.RDS")
+
+StartCCPhosApp(CCPTestData = TestData,
+               RDSTableCheckData = RDSTableCheck,
+               CurationReportData = CurationReport)
 
 
 
