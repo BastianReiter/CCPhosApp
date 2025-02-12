@@ -8,7 +8,9 @@
 #' @noRd
 #' @author Bastian Reiter
 MainServerComponent <- function(CCPSiteSpecifications,
-                                CCPTestData)
+                                CCPTestData,
+                                RDSTableCheckData,
+                                CurationReportData)
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 {
 
@@ -41,7 +43,9 @@ session$userData$CCPTestData <- NULL
 # Assigns content to session$userData objects at app start
 ModInitialize(id = "Initialize",
               CCPSiteSpecifications,
-              CCPTestData)
+              CCPTestData,
+              RDSTableCheckData,
+              CurationReportData)
 
 
 # Initialize menu behavior

@@ -3,15 +3,20 @@
 #'
 #' Launch Shiny app
 #'
-#' @param CCPConnections List of DSConnection objects
+#' @param CCPConnections \code{list} of \code{DSConnection} objects
 #' @param CCPSiteSpecifications
-#' @param CCPTestData List | Optional CCP test data
+#' @param CCPTestData \code{list} - Optional CCP test data
+#' @param RDSTableCheckData \code{list} - Optional RDSTableCheck data
+#' @param CurationReportData \code{list} - Optional CurationReport data
 #'
 #' @export
 #'
 #' @author Bastian Reiter
-StartCCPhosApp <- function(CCPSiteSpecifications = NULL,
-                           CCPTestData = NULL)
+StartCCPhosApp <- function(CCPConnections = NULL,
+                           CCPSiteSpecifications = NULL,
+                           CCPTestData = NULL,
+                           RDSTableCheckData = NULL,
+                           CurationReportData = NULL)
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 {
     require(DataEditR)
@@ -39,7 +44,9 @@ StartCCPhosApp <- function(CCPSiteSpecifications = NULL,
     shiny::addResourcePath('www', system.file("www", package = "CCPhosApp"))
 
     # Start CCPhos app
-    shinyApp(ui = MainUIComponent(),
-             server = MainServerComponent(CCPSiteSpecifications,
-                                          CCPTestData))
+    shiny::shinyApp(ui = MainUIComponent(),
+                    server = MainServerComponent(CCPSiteSpecifications,
+                                                 CCPTestData,
+                                                 RDSTableCheckData,
+                                                 CurationReportData))
 }
