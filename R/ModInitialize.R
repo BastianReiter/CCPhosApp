@@ -14,12 +14,16 @@
 #' @param CCPSiteSpecifications
 #' @param CCPTestData
 #' @param RDSTableCheckData
+#' @param CDSTableCheckData
+#' @param ADSTableCheckData
 #' @param CurationReportData
 #' @noRd
 ModInitialize <- function(id,
                           CCPSiteSpecifications,
                           CCPTestData,
                           RDSTableCheckData,
+                          CDSTableCheckData,
+                          ADSTableCheckData,
                           CurationReportData)
 {
     moduleServer(id,
@@ -32,6 +36,10 @@ ModInitialize <- function(id,
                       if (!is.null(CCPTestData)) { session$userData$CCPTestData <- CCPTestData }
 
                       if (!is.null(RDSTableCheckData)) { session$userData$RDSTableCheck(RDSTableCheckData) }
+
+                      if (!is.null(CDSTableCheckData)) { session$userData$CDSTableCheck(CDSTableCheckData) }
+
+                      if (!is.null(ADSTableCheckData)) { session$userData$ADSTableCheck(ADSTableCheckData) }
 
                       if (!is.null(CurationReportData)) { session$userData$CurationReport(CurationReportData) }
                  })

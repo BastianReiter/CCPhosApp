@@ -88,13 +88,16 @@ ModCurationReport_Server <- function(id)
                                                                                 {
                                                                                     TableData <- TableData %>%
                                                                                                     mutate(PrimaryExclusion = paste0(ExcludedPrimary, " (", round(ExcludedPrimary_Proportion * 100, 0), "%)"),
-                                                                                                           InterimCount = paste0(AfterPrimaryExclusion, " (", round(AfterPrimaryExclusion_Proportion * 100, 0), "%)"),
+                                                                                                           # InterimCount = paste0(AfterPrimaryExclusion, " (", round(AfterPrimaryExclusion_Proportion * 100, 0), "%)"),
                                                                                                            SecondaryExclusion = paste0(ExcludedSecondary, " (", round(ExcludedSecondary_Proportion * 100, 0), "%)"),
+                                                                                                           SecondaryRedundancyExclusion = paste0(ExcludedSecondaryRedundancy, " (", round(ExcludedSecondaryRedundancy_Proportion * 100, 0), "%)"),
                                                                                                            FinalCount = paste0(AfterSecondaryExclusion, " (", round(AfterSecondaryExclusion_Proportion * 100, 0), "%)")) %>%
-                                                                                                    select(InitialCount,
+                                                                                                    select(Site,
+                                                                                                           InitialCount,
                                                                                                            PrimaryExclusion,
-                                                                                                           InterimCount,
+                                                                                                           # InterimCount,
                                                                                                            SecondaryExclusion,
+                                                                                                           SecondaryRedundancyExclusion,
                                                                                                            FinalCount)
 
                                                                                     # Turn data frame into html object
@@ -102,10 +105,11 @@ ModCurationReport_Server <- function(id)
                                                                                                          ColContentHorizontalAlign = "center",
                                                                                                          ColumnLabels = c(InitialCount = "Initial Count",
                                                                                                                           PrimaryExclusion = "Primary Exclusion",
-                                                                                                                          InterimCount = "Interim Count",
+                                                                                                                          # InterimCount = "Interim Count",
                                                                                                                           SecondaryExclusion = "Secondary Exclusion",
+                                                                                                                          SecondaryRedundancyExclusion = "Secondary Redundancy Exclusion",
                                                                                                                           FinalCount = "Final Count"),
-                                                                                                         SemanticTableClass = "ui small compact inverted scrollable structured table")
+                                                                                                         SemanticTableCSSClass = "ui small compact inverted scrollable structured table")
                                                                                 })
                                                         })
 
@@ -135,7 +139,7 @@ ModCurationReport_Server <- function(id)
                                                                        DataFrameToHtmlTable(DataFrame = as.data.frame(TableData),
                                                                                             ColContentHorizontalAlign = "center",
                                                                                             ColumnLabels = c(SiteName = "Site"),
-                                                                                            SemanticTableClass = "ui small compact celled structured table")
+                                                                                            SemanticTableCSSClass = "ui small compact celled structured table")
                                                                     }
                                                                  })
 

@@ -102,6 +102,12 @@ shiny.semantic::semanticPage(
                              "CONNECT",
                              href = route_link("/")),
 
+                           a(id = "MenuItem_Settings",
+                             class = "item",
+                             icon("cogs"),
+                             "SETTINGS",
+                             href = route_link("settings")),
+
                            a(id = "MenuItem_Prepare",
                              class = "item",
                              icon("utensils"),      # Alternatives: mug hot, box open,
@@ -110,7 +116,7 @@ shiny.semantic::semanticPage(
 
                            a(id = "MenuItem_Explore",
                              class = "item",
-                             icon("tv"),      # Alternatives: binoculars
+                             icon("binoculars"),      # Alternatives: tv
                              "EXPLORE",
                              href = route_link("explore")),
 
@@ -136,6 +142,7 @@ shiny.semantic::semanticPage(
 
                        # Use shiny.router functionality to enable multi-page UI structure defined in UIPage() functions
                        shiny.router::router_ui(route("/", UIPageStart()),
+                                               route("settings", UIPageSettings()),
                                                route("prepare", UIPagePrepare()),
                                                route("explore", UIPageExplore()),
                                                route("analyze", UIPageAnalyze()),

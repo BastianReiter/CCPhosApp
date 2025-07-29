@@ -81,7 +81,7 @@ ModCheckpoints_Server <- function(id)
                                                                                                       CheckRDSTables = "database",
                                                                                                       CheckCurationCompletion = "wrench",
                                                                                                       CheckAugmentationCompletion = "magic"),
-                                                                                      SemanticTableClass = "ui small compact celled structured table",
+                                                                                      SemanticTableCSSClass = "ui small compact celled structured table",
                                                                                       TurnColorValuesIntoDots = TRUE)
                                                              }
                                                           })

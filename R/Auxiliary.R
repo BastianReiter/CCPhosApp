@@ -4,6 +4,31 @@
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
+#' ColorToRGBCSS
+#'
+#' Turn hexadecimal color code into a string of CSS code of the form 'rgba(r, g, b, a)'.
+#' Can be used with vectors.
+#'
+#' @param Color \code{character} - Vector of hexadecimal color code
+#' @param Alpha \code{double} - Optional alpha value vector - Default: 1
+#' @param RenderNATransparent \code{logical} - Indicating whether \code{NA} values for \code{Color} result in a totally transparent color
+#'
+#' @author Bastian Reiter
+ColorToRGBCSS <- function(Color,
+                          Alpha = 1,
+                          RenderNATransparent = TRUE)
+{
+    Scalar <- function(color, alpha)
+              {
+                  RGB <- col2rgb(color)
+                  if (RenderNATransparent == TRUE & is.na(color)) { Alpha <- 0 } else { Alpha <- alpha }      # If color is NA, set alpha value 0 (making resulting color effectively non-existent)
+                  paste0("rgba(", RGB[["red", 1]], ", ", RGB[["green", 1]], ", ", RGB[["blue", 1]], ", ", Alpha, ")")
+              }
+
+    Vectorize(Scalar)(Color, Alpha)
+}
+
+
 #' ConvertLogicalToIcon
 #'
 #' @param DataFrame \code{data.frame} or \code{tibble}
