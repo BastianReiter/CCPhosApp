@@ -11,6 +11,7 @@
 # Packages used for development
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+library(usethis)
 library(devtools)
 #library(shiny.info)
 #library(sass)
@@ -47,6 +48,8 @@ library(devtools)
 # use_package("shiny.semantic")
 # use_package("shiny.worker")
 # use_package("stringr")
+# use_package("sysfonts")
+# use_package("tidyr")
 # use_package("waiter")
 
 
@@ -60,6 +63,7 @@ library(devtools)
 # use_r("UIComponent")
 # use_r("ServerComponent")
 # use_r("DataFrameToHtmlTable.R")
+# use_r("CreateTableMonitor.R")
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -83,6 +87,7 @@ library(devtools)
 # use_r("ModLogin")
 # use_r("ModMessages")
 # use_r("ModProcessingTerminal")
+# use_r("ModServerObjectExplorer")
 # use_r("ModServerOpalMonitor")
 # use_r("ModServerWorkspaceMonitor")
 # use_r("ModUnivariateExploration")

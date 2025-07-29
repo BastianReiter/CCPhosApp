@@ -56,17 +56,17 @@ tr.TableRowColor_Grey { background-color: rgba(0, 0, 0, 0.05);
 
 
 
-td.CellClass_Info { background-color: rgba(5, 73, 150, 0.3);
-                    color: rgba(5, 73, 150, 1); }
+td.CellCSSClass_Info { background-color: rgba(5, 73, 150, 0.3);
+                       color: rgba(5, 73, 150, 1); }
 
-td.CellClass_Success { background-color: rgba(20, 235, 31, 0.3);
-                       color: rgba(20, 135, 31, 1); }
+td.CellCSSClass_Success { background-color: rgba(20, 235, 31, 0.3);
+                          color: rgba(20, 135, 31, 1); }
 
-td.CellClass_Failure { background-color: rgba(142, 30, 57, 0.4);
-                       color: rgba(142, 30, 57, 1); }
+td.CellCSSClass_Failure { background-color: rgba(142, 30, 57, 0.4);
+                          color: rgba(142, 30, 57, 1); }
 
-td.CellClass_Grey { background-color: rgba(0, 0, 0, 0.05);
-                    color: rgba(0, 0, 0, 0.4); }
+td.CellCSSClass_Grey { background-color: rgba(0, 0, 0, 0.05);
+                       color: rgba(0, 0, 0, 0.4); }
 
 
 

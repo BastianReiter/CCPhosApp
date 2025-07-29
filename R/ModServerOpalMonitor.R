@@ -47,8 +47,8 @@ ModServerOpalMonitor_Server <- function(id)
                                                                  DataFrameToHtmlTable(DataFrame = TableData,
                                                                                       ColContentHorizontalAlign = "center",
                                                                                       ColumnLabels = c(SiteName = "Site"),
-                                                                                      SemanticTableClass = "ui small compact celled structured table",
-                                                                                      TurnLogicalIntoIcon = TRUE)
+                                                                                      SemanticTableCSSClass = "ui small compact celled structured table",
+                                                                                      TurnLogicalsIntoIcons = TRUE)
                                                               }
                                                             })
                  })

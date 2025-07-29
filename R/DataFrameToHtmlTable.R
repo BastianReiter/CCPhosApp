@@ -1,53 +1,68 @@
 
 #' DataFrameToHtmlTable
 #'
+#' Turn a data.frame into HTML table code.
+#'
+#' To enable cell-specific CSS classes or style code, the passed data.frame should have columns named 'CellCSSClass_ABC' where 'ABC' is another column in the data.frame.
+#'
 #' @param DataFrame \code{data.frame} or \code{tibble}
-#' @param TableID \code{string} Used to tidentify the table object in the DOM
+#' @param TableID \code{string} - Used to identify the table object in the DOM
 #' @param CategoryColumn \code{string}
-#' @param CellClassColumns character vector
 #' @param ColContentHorizontalAlign Either a single string for all columns or a named character vector to determine horizontal content alignment for specific columns
-#' @param ColumnClass Either a single string for all columns or a named character vector to determine table cell classes for specific columns
+#' @param ColumnCSSClass Either a single string for all columns or a named character vector to determine table cell classes for specific columns
 #' @param ColumnIcons named \code{vector}
 #' @param ColumnLabels named \code{vector} with names being original table column names and elements being displayed column labels
 #' @param ColumnLabelsLineBreak \code{logical} Indicating whether column labels should span across two lines
-#' @param ColumnMaxWidth \code{integer} Maximum width of columns in character spaces
+#' @param ColumnMaxWidth \code{integer} - Maximum width of columns in character spaces
+#' @param HeaderColspans \code{integer vector}
 #' @param RotatedHeaderNames \code{vector}
 #' @param RowColorColumn \code{string}
-#' @param SemanticTableClass \code{string}
+#' @param SemanticTableCSSClass \code{string}
 #' @param TableStyle A \code{string} containing CSS style elements
-#' @param TurnLogicalIntoIcon \code{logical}
 #' @param TurnColorValuesIntoDots \code{logical}
+#' @param TurnLogicalsIntoIcons \code{logical}
+#' @param TurnNAsIntoBlanks \code{logical}
 #'
 #' @return HTML code
+#'
 #' @export
 #' @author Bastian Reiter
 DataFrameToHtmlTable <- function(DataFrame,
                                  TableID = NULL,
                                  CategoryColumn = NULL,
-                                 CellClassColumns = NULL,
                                  ColContentHorizontalAlign = "left",
-                                 ColumnClass = NULL,
+                                 ColumnCSSClass = NULL,
                                  ColumnIcons = NULL,
                                  ColumnLabels = NULL,
                                  ColumnLabelsLineBreak = FALSE,
                                  ColumnMaxWidth = 1000,
+                                 HeaderColspans = NULL,
                                  RotatedHeaderNames = character(),
                                  RowColorColumn = NULL,
-                                 SemanticTableClass = "ui celled table",
+                                 SemanticTableCSSClass = "ui celled table",
                                  TableStyle = "",
-                                 TurnLogicalIntoIcon = FALSE,
-                                 TurnColorValuesIntoDots = FALSE)
+                                 TurnColorValuesIntoDots = FALSE,
+                                 TurnLogicalsIntoIcons = FALSE,
+                                 TurnNAsIntoBlanks = FALSE)
 {
-    # For testing purposes only
+    ### For testing purposes only
+    # DataFrame <- readRDS("TestTable.rds")
     # TableID <- NULL
-    # DataFrame <- dsCCPhos::Meta_FeatureNames
-    # DataFrame <- DataFrame %>% mutate(CellClass_TableName_Curated = "Success")
-    # SemanticTableClass = "ui celled table"
-    # RotatedHeaderNames = character()
-    # TurnLogicalIntoIcon = FALSE
-    # CategoryColumn <- "TableName_Raw"
+    # CategoryColumn <- NULL
+    # ColContentHorizontalAlign <- "left"
+    # ColumnCSSClass <- NULL
+    # ColumnIcons <- NULL
+    # ColumnLabels <- NULL
+    # ColumnLabelsLineBreak <- FALSE
+    # ColumnMaxWidth <- 1000
+    # HeaderColspans <- NULL
+    # RotatedHeaderNames <- character()
     # RowColorColumn <- NULL
-    # CellClassColumns <- c("CellClass_TableName_Curated")
+    # SemanticTableCSSClass <- "ui celled table"
+    # TableStyle <- ""
+    # TurnColorValuesIntoDots <- TRUE
+    # TurnLogicalsIntoIcons <- FALSE
+    # TurnNAsIntoBlanks <- FALSE
 
 
     require(dplyr)
@@ -76,7 +91,8 @@ DataFrameToHtmlTable <- function(DataFrame,
     # If there are special purpose columns, don't render their content in the table
     HiddenColumns <- c(CategoryColumn,
                        RowColorColumn,
-                       CellClassColumns)
+                       names(DataFrame)[str_starts(names(DataFrame), "CellCSSClass")],      # All column names that start with "CellCSSClass"
+                       names(DataFrame)[str_starts(names(DataFrame), "CellCSSCode")])      # All column names that start with "CellCSSCode"
 
 
     # If there is a column informing about categories, get all unique category values
@@ -94,33 +110,42 @@ DataFrameToHtmlTable <- function(DataFrame,
     # Table Header: Get collection of th-elements as character-vector
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    StringsTableHeadRow <- purrr::modify(.x = colnames(DataFrame),
+    RelevantColumnHeaders <- colnames(DataFrame)
+    if (!is.null(HeaderColspans)) { RelevantColumnHeaders <- names(HeaderColspans) }
+
+    StringsTableHeadRow <- purrr::modify(.x = RelevantColumnHeaders,
                                          function(colname)
                                          {
                                             if (!(colname %in% HiddenColumns))      # Don't include headers from hidden columns
                                             {
-                                                HeaderCellClass <- ""
+                                                HeaderCellCSSClass <- ""
+                                                HeaderColspan <- 1
+
+                                                if (!is.null(HeaderColspans) & colname %in% names(HeaderColspans))
+                                                {
+                                                    HeaderColspan <- HeaderColspans[[colname]]
+                                                }
 
                                                 # If 'ColContentHorizontalAlign' is a single string
                                                 if (length(ColContentHorizontalAlign) == 1 & is.null(names(ColContentHorizontalAlign)))
                                                 {
-                                                    HeaderCellClass <- paste(HeaderCellClass,
-                                                                             case_when(ColContentHorizontalAlign == "right" ~ "right aligned",
-                                                                                       ColContentHorizontalAlign == "center" ~ "center aligned",
-                                                                                       .default = ""))
+                                                    HeaderCellCSSClass <- paste(HeaderCellCSSClass,
+                                                                                case_when(ColContentHorizontalAlign == "right" ~ "right aligned",
+                                                                                          ColContentHorizontalAlign == "center" ~ "center aligned",
+                                                                                          .default = ""))
                                                 }
 
                                                 # If 'ColContentHorizontalAlign' is a named vector with current column name in its names
                                                 if (!is.null(names(ColContentHorizontalAlign)) & colname %in% names(ColContentHorizontalAlign))
                                                 {
-                                                    HeaderCellClass <- paste(HeaderCellClass,
-                                                                             case_when(ColContentHorizontalAlign[colname] == "right" ~ "right aligned",
-                                                                                       ColContentHorizontalAlign[colname] == "center" ~ "center aligned",
-                                                                                       .default = ""))
+                                                    HeaderCellCSSClass <- paste(HeaderCellCSSClass,
+                                                                                case_when(ColContentHorizontalAlign[colname] == "right" ~ "right aligned",
+                                                                                          ColContentHorizontalAlign[colname] == "center" ~ "center aligned",
+                                                                                          .default = ""))
                                                 }
 
                                                 # If optional 'RotatedHeaderNames' is passed
-                                                if (colname %in% RotatedHeaderNames) { HeaderCellClass <- paste(HeaderCellClass, "rotate") }
+                                                if (colname %in% RotatedHeaderNames) { HeaderCellCSSClass <- paste0(HeaderCellCSSClass, " rotate") }
 
                                                 # Define ColLabel
                                                 ColLabel <- ""
@@ -129,9 +154,9 @@ DataFrameToHtmlTable <- function(DataFrame,
                                                 if (colname %in% names(ColumnIcons))
                                                 {
                                                     ColLabel <- paste0("icon(class = '", ColumnIcons[colname], "')")
-                                                }
-                                                else
-                                                {
+
+                                                } else {
+
                                                     # Define ColLabelText
                                                     ColLabelText <- colname
 
@@ -142,11 +167,11 @@ DataFrameToHtmlTable <- function(DataFrame,
                                                     {
                                                         # Truncate ColLabelText if required
                                                         if (!is.null(ColumnMaxWidth) & str_length(ColLabelText) > ColumnMaxWidth) { ColLabelText <- str_trunc(ColLabelText, ColumnMaxWidth, "right") }
-                                                    }
-                                                    else
-                                                    {
+
+                                                    } else {
+
                                                         if (str_length(ColLabelText) <= ColumnMaxWidth * 2) { ColLabelText <- paste0(substr(ColLabelText, 1, ColumnMaxWidth), " ", substr(ColLabelText, ColumnMaxWidth + 1, ColumnMaxWidth * 2)) }
-                                                        else if (str_length(ColLabelText) > ColumnMaxWidth * 2) { ColLabelText <- paste0(substr(ColLabelText, 1, ColumnMaxWidth), " ", str_trunc(substr(ColLabelText, ColumnMaxWidth + 1, ColumnMaxWidth * 2), ColumnMaxWidth, "right")) }
+                                                        else { ColLabelText <- paste0(substr(ColLabelText, 1, ColumnMaxWidth), " ", str_trunc(substr(ColLabelText, ColumnMaxWidth + 1, ColumnMaxWidth * 2), ColumnMaxWidth, "right")) }
                                                     }
 
                                                     # Put ColLabelText in span tag
@@ -154,10 +179,11 @@ DataFrameToHtmlTable <- function(DataFrame,
                                                 }
 
                                                 paste0("tags$th(",
-                                                       "class = '", HeaderCellClass, "', ",   # Add th CSS class
+                                                       "class = '", HeaderCellCSSClass, "', ",      # Add th CSS class
+                                                       "colspan = '", HeaderColspan, "', ",
                                                        "div(", ColLabel, "))")
-                                            }
-                                            else { return(NA) }
+
+                                            } else { return(NA) }
                                          })
 
     # Make single string for thead-element
@@ -198,24 +224,30 @@ DataFrameToHtmlTable <- function(DataFrame,
             StringsTableRowCells <- character()
 
             # --- Loop through COLUMNS -----------------------------------------
-            for(j in 1:ncol(Data))
+            for (j in 1:ncol(Data))
             {
                 ColumnName <- names(Data)[j]
 
                 if (!(ColumnName %in% HiddenColumns))      # Don't include cells from hidden columns
                 {
-                    CellValue <- as.character(Data[i, j])
-                    CellClass <- ""
+                    CellValue <- Data[i, j]
+
+                    # Turn 'CellValue' into character string
+                    if (!is.na(CellValue)) { CellValue <- as.character(CellValue) }      # For all non-NA values
+                    else { CellValue <- case_when(TurnNAsIntoBlanks == TRUE ~ "", .default = "NA") }      # If 'CellValue' is NA, turn it into 'NA' string (default) or blank '', depending on optional argument
+
+                    CellCSSClass <- ""
+                    CellCSSCode <- ""
                     CellIcon <- "None"
 
                     # Set specific column-wide CSS class for cells, if option is passed
                     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-                    # If 'ColumnClass' is a single string
-                    if (length(ColumnClass) == 1 & is.null(names(ColumnClass))) { CellClass <- paste(CellClass, ColumnClass) }
+                    # If 'ColumnCSSClass' is a single string
+                    if (length(ColumnCSSClass) == 1 & is.null(names(ColumnCSSClass))) { CellCSSClass <- paste(CellCSSClass, ColumnCSSClass) }
 
-                    # If 'ColumnClass' is a named vector with current column name in its names
-                    if (!is.null(names(ColumnClass)) & ColumnName %in% names(ColumnClass)) { CellClass <- paste(CellClass, ColumnClass[ColumnName]) }
+                    # If 'ColumnCSSClass' is a named vector with current column name in its names
+                    if (!is.null(names(ColumnCSSClass)) & ColumnName %in% names(ColumnCSSClass)) { CellCSSClass <- paste(CellCSSClass, ColumnCSSClass[ColumnName]) }
 
 
                     # Set column-wide CSS class determining horizontal alignment, if option is passed
@@ -224,51 +256,93 @@ DataFrameToHtmlTable <- function(DataFrame,
                     # If 'ColContentHorizontalAlign' is a single string
                     if (length(ColContentHorizontalAlign) == 1 & is.null(names(ColContentHorizontalAlign)))
                     {
-                        CellClass <- paste(CellClass,
-                                           case_when(ColContentHorizontalAlign == "right" ~ "right aligned",
-                                                     ColContentHorizontalAlign == "center" ~ "center aligned",
-                                                     .default = ""))
+                        CellCSSClass <- paste(CellCSSClass,
+                                              case_when(ColContentHorizontalAlign == "right" ~ "right aligned",
+                                                        ColContentHorizontalAlign == "center" ~ "center aligned",
+                                                        .default = ""))
                     }
 
                     # If 'ColContentHorizontalAlign' is a named vector with current column name in its names
                     if (!is.null(names(ColContentHorizontalAlign)) & ColumnName %in% names(ColContentHorizontalAlign))
                     {
-                        CellClass <- paste(CellClass,
-                                           case_when(ColContentHorizontalAlign[ColumnName] == "right" ~ "right aligned",
-                                                     ColContentHorizontalAlign[ColumnName] == "center" ~ "center aligned",
-                                                     .default = ""))
+                        CellCSSClass <- paste(CellCSSClass,
+                                              case_when(ColContentHorizontalAlign[ColumnName] == "right" ~ "right aligned",
+                                                        ColContentHorizontalAlign[ColumnName] == "center" ~ "center aligned",
+                                                        .default = ""))
                     }
 
 
-                    # Set value-dependent CSS class for cells, if optional class columns are passed
+                    # Set cell-specific CSS class for cells, if optional CSS class columns are passed
                     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-                    # In case there is a column defining a value-dependent cell class for current data
-                    if (paste0("CellClass_", ColumnName) %in% names(Data))
+                    # In case there is a column defining a cell-specific CSS class for current data column
+                    if (paste0("CellCSSClass_", ColumnName) %in% names(Data))
                     {
-                        CellClass <- paste(CellClass,
-                                           as.character(Data[i, paste0("CellClass_", ColumnName)]))
+                        CellCSSClass <- paste(CellCSSClass,
+                                              as.character(Data[i, paste0("CellCSSClass_", ColumnName)]))
 
-                        # Determine code for icon to be displayed in cell based on cell class (grepl() call checks if the string in 'CellClass' contains certain substrings)
-                        CellIcon <- case_when(grepl("CellClass_Success", CellClass, fixed = TRUE) ~ "icon(class = 'small green check')",
-                                              grepl("CellClass_Failure", CellClass, fixed = TRUE) ~ "icon(class = 'small red times')",
+                        # Determine code for icon to be displayed in cell based on CSS class (grepl() call checks if the string in 'CellCSSClass' contains certain substrings)
+                        CellIcon <- case_when(grepl("CellCSSClass_Success", CellCSSClass, fixed = TRUE) ~ "icon(class = 'small green check')",
+                                              grepl("CellCSSClass_Failure", CellCSSClass, fixed = TRUE) ~ "icon(class = 'small red times')",
                                               TRUE ~ "None")
                     }
 
+                    # Set cell-specific CSS code for cells, if optional CSS code columns are passed
+                    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+                    # In case there is a column defining cell-specific CSS code for current data column
+                    if (paste0("CellCSSCode_", ColumnName) %in% names(Data))
+                    {
+                        CellCSSCode <- as.character(Data[i, paste0("CellCSSCode_", ColumnName)])
+                    }
+
+                    # Build strings for all cells in the current table row
+                    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
                     StringsTableRowCells <- c(StringsTableRowCells,
                                               paste0("tags$td(",
-                                                     #--- Add td CSS class, if one is defined ---
-                                                     ifelse(CellClass != "",
-                                                            paste0("class = '", CellClass, "', "),
+                                                     #--- Add td CSS class, if defined ---
+                                                     ifelse(CellCSSClass != "",
+                                                            paste0("class = '", CellCSSClass, "', "),
                                                             ""),
-                                                     #--- Turn logical cell value into icon if option is passed ---
-                                                     ifelse(TurnLogicalIntoIcon == TRUE & CellValue %in% c(TRUE, FALSE),
-                                                            case_when(CellValue == TRUE ~ "icon(class = 'small green check')",
-                                                                      CellValue == FALSE ~ "icon(class = 'small red times')"),
-                                                     #--- Turn color string cell value into colored dot icon if option is passed ---
-                                                            ifelse(TurnColorValuesIntoDots == TRUE & CellValue %in% AvailableColors,
-                                                                   paste0("icon(class = 'small ", CellValue, " circle')"),
-                                                                   paste0("'", CellValue, "'"))),
+                                                     #--- Add td CSS code, if defined ---
+                                                     ifelse(CellCSSCode != "",
+                                                            paste0("style = '", CellCSSCode, "', "),
+                                                            ""),
+                                                     {  #--- Turn logical values into icon if option is passed ---
+                                                        if (TurnLogicalsIntoIcons == TRUE & any(str_detect(CellValue, c("TRUE", "FALSE"))))      # Does 'CellValue' contain at least one instance of 'TRUE' or 'FALSE' strings
+                                                        {
+                                                            ReplacementVector <- c("TRUE" = "§start§ icon(class = 'small green check') §end§",      # Use pseudo-code tags to mark start and end of icon code
+                                                                                   "FALSE" = "§start§ icon(class = 'small red times') §end§")
+
+                                                            String <- str_replace_all(CellValue, ReplacementVector)
+                                                            if (str_starts(String, "§start§")) { String <- str_sub(String, start = 8) } else { String <- paste0("'", String) }
+                                                            if (str_ends(String, "§end§")) { String <- str_sub(String, end = -6) } else { String <- paste0(String, "'") }
+
+                                                            str_replace_all(String, c("§start§" = "', ",
+                                                                                      "§end§" = ", '"))
+
+                                                        } else {
+
+                                                            #--- Turn strings coding for available colors in cell value into colored dot icons if option is passed ---
+                                                            if (TurnColorValuesIntoDots == TRUE & any(str_detect(CellValue, AvailableColors)))      # Does 'CellValue' contain at least one string that is also listed in 'AvailableColors'?
+                                                            {
+                                                                DetectedColors <- AvailableColors[str_detect(CellValue, AvailableColors)]
+                                                                ReplacementVector <- paste0("§start§ icon(class = 'small ", DetectedColors, " circle') §end§")      # Use pseudo-code tags to mark start and end of icon code
+                                                                names(ReplacementVector) <- DetectedColors
+
+                                                                String <- str_replace_all(CellValue, ReplacementVector)
+                                                                if (str_starts(String, "§start§")) { String <- str_sub(String, start = 8) } else { String <- paste0("'", String) }
+                                                                if (str_ends(String, "§end§")) { String <- str_sub(String, end = -6) } else { String <- paste0(String, "'") }
+
+                                                                str_replace_all(String, c("§start§" = "', ",
+                                                                                          "§end§" = ", '"))
+
+                                                            } else {
+
+                                                                paste0("'", CellValue, "'")
+                                                        }}
+                                                     },
                                                      #--- Add optional icon to value as determined by cell class ---
                                                      ifelse(CellIcon != "None",
                                                             paste0(", HTML('&ensp;'), ", CellIcon),      # Add two spaces before icon
@@ -298,7 +372,7 @@ DataFrameToHtmlTable <- function(DataFrame,
 
     # Concatenate all substrings into one string
     HtmlCallString <- paste0("tags$table(id = '", TableID,
-                                     "', class = '", SemanticTableClass,
+                                     "', class = '", SemanticTableCSSClass,
                                      "', style = '", TableStyle, "', ",
                              StringTableHead,
                              ", ",

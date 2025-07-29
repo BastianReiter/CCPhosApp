@@ -16,6 +16,8 @@ StartCCPhosApp <- function(CCPConnections = NULL,
                            CCPSiteSpecifications = NULL,
                            CCPTestData = NULL,
                            RDSTableCheckData = NULL,
+                           CDSTableCheckData = NULL,
+                           ADSTableCheckData = NULL,
                            CurationReportData = NULL)
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 {
@@ -48,5 +50,7 @@ StartCCPhosApp <- function(CCPConnections = NULL,
                     server = MainServerComponent(CCPSiteSpecifications,
                                                  CCPTestData,
                                                  RDSTableCheckData,
+                                                 CDSTableCheckData,
+                                                 ADSTableCheckData,
                                                  CurationReportData))
 }

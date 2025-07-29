@@ -127,8 +127,10 @@ ModProcessingTerminal_Server <- function(id)
                                   ReturnMessages(dsCCPhosClient::LoadRawDataSet(CCPSiteSpecifications = session$userData$CCPSiteSpecifications(),
                                                                                 DataSources = session$userData$CCPConnections()))
 
-                                  # Trigger function ds.CheckRDSTables() and save returned list
-                                  RDSTableCheck <- dsCCPhosClient::ds.CheckRDSTables(DataSources = session$userData$CCPConnections())
+                                  # Trigger function ds.CheckDataSet() for RDS and save returned list
+                                  RDSTableCheck <- dsCCPhosClient::ds.CheckDataSet(DataSources = session$userData$CCPConnections(),
+                                                                                   DataSetName = "RawDataSet",
+                                                                                   AssumeCCPDataSet = TRUE)
 
                                   # Assign to session$userData object
                                   session$userData$RDSTableCheck(RDSTableCheck)
@@ -164,6 +166,14 @@ ModProcessingTerminal_Server <- function(id)
 
                                   # Assign returned messages (concatenated lists) to reactive value ReturnMessages
                                   ReturnMessages(Curation$Messages)
+
+                                  # Trigger function ds.CheckDataSet() for CDS and save returned list
+                                  CDSTableCheck <- dsCCPhosClient::ds.CheckDataSet(DataSources = session$userData$CCPConnections(),
+                                                                                   DataSetName = "CuratedDataSet",
+                                                                                   AssumeCCPDataSet = TRUE)
+
+                                  # Assign to session$userData object
+                                  session$userData$CDSTableCheck(CDSTableCheck)
 
                                   # Update 'Checkpoints' data frame ...
                                   Checkpoints <- session$userData$Checkpoints() %>%
@@ -203,6 +213,13 @@ ModProcessingTerminal_Server <- function(id)
 
                                   # Assign returned messages (concatenated lists) to reactive value ReturnMessages
                                   ReturnMessages(Augmentation$Messages)
+
+                                  # Trigger function ds.CheckDataSet() for ADS and save returned list
+                                  ADSTableCheck <- dsCCPhosClient::ds.CheckDataSet(DataSources = session$userData$CCPConnections(),
+                                                                                   DataSetName = "AugmentedDataSet")
+
+                                  # Assign to session$userData object
+                                  session$userData$ADSTableCheck(ADSTableCheck)
 
                                   # Update 'Checkpoints' data frame ...
                                   Checkpoints <- session$userData$Checkpoints() %>%

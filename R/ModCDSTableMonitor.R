@@ -1,6 +1,6 @@
 
 
-# --- MODULE: RDSTableMonitor ---
+# --- MODULE: CDSTableMonitor ---
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Module UI component
@@ -8,14 +8,12 @@
 
 #' @param id
 #' @noRd
-ModRDSTableMonitor_UI <- function(id)
+ModCDSTableMonitor_UI <- function(id)
 {
     ns <- NS(id)
 
-    div(id = ns("RDSTableMonitorContainer"),
+    div(id = ns("CDSTableMonitorContainer"),
         style = "",
-
-        uiOutput(outputId = ns("TableStatus")),
 
         div(style = "display: grid;
                      grid-template-columns: 1fr 3fr 1fr;",
@@ -26,7 +24,7 @@ ModRDSTableMonitor_UI <- function(id)
                 style = "margin: 2em;",
 
                 div(class = "ui top attached label",
-                    "RDS Table Details"),
+                    "CDS Table Details"),
 
                 uiOutput(outputId = ns("TableDetails"))),
 
@@ -44,7 +42,7 @@ ModRDSTableMonitor_UI <- function(id)
 #' @param output
 #' @param session
 #' @noRd
-ModRDSTableMonitor_Server <- function(id)
+ModCDSTableMonitor_Server <- function(id)
 {
     require(dplyr)
     require(purrr)
@@ -56,40 +54,15 @@ ModRDSTableMonitor_Server <- function(id)
                       ns <- session$ns
 
                       #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                      # Render reactive output: Table status overview
-                      #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                      output$TableStatus <- renderUI({  req(session$userData$RDSTableCheck())
-
-                                                        # Modify table data
-                                                        TableData <- session$userData$RDSTableCheck()$TableStatus %>%
-                                                                          select(-CheckRDSTables)
-
-                                                        # For HTML table, create vector of column labels with shortened table names to save some horizontal space
-                                                        ColumnLabels <- str_remove(colnames(TableData), "RDS_") %>% set_names(colnames(TableData))
-                                                        ColumnLabels[1] <- "Site"
-
-                                                        if (!is.null(TableData))
-                                                        {
-                                                           DataFrameToHtmlTable(DataFrame = TableData,
-                                                                                ColContentHorizontalAlign = "center",
-                                                                                ColumnLabels = ColumnLabels,
-                                                                                ColumnMaxWidth = 14,
-                                                                                SemanticTableCSSClass = "ui small compact celled structured table",
-                                                                                TurnColorValuesIntoDots = TRUE)
-                                                        }
-                                                    })
-
-
-                      #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                       # Render reactive output: Table details
                       #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
                       # Dynamically create empty UI elements to be filled further down
-                      output$TableDetails <- renderUI({   req(session$userData$RDSTableCheck())
+                      output$TableDetails <- renderUI({   req(session$userData$CDSTableCheck())
 
                                                           TableOutputList <- list()
 
-                                                          TableNames <- names(session$userData$RDSTableCheck()$FeatureExistence)
+                                                          TableNames <- names(session$userData$CDSTableCheck()$FeatureExistence)
 
                                                           # Using for-loop instead of purrr-functionality because there is no map-function that can access both names and index of list items
                                                           for (i in 1:length(TableNames))
@@ -109,10 +82,10 @@ ModRDSTableMonitor_Server <- function(id)
                                                       })
 
 
-                      HTMLTableList_TableDetails <- reactive({  req(session$userData$RDSTableCheck())
+                      HTMLTableList_TableDetails <- reactive({  req(session$userData$CDSTableCheck())
 
-                                                                # Process data from 'RDSTableCheck' to get a list of data.frames (one per RDS table) that contain table details info
-                                                                TableList <- session$userData$RDSTableCheck()[c("TableRowCounts",
+                                                                # Process data from 'CDSTableCheck' to get a list of data.frames (one per CDS table) that contain table details info
+                                                                TableList <- session$userData$CDSTableCheck()[c("TableRowCounts",
                                                                                                                 "FeatureExistence",
                                                                                                                 "FeatureTypes",
                                                                                                                 "NonMissingValueRates")] %>%

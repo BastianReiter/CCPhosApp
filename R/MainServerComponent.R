@@ -10,6 +10,8 @@
 MainServerComponent <- function(CCPSiteSpecifications,
                                 CCPTestData,
                                 RDSTableCheckData,
+                                CDSTableCheckData,
+                                ADSTableCheckData,
                                 CurationReportData)
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 {
@@ -28,8 +30,10 @@ shiny.router::router_server()
 waiter::waiter_hide()
 
 # Initialize global objects
+session$userData$ADSTableCheck <- reactiveVal(NULL)
 session$userData$CCPConnections <- reactiveVal(NULL)
 session$userData$CCPSiteSpecifications <- reactiveVal(NULL)
+session$userData$CDSTableCheck <- reactiveVal(NULL)
 session$userData$Checkpoints <- reactiveVal(NULL)
 session$userData$CurationReport <- reactiveVal(NULL)
 session$userData$RDSTableCheck <- reactiveVal(NULL)
@@ -45,6 +49,8 @@ ModInitialize(id = "Initialize",
               CCPSiteSpecifications,
               CCPTestData,
               RDSTableCheckData,
+              CDSTableCheckData,
+              ADSTableCheckData,
               CurationReportData)
 
 
@@ -54,6 +60,7 @@ ModInitialize(id = "Initialize",
 SelectedMainMenuItem <- reactiveVal("Start")
 
 shinyjs::onclick(id = "MenuItem_Start", expr = SelectedMainMenuItem("Start"))
+shinyjs::onclick(id = "MenuItem_Settings", expr = SelectedMainMenuItem("Settings"))
 shinyjs::onclick(id = "MenuItem_Prepare", expr = SelectedMainMenuItem("Prepare"))
 shinyjs::onclick(id = "MenuItem_Explore", expr = SelectedMainMenuItem("Explore"))
 shinyjs::onclick(id = "MenuItem_Analyze", expr = SelectedMainMenuItem("Analyze"))
@@ -67,6 +74,10 @@ shinyjs::onclick(id = "MenuItem_Export", expr = SelectedMainMenuItem("Export"))
 observe({ shinyjs::toggleCssClass(class = "active",
                                   id = "MenuItem_Start",
                                   condition = (SelectedMainMenuItem() == "Start")) })
+
+observe({ shinyjs::toggleCssClass(class = "active",
+                                  id = "MenuItem_Settings",
+                                  condition = (SelectedMainMenuItem() == "Settings")) })
 
 observe({ shinyjs::toggleCssClass(class = "active",
                                   id = "MenuItem_Prepare",
@@ -148,6 +159,12 @@ ModCurationReport_Server("CurationReport")
 
 # --- Call module: Data Transformation Monitor ---
 ModDataTransformationMonitor_Server("DataTransformationMonitor")
+
+# --- Call module: CDS Table Monitor ---
+ModCDSTableMonitor_Server("CDSTableMonitor")
+
+# --- Call module: ADS Table Monitor ---
+ModADSTableMonitor_Server("ADSTableMonitor")
 
 
 

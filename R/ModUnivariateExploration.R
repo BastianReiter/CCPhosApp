@@ -159,8 +159,9 @@ ModUnivariateExploration_Server <- function(id,
                                                   {
                                                       list(ObjectSelection$Element(),
                                                            input$SliderMaxNumberCategories)
-                                                  }
-                                                  else { input$UpdateButton } })
+                                                  } else {
+                                                      input$UpdateButton
+                                                  } })
 
 
                       # Render selection info label (header)

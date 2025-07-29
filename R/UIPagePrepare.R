@@ -132,8 +132,7 @@ UIPagePrepare <- function()
                              overflow: auto;
                              margin: 0;",
 
-                    ModServerWorkspaceMonitor_UI("Prepare-ServerWorkspaceMonitor",
-                                                 ShowObjectDetailsTable = FALSE)))),
+                    ModServerWorkspaceMonitor_UI("Prepare-ServerWorkspaceMonitor")))),
 
 
         #-----------------------------------------------------------------------
@@ -226,9 +225,10 @@ UIPagePrepare <- function()
 
             div(class = "active content",
 
-                div(style = "height: 30em;",
+                div(style = "height: 30em;
+                             overflow: auto;",
 
-                    ModDataTransformationMonitor_UI("DataTransformationMonitor"))))
+                    ModDataTransformationMonitor_UI("DataTransformationMonitor")))),
 
 
 
@@ -236,6 +236,48 @@ UIPagePrepare <- function()
         #                    list(menu = "Transformation Monitors", content = uiOutput("TabContentTransformationMonitors"), id = "Tab_TransformationMonitors")),
         #        active = "Tab_TransformationMonitors")
 
+
+        #-----------------------------------------------------------------------
+        div(class = "ui divider",
+            style = "margin: 1.5em 0;"),
+        #-----------------------------------------------------------------------
+
+
+        div(class = "ui accordion",      # Note: For this to work an extra JS script is necessary (see MainUIComponent())
+
+            div(class = "active title AccordionHeader",
+                icon(class = "dropdown icon"),
+                "Curated Data Set Table Check"),
+
+            div(class = "active content",
+
+                div(style = "height: 30em;
+                             overflow: auto;
+                             margin: 0;",
+
+                    ModCDSTableMonitor_UI("CDSTableMonitor")))),
+
+
+
+        #-----------------------------------------------------------------------
+        div(class = "ui divider",
+            style = "margin: 1.5em 0;"),
+        #-----------------------------------------------------------------------
+
+
+        div(class = "ui accordion",      # Note: For this to work an extra JS script is necessary (see MainUIComponent())
+
+            div(class = "active title AccordionHeader",
+                icon(class = "dropdown icon"),
+                "Augmented Data Set Table Check"),
+
+            div(class = "active content",
+
+                div(style = "height: 30em;
+                             overflow: auto;
+                             margin: 0;",
+
+                    ModADSTableMonitor_UI("ADSTableMonitor"))))
 
 
     )
