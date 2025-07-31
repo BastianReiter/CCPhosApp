@@ -19,8 +19,8 @@ CreateTableMonitor <- function(TableData)
     # Process info on feature types for sensible printing
     FeatureTypes <- TableData$FeatureTypes %>%
                         rename_with(~ paste0(.x, "_TYPE"),
-                                    -SiteName) %>%
-                        mutate(across(.cols = -SiteName,
+                                    -ServerName) %>%
+                        mutate(across(.cols = -ServerName,
                                       .fns = ~ str_replace_all(string = .x,
                                                                pattern = c("character" = "chr",
                                                                            "double" = "dbl",
@@ -30,8 +30,8 @@ CreateTableMonitor <- function(TableData)
     # Process non-missing value rates for sensible printing
     NonMissingValueRates <- TableData$NonMissingValueRates %>%
                                 rename_with(~ paste0(.x, "_NMVR"),
-                                            -SiteName) %>%
-                                mutate(across(.cols = -SiteName,
+                                            -ServerName) %>%
+                                mutate(across(.cols = -ServerName,
                                               .fns = function(.x)
                                                      {
                                                         # If rate is between 0% and 1%, display as '<1%', otherwise round to full numbers and add '%'
@@ -43,8 +43,8 @@ CreateTableMonitor <- function(TableData)
     # To enable value-dependent cell styling, create data.frame with features containing CSS code
     NonMissingValueRates_CSS <- TableData$NonMissingValueRates %>%
                                     rename_with(~ paste0("CellCSSCode_", .x, "_NMVR"),
-                                                -SiteName) %>%
-                                    mutate(across(.cols = -SiteName,
+                                                -ServerName) %>%
+                                    mutate(across(.cols = -ServerName,
                                                   .fns = function(.x)
                                                          {
                                                             # Convert decimal numbers between 0 and 1 into hexadecimal color codes ranging on a defined color palette
@@ -69,7 +69,7 @@ CreateTableMonitor <- function(TableData)
     RowCounts <- TableData$TableRowCounts
 
     # Before joining tables, create vector defining correct column order
-    ColumnOrder <- c("SiteName",
+    ColumnOrder <- c("ServerName",
                      names(RowCounts)[-1],
                      rbind(FeatureNames,
                            names(FeatureTypes)[-1],
@@ -77,14 +77,14 @@ CreateTableMonitor <- function(TableData)
                            names(NonMissingValueRates_CSS)[-1]))
 
     TableDetails <- TableData$FeatureExistence %>%
-                        left_join(RowCounts, by = join_by(SiteName)) %>%
-                        left_join(FeatureTypes, by = join_by(SiteName)) %>%
-                        left_join(NonMissingValueRates, by = join_by(SiteName)) %>%
-                        left_join(NonMissingValueRates_CSS, by = join_by(SiteName)) %>%
+                        left_join(RowCounts, by = join_by(ServerName)) %>%
+                        left_join(FeatureTypes, by = join_by(ServerName)) %>%
+                        left_join(NonMissingValueRates, by = join_by(ServerName)) %>%
+                        left_join(NonMissingValueRates_CSS, by = join_by(ServerName)) %>%
                         select(all_of(ColumnOrder))
 
     HeaderColspans <- c(1, 1, rep.int(3, length(FeatureNames))) %>%
-                          set_names(c("SiteName", "RowCount", FeatureNames))
+                          set_names(c("ServerName", "RowCount", FeatureNames))
 
     return(list(TableDetails = TableDetails,
                 HeaderColspans = HeaderColspans))

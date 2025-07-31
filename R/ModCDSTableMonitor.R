@@ -98,7 +98,7 @@ ModCDSTableMonitor_Server <- function(id)
                                                                                       {
                                                                                           DataFrameToHtmlTable(DataFrame = TableData$TableDetails,
                                                                                                                ColContentHorizontalAlign = "center",
-                                                                                                               ColumnLabels = c(SiteName = "Site"),
+                                                                                                               ColumnLabels = c(ServerName = "Server"),
                                                                                                                HeaderColspans = TableData$HeaderColspans,
                                                                                                                SemanticTableCSSClass = "ui small compact inverted scrollable structured table",
                                                                                                                TurnLogicalsIntoIcons = TRUE,

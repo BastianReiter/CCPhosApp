@@ -11,15 +11,16 @@
 #' @param input
 #' @param output
 #' @param session
-#' @param CCPSiteSpecifications
+#' @param ServerSpecifications
 #' @param CCPTestData
 #' @param RDSTableCheckData
 #' @param CDSTableCheckData
 #' @param ADSTableCheckData
 #' @param CurationReportData
 #' @noRd
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ModInitialize <- function(id,
-                          CCPSiteSpecifications,
+                          ServerSpecifications,
                           CCPTestData,
                           RDSTableCheckData,
                           CDSTableCheckData,
@@ -29,9 +30,9 @@ ModInitialize <- function(id,
     moduleServer(id,
                  function(input, output, session)
                  {
-                      if (!is.null(CCPSiteSpecifications))
-                      { session$userData$CCPSiteSpecifications(CCPSiteSpecifications)
-                      } else { session$userData$CCPSiteSpecifications(as.data.frame(dsCCPhosClient::CCPSiteSpecifications)) }
+                      if (!is.null(ServerSpecifications))
+                      { session$userData$ServerSpecifications(ServerSpecifications)
+                      } else { session$userData$ServerSpecifications(as.data.frame(dsCCPhosClient::ServerSpecifications)) }
 
                       if (!is.null(CCPTestData)) { session$userData$CCPTestData <- CCPTestData }
 

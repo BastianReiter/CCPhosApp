@@ -48,9 +48,9 @@ ModLogin_UI <- function(id)
                            button_label = "Open file",
                            accept = c(".csv")),
 
-                dataOutputUI(ns("SiteSpecificationsSave")),
+                dataOutputUI(ns("ServerSpecificationsSave")),
 
-                dataEditUI(ns("SiteSpecificationsTable")),
+                dataEditUI(ns("ServerSpecificationsTable")),
 
                 br(),
 
@@ -87,13 +87,13 @@ ModLogin_UI <- function(id)
                 div(class = "fields",
 
                     div(class = "field",
-                        tags$label("Number of virtual sites"),
-                        text_input(ns("NumberOfSites"),
+                        tags$label("Number of virtual servers"),
+                        text_input(ns("NumberOfServers"),
                                    value = "3")),
 
                     div(class = "field",
-                        tags$label("Number of patients per site"),
-                        text_input(ns("NumberOfPatientsPerSite"),
+                        tags$label("Number of patients per server"),
+                        text_input(ns("NumberOfPatientsPerServer"),
                                    value = "1000"))),
 
                 action_button(ns("ButtonLoginVirtual"),
@@ -131,20 +131,20 @@ ModLogin_Server <- function(id)
                     # --- Server logic real CCP connection ---
 
                     # Create a reactive expression containing a data frame read from an uploaded csv-file if provided
-                    SiteSpecifications_InputData <- reactive({ FilePath <- input$FileInput$datapath
-                                                               if (is.null(FilePath)) { return(dsCCPhosClient::CCPSiteSpecifications) }
+                    ServerSpecifications_InputData <- reactive({ FilePath <- input$FileInput$datapath
+                                                               if (is.null(FilePath)) { return(dsCCPhosClient::ServerSpecifications) }
                                                                else { return(read.csv(file = FilePath)) } })
 
                     # Create a reactive value containing data in the specification's table (initially fed with optional input and then optionally edited)
-                    SiteSpecifications_EditData <- dataEditServer(id = "SiteSpecificationsTable",
-                                                                  data = SiteSpecifications_InputData,
-                                                                  col_names = c("Site name", "Site server URL", "Project name", "Token"),
+                    ServerSpecifications_EditData <- dataEditServer(id = "ServerSpecificationsTable",
+                                                                  data = ServerSpecifications_InputData,
+                                                                  col_names = c("Server name", "Server URL", "Project name", "Token"),
                                                                   col_stretch = TRUE,
                                                                   col_options = list(Token = "password"))
 
                     # Determine file-saving functionality
-                    dataOutputServer(id = "SiteSpecificationsSave",
-                                     data = SiteSpecifications_EditData,
+                    dataOutputServer(id = "ServerSpecificationsSave",
+                                     data = ServerSpecifications_EditData,
                                      write_fun = "write.csv",
                                      write_args = list(row.names = FALSE))   # Don't write row names in csv-file
 
@@ -152,19 +152,19 @@ ModLogin_Server <- function(id)
                     observe({ WaiterScreen$show()
                               on.exit({ WaiterScreen$hide() })
 
-                              # Assign Site Specifications (CCP credentials and project names) to session$userData according to input table
-                              session$userData$CCPSiteSpecifications(SiteSpecifications_EditData())
+                              # Assign Server Specifications (CCP credentials and project names) to session$userData according to input table
+                              session$userData$ServerSpecifications(ServerSpecifications_EditData())
 
                               # Trigger dsCCPhosClient::ConnectToCCP() ...
-                              Connections <- dsCCPhosClient::ConnectToCCP(CCPSiteSpecifications = session$userData$CCPSiteSpecifications())
+                              Connections <- dsCCPhosClient::ConnectToCCP(ServerSpecifications = session$userData$ServerSpecifications())
 
                               # ... and assign return to session$userData
-                              session$userData$CCPConnections(Connections)
+                              session$userData$DSConnections(Connections)
 
                               # Initiate 'Checkpoints' data frame ...
-                              Checkpoints <- session$userData$CCPSiteSpecifications() %>%
-                                                  select(SiteName) %>%
-                                                  mutate(ConnectionStatus = case_when(SiteName %in% names(session$userData$CCPConnections()) ~ "green",
+                              Checkpoints <- session$userData$ServerSpecifications() %>%
+                                                  select(ServerName) %>%
+                                                  mutate(ConnectionStatus = case_when(ServerName %in% names(session$userData$DSConnections()) ~ "green",
                                                                                       TRUE ~ "red"))
 
                               # ... and assign it to session$userData object
@@ -181,22 +181,22 @@ ModLogin_Server <- function(id)
 
                               # Trigger function that returns connections object
                               Connections <- dsCCPhosClient::ConnectToVirtualCCP(CCPTestData = session$userData$CCPTestData,
-                                                                                 NumberOfSites = as.integer(input$NumberOfSites),
-                                                                                 NumberOfPatientsPerSite = as.integer(input$NumberOfPatientsPerSite))
+                                                                                 NumberOfServers = as.integer(input$NumberOfServers),
+                                                                                 NumberOfPatientsPerServer = as.integer(input$NumberOfPatientsPerServer))
 
                               # Assign connections to session$userData object
-                              session$userData$CCPConnections(Connections)
+                              session$userData$DSConnections(Connections)
 
-                              # Assign virtual site specifications to session$userData object
-                              session$userData$CCPSiteSpecifications(data.frame(SiteName = names(Connections),
-                                                                                URL = "Virtual",
-                                                                                ProjectName = "Virtual",
-                                                                                Token = "Virtual"))
+                              # Assign virtual server specifications to session$userData object
+                              session$userData$ServerSpecifications(data.frame(ServerName = names(Connections),
+                                                                               URL = "Virtual",
+                                                                               ProjectName = "Virtual",
+                                                                               Token = "Virtual"))
 
                               # Initiate 'Checkpoints' data frame ...
-                              Checkpoints <- session$userData$CCPSiteSpecifications() %>%
-                                                  select(SiteName) %>%
-                                                  mutate(CheckConnection = case_when(SiteName %in% names(session$userData$CCPConnections()) ~ "green",
+                              Checkpoints <- session$userData$ServerSpecifications() %>%
+                                                  select(ServerName) %>%
+                                                  mutate(CheckConnection = case_when(ServerName %in% names(session$userData$DSConnections()) ~ "green",
                                                                                      TRUE ~ "red"))
 
                               # ... and assign it to session$userData object

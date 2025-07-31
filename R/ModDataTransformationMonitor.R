@@ -17,8 +17,8 @@ ModDataTransformationMonitor_UI <- function(id)
                  grid-gap: 4em;",
 
 
-        div(selectInput(inputId = ns("SiteName"),
-                        label = "Select Site",
+        div(selectInput(inputId = ns("ServerName"),
+                        label = "Select Server",
                         choices = ""),
 
             selectInput(inputId = ns("MonitorTableName"),
@@ -93,7 +93,7 @@ ModDataTransformationMonitor_Server <- function(id)
 
                       LoadingOn <- function()
                       {
-                          shinyjs::disable("SiteName")
+                          shinyjs::disable("ServerName")
                           shinyjs::disable("MonitorTableName")
                           shinyjs::disable("ShowNonOccurringValues")
                           WaiterScreen$show()
@@ -101,7 +101,7 @@ ModDataTransformationMonitor_Server <- function(id)
 
                       LoadingOff <- function()
                       {
-                          shinyjs::enable("SiteName")
+                          shinyjs::enable("ServerName")
                           shinyjs::enable("MonitorTableName")
                           shinyjs::enable("ShowNonOccurringValues")
                           WaiterScreen$hide()
@@ -112,7 +112,7 @@ ModDataTransformationMonitor_Server <- function(id)
                       # Update input elements when data changes
                       #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                       observe({ updateSelectInput(session = getDefaultReactiveDomain(),
-                                                  inputId = "SiteName",
+                                                  inputId = "ServerName",
                                                   choices = names(session$userData$CurationReport()$Transformation))
 
                                 updateSelectInput(session = getDefaultReactiveDomain(),
@@ -129,7 +129,7 @@ ModDataTransformationMonitor_Server <- function(id)
                       # Reactive expression: Data for eligibility overview
                       #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                       Data_EligibilityOverview <- reactive({ req(session$userData$CurationReport())
-                                                             req(input$SiteName)
+                                                             req(input$ServerName)
                                                              req(input$MonitorTableName)
 
                                                              if (!is.null(session$userData$CurationReport()))
@@ -140,7 +140,7 @@ ModDataTransformationMonitor_Server <- function(id)
                                                                  #   - 'Feature': contains names of features
                                                                  #   - 'data': plot data for feature-specific plot
                                                                  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                                                                 session$userData$CurationReport()$Transformation[[input$SiteName]]$EligibilityOverviews[[input$MonitorTableName]] %>%
+                                                                 session$userData$CurationReport()$Transformation[[input$ServerName]]$EligibilityOverviews[[input$MonitorTableName]] %>%
                                                                      select(-ends_with("_Proportional")) %>%
                                                                      pivot_longer(cols = c(Raw, Harmonized, Recoded, Final),
                                                                                   names_to = "Stage",
@@ -239,12 +239,12 @@ ModDataTransformationMonitor_Server <- function(id)
                       # Reactive expression: Data for transformation track table
                       #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                       Data_TransformationTracks <- reactive({ req(session$userData$CurationReport())
-                                                              req(input$SiteName)
+                                                              req(input$ServerName)
                                                               req(input$MonitorTableName)
 
                                                               if (!is.null(session$userData$CurationReport()))
                                                               {
-                                                                  session$userData$CurationReport()$Transformation[[input$SiteName]]$Monitors[[input$MonitorTableName]] %>%
+                                                                  session$userData$CurationReport()$Transformation[[input$ServerName]]$Monitors[[input$MonitorTableName]] %>%
                                                                       { if (input$ShowNonOccurringValues == FALSE) { filter(., IsOccurring == TRUE) } else {.} } %>%       # Filter for occurring values only, if option checked in UI
                                                                       mutate(CellCSSClass_Value_Raw = case_when(IsOccurring == FALSE & IsEligible_Raw == TRUE ~ "CellCSSClass_Info",
                                                                                                                 IsOccurring == TRUE & IsEligible_Raw == TRUE ~ "CellCSSClass_Success",

@@ -66,7 +66,7 @@ ModRDSTableMonitor_Server <- function(id)
 
                                                         # For HTML table, create vector of column labels with shortened table names to save some horizontal space
                                                         ColumnLabels <- str_remove(colnames(TableData), "RDS_") %>% set_names(colnames(TableData))
-                                                        ColumnLabels[1] <- "Site"
+                                                        ColumnLabels[1] <- "Server"
 
                                                         if (!is.null(TableData))
                                                         {
@@ -125,7 +125,7 @@ ModRDSTableMonitor_Server <- function(id)
                                                                                       {
                                                                                           DataFrameToHtmlTable(DataFrame = TableData$TableDetails,
                                                                                                                ColContentHorizontalAlign = "center",
-                                                                                                               ColumnLabels = c(SiteName = "Site"),
+                                                                                                               ColumnLabels = c(ServerName = "Server"),
                                                                                                                HeaderColspans = TableData$HeaderColspans,
                                                                                                                SemanticTableCSSClass = "ui small compact inverted scrollable structured table",
                                                                                                                TurnLogicalsIntoIcons = TRUE,

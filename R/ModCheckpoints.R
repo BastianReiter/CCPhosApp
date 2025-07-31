@@ -72,7 +72,7 @@ ModCheckpoints_Server <- function(id)
                                                              {
                                                                  DataFrameToHtmlTable(DataFrame = session$userData$Checkpoints(),
                                                                                       ColContentHorizontalAlign = "center",
-                                                                                      ColumnLabels = c(SiteName = "Site",
+                                                                                      ColumnLabels = c(ServerName = "Server",
                                                                                                        dsCCPhosVersion = "dsCCPhos"),
                                                                                       ColumnIcons = c(CheckConnection = "wifi",
                                                                                                       CheckPackageAvailability = "box",

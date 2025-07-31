@@ -92,7 +92,7 @@ ModCurationReport_Server <- function(id)
                                                                                                            SecondaryExclusion = paste0(ExcludedSecondary, " (", round(ExcludedSecondary_Proportion * 100, 0), "%)"),
                                                                                                            SecondaryRedundancyExclusion = paste0(ExcludedSecondaryRedundancy, " (", round(ExcludedSecondaryRedundancy_Proportion * 100, 0), "%)"),
                                                                                                            FinalCount = paste0(AfterSecondaryExclusion, " (", round(AfterSecondaryExclusion_Proportion * 100, 0), "%)")) %>%
-                                                                                                    select(Site,
+                                                                                                    select(Server,
                                                                                                            InitialCount,
                                                                                                            PrimaryExclusion,
                                                                                                            # InterimCount,
@@ -138,7 +138,7 @@ ModCurationReport_Server <- function(id)
                                                                     {
                                                                        DataFrameToHtmlTable(DataFrame = as.data.frame(TableData),
                                                                                             ColContentHorizontalAlign = "center",
-                                                                                            ColumnLabels = c(SiteName = "Site"),
+                                                                                            ColumnLabels = c(ServerName = "Server"),
                                                                                             SemanticTableCSSClass = "ui small compact celled structured table")
                                                                     }
                                                                  })
