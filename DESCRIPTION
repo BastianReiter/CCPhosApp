@@ -1,6 +1,6 @@
 Package: CCPhosApp
 Title: The app for working with dsCCPhos
-Version: 0.1.79
+Version: 0.1.80
 Authors@R: 
     person("Bastian", "Reiter", , "b.reiter@med.uni-frankfurt.de", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-1088-0502"))
@@ -12,7 +12,6 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Imports:
     DataEditR,
-    dsCCPhosClient (>= 0.1.17),
     DT,
     gt (>= 0.10.1),
     plotly,
@@ -24,7 +23,8 @@ Imports:
     sysfonts,
     tidyr,
     waiter (>= 0.2.5)
-Depends: 
+Depends:
+    dsCCPhosClient (>= 0.1.79),
     R (>= 2.10)
 LazyData: true
 Remotes: 

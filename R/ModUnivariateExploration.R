@@ -176,26 +176,26 @@ ModUnivariateExploration_Server <- function(id,
 
 
                       # A tibble created by dsCCPhosClient::dsGetFeatureInfo()
-                      FeatureInfo <- reactive({ req(session$userData$CCPConnections())
+                      FeatureInfo <- reactive({ req(session$userData$DSConnections())
                                                 req(ObjectSelection)
 
                                                 # Get meta data of table object
                                                 TableMetaData <- ds.GetObjectMetaData(ObjectName = ObjectSelection$Object(),
-                                                                                      DataSources = session$userData$CCPConnections())
+                                                                                      DSConnections = session$userData$DSConnections())
 
                                                 # Check if selected object is a tibble / data.frame. If not, return NULL,
                                                 if (TableMetaData$FirstEligible$Class != "data.frame") { return(NULL) }
 
                                                 # Returns a tibble
-                                                dsCCPhosClient::ds.GetFeatureInfo(DataSources = session$userData$CCPConnections(),
-                                                                                  TableName = ObjectSelection$Object(),
-                                                                                  FeatureName = ObjectSelection$Element())
+                                                dsCCPhosClient::ds.GetFeatureInfo(TableName = ObjectSelection$Object(),
+                                                                                  FeatureName = ObjectSelection$Element(),
+                                                                                  DSConnections = session$userData$DSConnections())
                                                 }) %>% bindEvent({ TriggerUpdate() })
 
 
                       # Reactive expression containing type of selected feature ('character', 'numeric', ...)
                       FeatureType <- reactive({ req(FeatureInfo())
-                                                filter(FeatureInfo(), Site == "All")$DataType })
+                                                filter(FeatureInfo(), Server == "All")$DataType })
 
 
                       # Render table containing info about data availability in selected feature
@@ -238,16 +238,16 @@ ModUnivariateExploration_Server <- function(id,
                                                 # Get and return tibble containing statistics depending on feature type
                                                 if (FeatureType() %in% c("double", "integer", "numeric"))
                                                 {
-                                                    return(dsCCPhosClient::ds.GetSampleStatistics(DataSources = session$userData$CCPConnections(),
-                                                                                                  TableName = ObjectSelection$Object(),
-                                                                                                  MetricFeatureName = ObjectSelection$Element()))
+                                                    return(dsCCPhosClient::ds.GetSampleStatistics(TableName = ObjectSelection$Object(),
+                                                                                                  MetricFeatureName = ObjectSelection$Element(),
+                                                                                                  DSConnections = session$userData$DSConnections()))
                                                 }
                                                 else if (FeatureType() %in% c("character", "logical"))
                                                 {
-                                                    return(dsCCPhosClient::ds.GetFrequencyTable(DataSources = session$userData$CCPConnections(),
-                                                                                                TableName = ObjectSelection$Object(),
+                                                    return(dsCCPhosClient::ds.GetFrequencyTable(TableName = ObjectSelection$Object(),
                                                                                                 FeatureName = ObjectSelection$Element(),
-                                                                                                MaxNumberCategories = input$SliderMaxNumberCategories))
+                                                                                                MaxNumberCategories = input$SliderMaxNumberCategories,
+                                                                                                DSConnections = session$userData$DSConnections()))
                                                 }
                                                 else { return(NULL) }
 
@@ -271,13 +271,13 @@ ModUnivariateExploration_Server <- function(id,
                                                             {
                                                                 # Format relative frequency values as percentages in brackets for table displaying purposes
                                                                 RelativeFrequencies <- Statistics()$RelativeFrequencies %>%
-                                                                                            mutate(across(-Site, ~ paste0("(", round(.x * 100, 0), "%)")))
+                                                                                            mutate(across(-Server, ~ paste0("(", round(.x * 100, 0), "%)")))
 
                                                                 # Restructure table data for displaying purposes ('AbsoluteFrequency (RelativeFrequency %)')
                                                                 TableData <- Statistics()$AbsoluteFrequencies %>%
                                                                                   mutate(across(everything(), as.character)) %>%
                                                                                   bind_rows(RelativeFrequencies) %>%
-                                                                                  group_by(Site) %>%
+                                                                                  group_by(Server) %>%
                                                                                       summarize(across(everything(), ~ paste0(.x, collapse = "  ")))
                                                             }
 
@@ -301,7 +301,7 @@ ModUnivariateExploration_Server <- function(id,
                                                             if (FeatureType() %in% c("double", "integer", "numeric"))
                                                             {
                                                                 Table <- Table %>%
-                                                                            DT::formatRound(names(Statistics())[!(names(Statistics()) %in% c("Site", "N"))],      # Apply formatting to all columns except 'Site' and 'N'
+                                                                            DT::formatRound(names(Statistics())[!(names(Statistics()) %in% c("Server", "N"))],      # Apply formatting to all columns except 'Server' and 'N'
                                                                                             digits = 2)
                                                             }
 
@@ -325,15 +325,15 @@ ModUnivariateExploration_Server <- function(id,
                                                               if (FeatureType() %in% c("character", "logical"))
                                                               {
                                                                   PlotData <- Statistics()$AbsoluteFrequencies %>%
-                                                                                  pivot_longer(cols = -Site,
+                                                                                  pivot_longer(cols = -Server,
                                                                                                names_to = "Value",
                                                                                                values_to = "AbsoluteFrequency") %>%
-                                                                                  filter(Site != "All")
+                                                                                  filter(Server != "All")
 
                                                                   Plot <- dsCCPhosClient::MakeColumnPlot(DataFrame = PlotData,
                                                                                                          XFeature = Value,
                                                                                                          YFeature = AbsoluteFrequency,
-                                                                                                         GroupingFeature = Site)
+                                                                                                         GroupingFeature = Server)
 
 
                                                                   # Plot <- plot_ly(data = as.data.frame(Statistics()$AbsoluteFrequencies),      # Must be a data.frame, not a tibble!
@@ -366,7 +366,7 @@ ModUnivariateExploration_Server <- function(id,
                                                             })
 
 
-                      # observe({ req(session$userData$CCPConnections())
+                      # observe({ req(session$userData$DSConnections())
                       #           req(ObjectSelection)
                       #
                       #           LoadingOn()
@@ -376,7 +376,7 @@ ModUnivariateExploration_Server <- function(id,
                       #           # {
                       #               SampleStatistics <- dsCCPhosClient::ds.GetSampleStatistics(TableName = ObjectSelection$Object(),
                       #                                                                          MetricFeatureName = ObjectSelection$Element(),
-                      #                                                                          DataSources = session$userData$CCPConnections())
+                      #                                                                          DSConnections = session$userData$DSConnections())
                       #
                       #               output$StatisticsTable <- renderUI({ DataFrameToHtmlTable(DataFrame = SampleStatistics,
                       #                                                                         SemanticTableClass = "ui small very compact selectable celled table") })
@@ -384,9 +384,9 @@ ModUnivariateExploration_Server <- function(id,
                       #               output$StatisticsPlot <- renderPlot({ dsCCPhosClient::MakeBoxPlot(SampleStatistics = SampleStatistics,
                       #                                                                                 AxisTitle_y = "Patient age at diagnosis",
                       #                                                                                 FillPalette = c("All" = CCPhosColors$MediumGrey,
-                      #                                                                                                 "SiteA" = CCPhosColors$Primary,
-                      #                                                                                                 "SiteB" = CCPhosColors$Secondary,
-                      #                                                                                                 "SiteC" = CCPhosColors$Tertiary)) })
+                      #                                                                                                 "ServerA" = CCPhosColors$Primary,
+                      #                                                                                                 "ServerB" = CCPhosColors$Secondary,
+                      #                                                                                                 "ServerC" = CCPhosColors$Tertiary)) })
                       #           # }
                       #           # else
                       #           # {

@@ -7,7 +7,8 @@
 #'
 #' @noRd
 #' @author Bastian Reiter
-MainServerComponent <- function(CCPSiteSpecifications,
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+MainServerComponent <- function(ServerSpecifications,
                                 CCPTestData,
                                 RDSTableCheckData,
                                 CDSTableCheckData,
@@ -31,8 +32,8 @@ waiter::waiter_hide()
 
 # Initialize global objects
 session$userData$ADSTableCheck <- reactiveVal(NULL)
-session$userData$CCPConnections <- reactiveVal(NULL)
-session$userData$CCPSiteSpecifications <- reactiveVal(NULL)
+session$userData$DSConnections <- reactiveVal(NULL)
+session$userData$ServerSpecifications <- reactiveVal(NULL)
 session$userData$CDSTableCheck <- reactiveVal(NULL)
 session$userData$Checkpoints <- reactiveVal(NULL)
 session$userData$CurationReport <- reactiveVal(NULL)
@@ -46,7 +47,7 @@ session$userData$CCPTestData <- NULL
 # --- Call module: Initialize ---
 # Assigns content to session$userData objects at app start
 ModInitialize(id = "Initialize",
-              CCPSiteSpecifications,
+              ServerSpecifications,
               CCPTestData,
               RDSTableCheckData,
               CDSTableCheckData,
@@ -108,8 +109,8 @@ output$ProjectNameOutput <- renderUI({ "" })
 
 # For testing purposes: Arbitrary text monitor element
 output$TestMonitor <- renderText({
-                                    #req(session$userData$CCPSiteSpecifications())
-                                    #paste(names(session$userData$CCPSiteSpecifications()), collapse = ", ")
+                                    #req(session$userData$ServerSpecifications())
+                                    #paste(names(session$userData$ServerSpecifications()), collapse = ", ")
 
                                  })
 
@@ -138,7 +139,7 @@ StatusDataAugmented <- ModProcessingTerminal_Server(id = "AugmentData")
 
 SelectedProcessingStep <- reactiveVal("None")
 
-observe({ if (is.list(session$userData$CCPConnections())) { StatusConnected(TRUE) }
+observe({ if (is.list(session$userData$DSConnections())) { StatusConnected(TRUE) }
           else { StatusConnected(FALSE) } })
 
 
@@ -417,7 +418,7 @@ ModUnivariateExploration_Server("UnivariateExploration",
 #
 #   onStop(function() {
 #     cat("Doing application cleanup\n")
-#       if(session$userData$CCPConnections != "None") {DSI::datashield.logout(session$userData$CCPConnections) }
+#       if(session$userData$DSConnections != "None") {DSI::datashield.logout(session$userData$DSConnections) }
 #   })
 # }
 

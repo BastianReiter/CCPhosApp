@@ -54,13 +54,13 @@ ModConnectionStatus_Server <- function(id)
     moduleServer(id,
                  function(input, output, session)
                  {
-                      output$StatusIcon <- renderUI({ if (is.list(session$userData$CCPConnections())) { shiny.semantic::icon(class = "large green power off") }
+                      output$StatusIcon <- renderUI({ if (is.list(session$userData$DSConnections())) { shiny.semantic::icon(class = "large green power off") }
                                                       else { shiny.semantic::icon(class = "large grey power off") } })
 
-                      output$StatusText <- renderText({ if (is.list(session$userData$CCPConnections())) { "Connected to CCP" }
+                      output$StatusText <- renderText({ if (is.list(session$userData$DSConnections())) { "Connected to CCP" }
                                                         else { "No connection established" } })
 
-                      observe({ if (is.list(session$userData$CCPConnections()))
+                      observe({ if (is.list(session$userData$DSConnections()))
                                 {
                                     shinyjs::enable("ConsoleButton")
                                     shinyjs::enable("LogoutButton")
@@ -75,8 +75,8 @@ ModConnectionStatus_Server <- function(id)
                       # Switch console button functionality
 
                       # Logout button functionality
-                      observe({ DSI::datashield.logout(session$userData$CCPConnections())
-                                session$userData$CCPConnections(NULL) }) %>%
+                      observe({ DSI::datashield.logout(session$userData$DSConnections())
+                                session$userData$DSConnections(NULL) }) %>%
                           bindEvent(input$LogoutButton)
 
                  })
