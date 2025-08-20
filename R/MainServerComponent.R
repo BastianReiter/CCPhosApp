@@ -8,12 +8,14 @@
 #' @noRd
 #' @author Bastian Reiter
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-MainServerComponent <- function(ServerSpecifications,
-                                CCPTestData,
-                                RDSTableCheckData,
-                                CDSTableCheckData,
-                                ADSTableCheckData,
-                                CurationReportData)
+MainServerComponent <- function(ADSTableCheckData = NULL,
+                                CCPTestData = NULL,
+                                CDSTableCheckData = NULL,
+                                CurationReportData = NULL,
+                                DSConnections = NULL,
+                                RDSTableCheckData = NULL,
+                                ServerSpecifications = NULL,
+                                ServerWorkspaceInfo = NULL)
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 {
 
@@ -47,12 +49,14 @@ session$userData$CCPTestData <- NULL
 # --- Call module: Initialize ---
 # Assigns content to session$userData objects at app start
 ModInitialize(id = "Initialize",
-              ServerSpecifications,
-              CCPTestData,
-              RDSTableCheckData,
-              CDSTableCheckData,
-              ADSTableCheckData,
-              CurationReportData)
+              ADSTableCheckData = ADSTableCheckData,
+              CCPTestData = CCPTestData,
+              CDSTableCheckData = CDSTableCheckData,
+              CurationReportData = CurationReportData,
+              DSConnections = DSConnections,
+              RDSTableCheckData = RDSTableCheckData,
+              ServerSpecifications = ServerSpecifications,
+              ServerWorkspaceInfo = ServerWorkspaceInfo)
 
 
 # Initialize menu behavior
@@ -150,7 +154,7 @@ ModCheckpoints_Server("Checkpoints")
 ModServerOpalMonitor_Server("ServerOpalMonitor")
 
 # --- Call module: Server Workspace Monitor ---
-ModServerWorkspaceMonitor_Server("Prepare-ServerWorkspaceMonitor")
+ModServerExplorer_Server("Prepare-ServerExplorer")
 
 # --- Call module: RDS Table Monitor ---
 ModRDSTableMonitor_Server("RDSTableMonitor")
@@ -402,7 +406,7 @@ InitiateStepJS(StepID = "Step_AugmentData")
 
 
 # --- Call module: Server Workspace Monitor ---
-Selection <- ModServerWorkspaceMonitor_Server("Explore-ServerWorkspaceMonitor")
+Selection <- ModServerExplorer_Server("Explore-ServerExplorer")
 SelectedObject <- Selection$Object
 SelectedElement <- Selection$Element
 
@@ -411,6 +415,8 @@ ModUnivariateExploration_Server("UnivariateExploration",
                                 Selection)
 
 
+# This stops the Shiny server in the current R process (specifically ends the background R process when hosting browser is closed)
+session$onSessionEnded(function() { stopApp() })
 
 
 # onStart = function() {

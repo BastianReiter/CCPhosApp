@@ -132,7 +132,7 @@ UIPagePrepare <- function()
                              overflow: auto;
                              margin: 0;",
 
-                    ModServerWorkspaceMonitor_UI("Prepare-ServerWorkspaceMonitor")))),
+                    ModServerExplorer_UI("Prepare-ServerExplorer")))),
 
 
         #-----------------------------------------------------------------------
@@ -207,7 +207,7 @@ UIPagePrepare <- function()
         #
         #                 div(style = "height: 100%;
         #                              overflow: auto;",
-        #                     ModServerWorkspaceMonitor_UI("Prepare-ServerWorkspaceMonitor",
+        #                     ModServerExplorer_UI("Prepare-ServerExplorer",
         #                                                  ShowObjectDetailsTable = FALSE)))))),
 
 

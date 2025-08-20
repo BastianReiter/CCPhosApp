@@ -55,13 +55,15 @@ library(devtools)
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Adding general R script files
+# Adding general R functions
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # use_r("Auxiliary.R")
+# use_r("BackgroundProcess.R")
 # use_r("StartCCPhosApp")
 # use_r("UIComponent")
 # use_r("ServerComponent")
+# use_r("ServerExplorer.R")
 # use_r("DataFrameToHtmlTable.R")
 # use_r("CreateTableMonitor.R")
 

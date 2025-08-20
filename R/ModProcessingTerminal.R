@@ -161,6 +161,7 @@ ModProcessingTerminal_Server <- function(id)
 
                                   # Trigger function ds.CurateData() and save return
                                   Curation <- dsCCPhosClient::ds.CurateData(RawDataSetName = "RawDataSet",
+                                                                            Settings = NULL,
                                                                             OutputName = "CurationOutput",
                                                                             DSConnections = session$userData$DSConnections())
 

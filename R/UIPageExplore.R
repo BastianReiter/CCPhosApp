@@ -12,7 +12,7 @@ UIPageExplore <- function()
 
         div(style = "height: 26em;",
 
-            ModServerWorkspaceMonitor_UI("Explore-ServerWorkspaceMonitor")),
+            ModServerExplorer_UI("Explore-ServerExplorer")),
 
 
         #-----------------------------------------------------------------------

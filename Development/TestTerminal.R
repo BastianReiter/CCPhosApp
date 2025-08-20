@@ -10,20 +10,29 @@ library(CCPhosApp)
 
 TestData <- readRDS("../dsCCPhos/Development/Data/TestData/CCPTestData.rds")
 
-RDSTableCheck <- readRDS(file = "C:/Users/Basti/Desktop/CurationReports/CRC/CRC_RDSTableCheck_20250624.RDS")
-CurationReport <- readRDS(file = "C:/Users/Basti/Desktop/CurationReports/CRC/CRC_CurationReport_20250624.RDS")
-CDSTableCheck <- readRDS(file = "C:/Users/Basti/Desktop/CurationReports/CRC/CRC_CDSTableCheck_20250624.RDS")
+# RDSTableCheck <- readRDS(file = "C:/Users/Basti/Desktop/CurationReports/CRC/CRC_RDSTableCheck_20250624.RDS")
+# CurationReport <- readRDS(file = "C:/Users/Basti/Desktop/CurationReports/CRC/CRC_CurationReport_20250624.RDS")
+# CDSTableCheck <- readRDS(file = "C:/Users/Basti/Desktop/CurationReports/CRC/CRC_CDSTableCheck_20250624.RDS")
 
-CurationReport <- readRDS(file = "C:/Users/Basti/Desktop/CurationReports/CurationReport_ALL_20250508.rds")
-CurationReport <- readRDS(file = "C:/Users/Basti/Desktop/CurationReports/CurationReport_Berlin2025-03-03.rds")
+# CurationReport <- readRDS(file = "C:/Users/Basti/Desktop/CurationReports/CurationReport_ALL_20250508.rds")
+# CurationReport <- readRDS(file = "C:/Users/Basti/Desktop/CurationReports/CurationReport_Berlin2025-03-03.rds")
+
+CurationReport <- readRDS(file = "C:/Users/Basti/OneDrive/ARBEIT/IDMKD/Projekte/CCP/CDSG Projekte/EvaSchaefer/CurationReport_20250731.rds")
+#RDSTableCheck <- readRDS(file = "C:/Users/Basti/OneDrive/ARBEIT/IDMKD/Projekte/CCP/CDSG Projekte/EvaSchaefer/RDSTableCheck_20250731.rds")
+CDSTableCheck <- readRDS(file = "C:/Users/Basti/OneDrive/ARBEIT/IDMKD/Projekte/CCP/CDSG Projekte/EvaSchaefer/CDSTableCheck_20250731.rds")
+ADSTableCheck <- readRDS(file = "C:/Users/Basti/OneDrive/ARBEIT/IDMKD/Projekte/CCP/CDSG Projekte/EvaSchaefer/ADSTableCheck_20250731.rds")
+
+
+
 
 StartCCPhosApp(CCPTestData = TestData)
-               #RDSTableCheckData = RDSTableCheck,
-               #CurationReportData = CurationReport)
+               CDSTableCheckData = RDSTableCheck,
+               ADSTableCheckData = ADSTableCheck,
+               CurationReportData = CurationReport)
 
 
 
-
+ServerExplorer()
 
 
 

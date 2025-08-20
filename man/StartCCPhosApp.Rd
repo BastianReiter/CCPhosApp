@@ -4,12 +4,25 @@
 \alias{StartCCPhosApp}
 \title{StartCCPhosApp}
 \usage{
-StartCCPhosApp(CCPSiteSpecifications = NULL, CCPTestData = NULL)
+StartCCPhosApp(
+  ADSTableCheckData = NULL,
+  CCPTestData = NULL,
+  CDSTableCheckData = NULL,
+  CurationReportData = NULL,
+  DSConnections = NULL,
+  RDSTableCheckData = NULL,
+  ServerSpecifications = NULL,
+  ServerWorkspaceInfo = NULL
+)
 }
 \arguments{
-\item{CCPTestData}{List | Optional CCP test data}
+\item{CCPTestData}{\code{list} - Optional CCP test data}
 
-\item{CCPConnections}{List of DSConnection objects}
+\item{CurationReportData}{\code{list} - Optional CurationReport data}
+
+\item{DSConnections}{\code{list} of \code{DSConnection} objects}
+
+\item{RDSTableCheckData}{\code{list} - Optional RDSTableCheck data}
 }
 \description{
 Launch Shiny app
