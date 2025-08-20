@@ -13,13 +13,14 @@
 #'
 #' @author Bastian Reiter
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-StartCCPhosApp <- function(DSConnections = NULL,
-                           ServerSpecifications = NULL,
+StartCCPhosApp <- function(ADSTableCheckData = NULL,
                            CCPTestData = NULL,
-                           RDSTableCheckData = NULL,
                            CDSTableCheckData = NULL,
-                           ADSTableCheckData = NULL,
-                           CurationReportData = NULL)
+                           CurationReportData = NULL,
+                           DSConnections = NULL,
+                           RDSTableCheckData = NULL,
+                           ServerSpecifications = NULL,
+                           ServerWorkspaceInfo = NULL)
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 {
   require(DataEditR)
@@ -48,10 +49,12 @@ StartCCPhosApp <- function(DSConnections = NULL,
 
   # Start CCPhos app
   shiny::shinyApp(ui = MainUIComponent(),
-                  server = MainServerComponent(ServerSpecifications,
-                                               CCPTestData,
-                                               RDSTableCheckData,
-                                               CDSTableCheckData,
-                                               ADSTableCheckData,
-                                               CurationReportData))
+                  server = MainServerComponent(ADSTableCheckData = ADSTableCheckData,
+                                               CCPTestData = CCPTestData,
+                                               CDSTableCheckData = CDSTableCheckData,
+                                               CurationReportData = CurationReportData,
+                                               DSConnections = DSConnections,
+                                               RDSTableCheckData = RDSTableCheckData,
+                                               ServerSpecifications = ServerSpecifications,
+                                               ServerWorkspaceInfo = ServerWorkspaceInfo))
 }

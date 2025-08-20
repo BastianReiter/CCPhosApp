@@ -1,19 +1,18 @@
 
 
-# --- MODULE: ServerWorkspaceMonitor ---
+# --- MODULE: ServerExplorer ---
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Module UI component
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 #' @param id
-#' @param ShowObjectDetailTable
 #' @noRd
-ModServerWorkspaceMonitor_UI <- function(id)
+ModServerExplorer_UI <- function(id)
 {
     ns <- NS(id)
 
-    div(id = ns("ServerWorkspaceMonitorContainer"),
+    div(id = ns("ServerExplorerContainer"),
         class = "ui segment",
         style = "height: 100%;
                  margin: 0;",
@@ -23,13 +22,16 @@ ModServerWorkspaceMonitor_UI <- function(id)
                    class = "ui left attached toggle button"),
             button(ns("ByServerButton"),
                    label = "by Server",
-                   class = "ui right attached toggle button")),
+                   class = "ui right attached toggle button"),
+            button(ns("UpdateButton"),
+                   label = "Update",
+                   class = "ui right attached button")),
 
         # div(class = "ui top attached label",
         #     "Object"),
 
         div(style = "display: grid;
-                     grid-template-columns: 2fr 2fr 2fr;
+                     grid-template-columns: 2fr 2fr 2fr 2fr;
                      grid-gap: 1em;
                      margin: 0;
                      height: 100%;",
@@ -50,6 +52,12 @@ ModServerWorkspaceMonitor_UI <- function(id)
                          overflow: auto;",
 
                 DTOutput(ns("ObjectDetails"),
+                         width = "95%")),
+
+            div(style = "height: calc(100% - 30px);
+                         overflow: auto;",
+
+                DTOutput(ns("EligibleValues"),
                          width = "95%"))))
 }
 
@@ -64,7 +72,9 @@ ModServerWorkspaceMonitor_UI <- function(id)
 #' @param output
 #' @param session
 #' @noRd
-ModServerWorkspaceMonitor_Server <- function(id)
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ModServerExplorer_Server <- function(id)
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 {
     require(dplyr)
 
@@ -72,6 +82,14 @@ ModServerWorkspaceMonitor_Server <- function(id)
                  function(input, output, session)
                  {
                       ns <- session$ns
+
+                      # To shorten reference reactive value
+                      #ServerWorkspaceInfo <- reactive({ return(session$userData$ServerWorkspaceInfo()) })
+
+                      observe({ req(session$userData$ServerWorkspaceInfo())
+                                session$userData$ServerWorkspaceInfo(dsCCPhosClient::GetServerWorkspaceInfo(DSConnections = session$userData$DSConnections()))
+                              }) %>%
+                          bindEvent(input$UpdateButton)
 
                       SelectedObjectName <- reactiveVal(NULL)
                       SelectedServerName <- reactiveVal(NULL)

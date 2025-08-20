@@ -8,59 +8,65 @@ DataFrameToHtmlTable(
   DataFrame,
   TableID = NULL,
   CategoryColumn = NULL,
-  CellClassColumns = NULL,
   ColContentHorizontalAlign = "left",
-  ColumnClass = NULL,
+  ColumnCSSClass = NULL,
   ColumnIcons = NULL,
   ColumnLabels = NULL,
   ColumnLabelsLineBreak = FALSE,
   ColumnMaxWidth = 1000,
+  HeaderColspans = NULL,
   RotatedHeaderNames = character(),
   RowColorColumn = NULL,
-  SemanticTableClass = "ui celled table",
+  SemanticTableCSSClass = "ui celled table",
   TableStyle = "",
-  TurnLogicalIntoIcon = FALSE,
-  TurnColorValuesIntoDots = FALSE
+  TurnColorValuesIntoDots = FALSE,
+  TurnLogicalsIntoIcons = FALSE,
+  TurnNAsIntoBlanks = FALSE
 )
 }
 \arguments{
 \item{DataFrame}{\code{data.frame} or \code{tibble}}
 
-\item{TableID}{\code{string} Used to tidentify the table object in the DOM}
+\item{TableID}{\code{string} - Used to identify the table object in the DOM}
 
 \item{CategoryColumn}{\code{string}}
 
-\item{CellClassColumns}{character vector}
-
 \item{ColContentHorizontalAlign}{Either a single string for all columns or a named character vector to determine horizontal content alignment for specific columns}
 
-\item{ColumnClass}{Either a single string for all columns or a named character vector to determine table cell classes for specific columns}
+\item{ColumnCSSClass}{Either a single string for all columns or a named character vector to determine table cell classes for specific columns}
 
 \item{ColumnIcons}{named \code{vector}}
 
-\item{ColumnLabels}{named \code{vector}}
+\item{ColumnLabels}{named \code{vector} with names being original table column names and elements being displayed column labels}
 
 \item{ColumnLabelsLineBreak}{\code{logical} Indicating whether column labels should span across two lines}
 
-\item{ColumnMaxWidth}{\code{integer} Maximum width of columns in character spaces}
+\item{ColumnMaxWidth}{\code{integer} - Maximum width of columns in character spaces}
+
+\item{HeaderColspans}{\code{integer vector}}
 
 \item{RotatedHeaderNames}{\code{vector}}
 
 \item{RowColorColumn}{\code{string}}
 
-\item{SemanticTableClass}{\code{string}}
+\item{SemanticTableCSSClass}{\code{string}}
 
 \item{TableStyle}{A \code{string} containing CSS style elements}
 
-\item{TurnLogicalIntoIcon}{\code{logical}}
-
 \item{TurnColorValuesIntoDots}{\code{logical}}
+
+\item{TurnLogicalsIntoIcons}{\code{logical}}
+
+\item{TurnNAsIntoBlanks}{\code{logical}}
 }
 \value{
 HTML code
 }
 \description{
-DataFrameToHtmlTable
+Turn a data.frame into HTML table code.
+}
+\details{
+To enable cell-specific CSS classes or style code, the passed data.frame should have columns named 'CellCSSClass_ABC' where 'ABC' is another column in the data.frame.
 }
 \author{
 Bastian Reiter
