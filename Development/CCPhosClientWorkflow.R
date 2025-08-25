@@ -57,14 +57,12 @@ CCPConnections <- ConnectToVirtualCCP(CCPTestData = TestData,
 # Display app in Viewer pane
 # options(shiny.launch.browser = .rs.invokeShinyPaneViewer)
 
-ServerExplorer()
+BgProcess <- ServerExplorer()
 
-TestProcess <- RunAutonomousApp(ShinyAppInitFunction = StartCCPhosApp,
-                                Arguments = list(CCPTestData = TestData))
+# BgProcess$is_alive()
+# BgProcess$read_error()
+# BgProcess$kill()
 
-TestProcess$is_alive()
-TestProcess$read_all_error()
-TestProcess$kill()
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Load Raw Data Set (RDS) from Opal data base to R sessions on servers

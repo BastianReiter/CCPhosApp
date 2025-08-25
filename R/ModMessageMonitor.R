@@ -7,9 +7,10 @@
 # Module UI component
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-#' @param id
 #' @noRd
+#-------------------------------------------------------------------------------
 ModMessageMonitor_UI <- function(id)
+#-------------------------------------------------------------------------------
 {
     ns <- NS(id)
 
@@ -30,14 +31,11 @@ ModMessageMonitor_UI <- function(id)
 # Module server component
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-#' @param id
-#' @param MessagesList
-#' @param input
-#' @param output
-#' @param session
 #' @noRd
+#-------------------------------------------------------------------------------
 ModMessageMonitor_Server <- function(id,
                                      MessagesList)
+#-------------------------------------------------------------------------------
 {
     # Formal check if argument is reactive (relevant only during development)
     stopifnot(is.reactive(MessagesList))

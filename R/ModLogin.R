@@ -9,9 +9,10 @@
 
 #' Module Login UI function
 #'
-#' @param id
 #' @noRd
+#-------------------------------------------------------------------------------
 ModLogin_UI <- function(id)
+#-------------------------------------------------------------------------------
 {
     ns <- NS(id)
 
@@ -110,12 +111,10 @@ ModLogin_UI <- function(id)
 
 #' Module Login Server function
 #'
-#' @param id
-#' @param input
-#' @param output
-#' @param session
 #' @noRd
+#-------------------------------------------------------------------------------
 ModLogin_Server <- function(id)
+#-------------------------------------------------------------------------------
 {
     require(dplyr)
 

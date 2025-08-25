@@ -6,9 +6,10 @@
 # Module UI component
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-#' @param id
 #' @noRd
+#-------------------------------------------------------------------------------
 ModUnivariateExploration_UI <- function(id)
+#-------------------------------------------------------------------------------
 {
     ns <- NS(id)
 
@@ -118,13 +119,11 @@ ModUnivariateExploration_UI <- function(id)
 # Module server component
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-#' @param id
-#' @param input
-#' @param output
-#' @param session
 #' @noRd
+#-------------------------------------------------------------------------------
 ModUnivariateExploration_Server <- function(id,
                                             ObjectSelection)
+#-------------------------------------------------------------------------------
 {
     require(DT)
     require(plotly)

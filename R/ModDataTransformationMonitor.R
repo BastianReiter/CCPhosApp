@@ -6,9 +6,10 @@
 # Module UI component
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-#' @param id
 #' @noRd
+#-------------------------------------------------------------------------------
 ModDataTransformationMonitor_UI <- function(id)
+#-------------------------------------------------------------------------------
 {
     ns <- NS(id)
 
@@ -69,12 +70,10 @@ ModDataTransformationMonitor_UI <- function(id)
 # Module server component
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-#' @param id
-#' @param input
-#' @param output
-#' @param session
 #' @noRd
+#-------------------------------------------------------------------------------
 ModDataTransformationMonitor_Server <- function(id)
+#-------------------------------------------------------------------------------
 {
     require(dplyr)
     require(plotly)

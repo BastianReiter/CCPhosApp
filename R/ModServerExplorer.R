@@ -6,9 +6,10 @@
 # Module UI component
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-#' @param id
 #' @noRd
+#-------------------------------------------------------------------------------
 ModServerExplorer_UI <- function(id)
+#-------------------------------------------------------------------------------
 {
     ns <- NS(id)
 
@@ -57,7 +58,7 @@ ModServerExplorer_UI <- function(id)
             div(style = "height: calc(100% - 30px);
                          overflow: auto;",
 
-                DTOutput(ns("EligibleValues"),
+                DTOutput(ns("Values"),
                          width = "95%"))))
 }
 
@@ -67,14 +68,10 @@ ModServerExplorer_UI <- function(id)
 # Module server component
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-#' @param id
-#' @param input
-#' @param output
-#' @param session
 #' @noRd
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#-------------------------------------------------------------------------------
 ModServerExplorer_Server <- function(id)
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#-------------------------------------------------------------------------------
 {
     require(dplyr)
 
@@ -281,6 +278,30 @@ ModServerExplorer_Server <- function(id)
                                                         # Returning name of element selected in table
                                                         DataObjectDetails()$Element[RowIndex]
                                                       })
+
+                      DataValues <- reactive({  req(session$userData$ServerWorkspaceInfo())
+                                                req(SelectedObjectName())
+                                                req(SelectedElementName())
+
+                                                session$userData$ServerWorkspaceInfo()$EligibleValues[[SelectedObjectName()]][[SelectedElementName()]] %>%
+                                                    select(Value, Label)
+                                            })
+
+                      output$Values <- renderDT({ req(DataValues())
+
+                                                  DT::datatable(data = DataValues(),
+                                                                class = "ui small compact scrollable table",
+                                                                editable = FALSE,
+                                                                escape = FALSE,
+                                                                filter = "none",
+                                                                options = list(info = FALSE,
+                                                                               ordering = FALSE,
+                                                                               paging = FALSE,
+                                                                               searching = FALSE,
+                                                                               layout = list(top = NULL)),
+                                                                rownames = FALSE,
+                                                                style = "semanticui")
+                                                })
 
                       return(list(Object = SelectedObjectName,
                                   Element = SelectedElementName))

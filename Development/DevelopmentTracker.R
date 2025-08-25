@@ -37,10 +37,13 @@ library(devtools)
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Adding package dependencies using usethis::use_package()
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# use_package("callr")
 # use_package("DataEditR")
 # use_dev_package("dsCCPhosClient", remote = "BastianReiter/dsCCPhosClient")
 # use_package("DT")
 # use_package("gt")
+# use_package("httpuv")
+# use_package("pingr")
 # use_package("plotly")
 # use_package("shiny")
 # use_package("shinyjs")
@@ -59,13 +62,13 @@ library(devtools)
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # use_r("Auxiliary.R")
-# use_r("BackgroundProcess.R")
+# use_r("CreateTableMonitor.R")
+# use_r("DataFrameToHtmlTable.R")
+# use_r("RunAutonomousApp.R")
 # use_r("StartCCPhosApp")
-# use_r("UIComponent")
 # use_r("ServerComponent")
 # use_r("ServerExplorer.R")
-# use_r("DataFrameToHtmlTable.R")
-# use_r("CreateTableMonitor.R")
+# use_r("UIComponent")
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
