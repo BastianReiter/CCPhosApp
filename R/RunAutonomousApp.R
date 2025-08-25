@@ -3,36 +3,47 @@
 #'
 #' Set up a background process essentially running a separate R session. Use this session to run a Shiny app autonomously from hosting R session.
 #'
-#' @param ShinyAppInitFunction
+#' @param ShinyAppInitFunction \code{function} initializing a Shiny app with \code{shiny::shinyApp}
+#' @param AppArguments \code{list} containing optional arguments for app initializing function
+#' @param Host \code{string} Default: '127.0.0.1'
+#' @param Port \code{integer} If this argument is \code{NULL} the function will find a random free port and use it
+#' @param RunInViewer \code{logical} If \code{TRUE}, display and run the app in the RStudio Viewer pane (requires \code{rstudioapi}) instead of default web browser
 #'
-#' @return An \code{r_process} object. See also documentation for \code{callr::r_bg()}.
+#' @return A \code{processx::r_process} object. See also documentation for \code{callr::r_bg()}.
 #'
 #' @export
 #' @author Bastian Reiter
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 RunAutonomousApp <- function(ShinyAppInitFunction,
-                             Arguments = NULL,
+                             AppArguments = NULL,
                              Host = "127.0.0.1",
-                             Port = 49152)
+                             Port = NULL,
+                             RunInViewer = FALSE)
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 {
   require(callr)
+  require(dsCCPhosClient)
+  require(httpuv)
   require(pingr)
+  require(shiny)
 
   # --- For Testing Purposes ---
   # ShinyAppInitFunction <- CCPhosApp::StartCCPhosApp
   # AppArguments <- list(CCPTestData = TestData)
   # Host <- "127.0.0.1"
-  # Port <- 49153
+  # Port <- NULL
+
+  # If no 'Port' is specifically passed, find a free port randomly with httpuv::randomPort()
+  if (is.null(Port)) { Port <- httpuv::randomPort() }
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   Process <- callr::r_bg(
-                args = list(ShinyApp.Bg = ShinyApp,
+                args = list(ShinyAppInitFunction.Bg = ShinyAppInitFunction,
                             AppArguments.Bg = AppArguments,
                             Host.Bg = Host,
                             Port.Bg = Port),
-                func = function(ShinyApp.Bg, AppArguments.Bg, Host.Bg, Port.Bg)
+                func = function(ShinyAppInitFunction.Bg, AppArguments.Bg, Host.Bg, Port.Bg)
                        {
                           #TestData <- readRDS("../dsCCPhos/Development/Data/TestData/CCPTestData.rds")
 
@@ -41,7 +52,7 @@ RunAutonomousApp <- function(ShinyAppInitFunction,
                           library(shiny)
 
                           # Start CCPhos app
-                          shiny::runApp(do.call(ShinyApp.Bg, AppArguments.Bg),
+                          shiny::runApp(do.call(ShinyAppInitFunction.Bg, AppArguments.Bg),
                                         port = Port.Bg,
                                         host = Host.Bg,
                                         launch.browser = FALSE)
@@ -56,20 +67,23 @@ RunAutonomousApp <- function(ShinyAppInitFunction,
     Sys.sleep(0.01)   # Stall - Effectively check every 0.01 seconds if URL is available yet
   }
 
-  # Open browser window hosting the app
-  browseURL(paste0("http://", Host, ":", Port))
+  # Compile the URL that hosts the process which itself runs the app
+  AppURL <- paste0("http://", Host, ":", Port)
+
+  # Print a message with the 'AppURL'
+  dsCCPhosClient::PrintSoloMessage(c(Info = paste0("App available at ", AppURL)))
+
+  # If the option 'RunInViewer' is TRUE, display and run the app in the RStudio Viewer pane...
+  if (RunInViewer == TRUE & require(rstudioapi) == TRUE)
+  {
+      rstudioapi::viewer(url = AppURL)
+  } else {   # ... otherwise open in default web browser
+      browseURL(AppURL)
+  }
+
+  # Note: The background process started by callr::r_bg() can be ended automatically for Shiny apps by calling 'session$onSessionEnded(function() { stopApp() })' in the server component
+
+  # system2("firefox", args = c("--new-window", AppURL))
 
   return(Process)
 }
-
-
-# Now manually open browser
-# browseURL("http://127.0.0.1:49154")
-#
-# library(rstudioapi)
-# viewer(url = "http://127.0.0.1:49154")
-#
-# TestProcess$is_alive()
-# TestProcess$read_error()
-# TestProcess$kill()
-

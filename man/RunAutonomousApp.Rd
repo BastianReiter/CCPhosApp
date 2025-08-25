@@ -5,17 +5,26 @@
 \title{RunAutonomousApp}
 \usage{
 RunAutonomousApp(
-  ShinyApp,
+  ShinyAppInitFunction,
   AppArguments = NULL,
   Host = "127.0.0.1",
-  Port = 49152
+  Port = NULL,
+  RunInViewer = FALSE
 )
 }
 \arguments{
-\item{ShinyApp}{}
+\item{ShinyAppInitFunction}{\code{function} initializing a Shiny app with \code{shiny::shinyApp}}
+
+\item{AppArguments}{\code{list} containing optional arguments for app initializing function}
+
+\item{Host}{\code{string} Default: '127.0.0.1'}
+
+\item{Port}{\code{integer} If this argument is \code{NULL} the function will find a random free port and use it}
+
+\item{RunInViewer}{\code{logical} If \code{TRUE}, display and run the app in the RStudio Viewer pane (requires \code{rstudioapi}) instead of default web browser}
 }
 \value{
-An \code{r_process} object. See also documentation for \code{callr::r_bg()}.
+A \code{processx::r_process} object. See also documentation for \code{callr::r_bg()}.
 }
 \description{
 Set up a background process essentially running a separate R session. Use this session to run a Shiny app autonomously from hosting R session.

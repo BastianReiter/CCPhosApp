@@ -7,18 +7,8 @@
 # Module server component
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-#' @param id
-#' @param input
-#' @param output
-#' @param session
-#' @param ServerSpecifications
-#' @param CCPTestData
-#' @param RDSTableCheckData
-#' @param CDSTableCheckData
-#' @param ADSTableCheckData
-#' @param CurationReportData
 #' @noRd
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#-------------------------------------------------------------------------------
 ModInitialize <- function(id,
                           ADSTableCheckData = NULL,
                           CCPTestData = NULL,
@@ -28,6 +18,7 @@ ModInitialize <- function(id,
                           RDSTableCheckData = NULL,
                           ServerSpecifications = NULL,
                           ServerWorkspaceInfo = NULL)
+#-------------------------------------------------------------------------------
 {
     moduleServer(id,
                  function(input, output, session)

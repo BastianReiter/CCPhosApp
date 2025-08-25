@@ -4,13 +4,27 @@
 \alias{ServerExplorer}
 \title{ServerExplorer}
 \usage{
-ServerExplorer(ServerWorkspaceInfo = NULL, DSConnections = NULL)
+ServerExplorer(
+  ServerWorkspaceInfo = NULL,
+  DSConnections = NULL,
+  RunAutonomously = TRUE,
+  RunInViewer = FALSE,
+  EndProcessWhenClosingApp = TRUE
+)
 }
 \arguments{
+\item{ServerWorkspaceInfo}{\code{list} containing the previously obtained results of \code{dsCCPhosClient::GetServerWorkspaceInfo()}. Default is \code{NULL}, which means these info data are obtained by the app itself.}
+
 \item{DSConnections}{\code{list} of \code{DSConnection} objects}
+
+\item{RunAutonomously}{\code{logical} indicating whether the Shiny app is hosted by a background process (default) available as a URL via web browsers or - if set to \code{FALSE} - is hosted by the current running R session.}
+
+\item{RunInViewer}{\code{logical} indicating whether the Shiny app should be run in the RStudio Viewer pane (Default: \code{FALSE})}
+
+\item{EndProcessWhenClosingApp}{\code{logical} indicating whether the background process that runs the Shiny app (if it runs autonomously) should end when the app is closed (default) or should be preserved, in which case it should be ended manually.}
 }
 \description{
-Launch Module \code{ModServerExplorer} as a Shiny app.
+Launch Module \code{ModServerExplorer} as a Shiny app in a background process so it runs independently from hosting R session.
 }
 \author{
 Bastian Reiter
