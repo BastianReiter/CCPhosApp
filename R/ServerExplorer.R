@@ -14,11 +14,14 @@
 #' @export
 #' @author Bastian Reiter
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-ServerExplorer <- function(ServerWorkspaceInfo = NULL,
+ServerExplorer <- function(#--- Arguments for app itself ---
+                           ServerWorkspaceInfo = NULL,
                            DSConnections = NULL,
+                           #--- Arguments for app wrapper ---
+                           EndProcessWhenClosingApp = TRUE,
                            RunAutonomously = TRUE,
                            RunInViewer = FALSE,
-                           EndProcessWhenClosingApp = TRUE)
+                           ...)
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 {
   # --- For Testing Purposes ---#
@@ -34,10 +37,8 @@ ServerExplorer <- function(ServerWorkspaceInfo = NULL,
 #-------------------------------------------------------------------------------
 
   # Create the app initiating function (UI and server component resulting in a ShinyApp object)
-  InitFunction <- function(ServerWorkspaceInfo,
-                           DSConnections)
+  InitFunction <- function(...)
   {
-      #require(DataEditR)
       require(dsCCPhosClient)
       require(dplyr)
       require(DSI)
@@ -47,7 +48,6 @@ ServerExplorer <- function(ServerWorkspaceInfo = NULL,
       require(purrr)
       require(shiny)
       require(shinyjs)
-      #require(shiny.router)
       require(shiny.semantic)
       require(stringr)
       require(waiter)
@@ -62,13 +62,26 @@ ServerExplorer <- function(ServerWorkspaceInfo = NULL,
 
               #textOutput(outputId = "TestMonitor"),
 
-              ModServerExplorer_UI(id = "Test")
+              div(h4(class = "ui dividing header",
+                     "Server Explorer"),
+
+                  div(style = "height: 40em;",
+
+                      ModServerExplorer_UI("ServerExplorer")),
+
+                  #-------------------------------------------------------------
+                  div(class = "ui divider"),
+                  #-------------------------------------------------------------
+
+                  div(ModUnivariateExploration_UI("UnivariateExploration")))
           )
       }
 
       # Mini-App server function
       Server <- function(input, output, session)
       {
+          WaiterScreen <- CreateWaiterScreen(ID = "WaiterScreenContainer")
+
           # Initialize global objects
           session$userData$DSConnections <- reactiveVal(NULL)
           session$userData$ServerWorkspaceInfo <- reactiveVal(NULL)
@@ -81,10 +94,16 @@ ServerExplorer <- function(ServerWorkspaceInfo = NULL,
                         DSConnections = DSConnections,
                         ServerWorkspaceInfo = ServerWorkspaceInfo)
 
-          # Call module
-          ModServerExplorer_Server(id = "Test")
+          # --- Call module server logic ---
+          Selection <- ModServerExplorer_Server(id = "ServerExplorer")
+          SelectedObject <- Selection$Object
+          SelectedElement <- Selection$Element
 
-          # If the option 'EndProcessWhenClosingApp' is true, this ensures that the background process is automatically ending when the app shuts down
+          ModUnivariateExploration_Server(id = "UnivariateExploration",
+                                          Selection)
+
+
+          # If the option 'EndProcessWhenClosingApp' is TRUE, the following ensures that the background process is automatically ending when the app shuts down
           if (EndProcessWhenClosingApp == TRUE) { session$onSessionEnded(function() { stopApp() }) }
       }
 
@@ -97,12 +116,11 @@ ServerExplorer <- function(ServerWorkspaceInfo = NULL,
   if (RunAutonomously == TRUE)
   {
       RunAutonomousApp(ShinyAppInitFunction = InitFunction,
-                       AppArguments = list(ServerWorkspaceInfo = ServerWorkspaceInfo,
-                                           DSConnections = DSConnections),
+                       AppArguments = list(...),
                        RunInViewer = RunInViewer)
   } else {
 
-      InitFunction(ServerWorkspaceInfo = ServerWorkspaceInfo,
-                   DSConnections = DSConnections)
+      # This returns the app itself
+      InitFunction(...)
   }
 }

@@ -57,7 +57,7 @@ CCPConnections <- ConnectToVirtualCCP(CCPTestData = TestData,
 # Display app in Viewer pane
 # options(shiny.launch.browser = .rs.invokeShinyPaneViewer)
 
-BgProcess <- ServerExplorer()
+BgProcess <- ServerExplorer(RunAutonomously = FALSE)
 
 # BgProcess$is_alive()
 # BgProcess$read_error()
@@ -68,7 +68,7 @@ BgProcess <- ServerExplorer()
 # Load Raw Data Set (RDS) from Opal data base to R sessions on servers
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Messages <- LoadRawDataSet(ServerSpecifications = NULL)
+LoadRawDataSet(ServerSpecifications = NULL)
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -102,15 +102,12 @@ ds.DrawSample(RawDataSetName = "RawDataSet",
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Transform Raw Data Set (RDS) into Curated Data Set (CDS) (using default settings)
-Curation <- ds.CurateData(RawDataSetName = "RawDataSet",
-                          Settings = NULL,
-                          OutputName = "CurationOutput")
+ds.CurateData(RawDataSetName = "RawDataSet",
+              Settings = NULL,
+              OutputName = "CurationOutput")
 
 CDSTableCheck <- ds.CheckDataSet(DataSetName = "CuratedDataSet",
                                  AssumeCCPDataSet = TRUE)
-
-# Make tables from Curated Data Set directly addressable by unpacking them into R server session
-Messages <- ds.UnpackCuratedDataSet(CuratedDataSetName = "CuratedDataSet")
 
 # Get curation reports
 CurationReport <- ds.GetCurationReport()
@@ -126,8 +123,6 @@ CurationReport <- ds.GetCurationReport()
 Messages <- ds.AugmentData(CuratedDataSetName = "CuratedDataSet",
                            OutputName = "AugmentationOutput")
 
-# Make tables from Augmented Data Set directly addressable by unpacking them into R server session
-Messages <- ds.UnpackAugmentedDataSet(AugmentedDataSetName = "AugmentedDataSet")
 
 ADSTableCheck <- ds.CheckDataSet(DataSetName = "AugmentedDataSet")
 
