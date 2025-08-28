@@ -92,10 +92,10 @@ ModUnivariateExploration_UI <- function(id)
                              grid-template-columns: auto auto;
                              grid-gap: 1em;",
 
-                    DTOutput(ns("FeatureInfoTable")),
+                    DTOutput(ns("FeatureInfoTable")))),
 
-                    plotOutput(ns("FeatureInfoPlot"),
-                               width = "80%"))),
+                    # plotOutput(ns("FeatureInfoPlot"),
+                    #            width = "80%"))),
 
 
             # Statistics Row
@@ -206,14 +206,14 @@ ModUnivariateExploration_Server <- function(id,
 
                                                              # Restructure table data for table displaying purposes ('Count (Proportion %)')
                                                              TableData <- FeatureInfo() %>%
-                                                                              mutate("N Valid" = paste0(N_Valid, " (", round(ValidProportion * 100, 0), "%)"),
-                                                                                     "N Missing" = paste0(N_Missing, " (", round(MissingProportion * 100, 0), "%)"),
-                                                                                     .after = N_Total) %>%
-                                                                              select(-N_Valid,
+                                                                              mutate("N Valid" = paste0(N.Valid, " (", round(ValidProportion * 100, 0), "%)"),
+                                                                                     "N Missing" = paste0(N.Missing, " (", round(MissingProportion * 100, 0), "%)"),
+                                                                                     .after = N.Total) %>%
+                                                                              select(-N.Valid,
                                                                                      -ValidProportion,
-                                                                                     -N_Missing,
+                                                                                     -N.Missing,
                                                                                      -MissingProportion) %>%
-                                                                              rename("N Total" = N_Total)
+                                                                              rename("N Total" = N.Total)
 
                                                              # Create table
                                                              DT::datatable(data = TableData,

@@ -36,7 +36,7 @@ RunAutonomousApp <- function(ShinyAppInitFunction,
   # If no 'Port' is specifically passed, find a free port randomly with httpuv::randomPort()
   if (is.null(Port)) { Port <- httpuv::randomPort() }
 
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#-------------------------------------------------------------------------------
 
   Process <- callr::r_bg(
                 args = list(ShinyAppInitFunction.Bg = ShinyAppInitFunction,
@@ -63,8 +63,8 @@ RunAutonomousApp <- function(ShinyAppInitFunction,
   # Check if URL is responding and stall if it needs time loading (Credit to Will Landau)
   while(!pingr::is_up(destination = Host, port = Port))
   {
-    if (!Process$is_alive()) stop(Process$read_all_error())   # If process was ended for some reason, print error messages.
-    Sys.sleep(0.01)   # Stall - Effectively check every 0.01 seconds if URL is available yet
+      if (!Process$is_alive()) stop(Process$read_all_error())   # If process was ended for some reason, print error messages.
+      Sys.sleep(0.01)   # Stall - Effectively check every 0.01 seconds if URL is available yet
   }
 
   # Compile the URL that hosts the process which itself runs the app

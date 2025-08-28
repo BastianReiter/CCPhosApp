@@ -13,48 +13,62 @@
 #'
 #' @author Bastian Reiter
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-StartCCPhosApp <- function(ADSTableCheckData = NULL,
+StartCCPhosApp <- function(#--- Arguments for app itself ---
+                           ADSTableCheckData = NULL,
                            CCPTestData = NULL,
                            CDSTableCheckData = NULL,
                            CurationReportData = NULL,
                            DSConnections = NULL,
                            RDSTableCheckData = NULL,
                            ServerSpecifications = NULL,
-                           ServerWorkspaceInfo = NULL)
+                           ServerWorkspaceInfo = NULL,
+                           #--- Arguments for app wrapper ---
+                           EndProcessWhenClosingApp = TRUE,
+                           RunAutonomously = TRUE,
+                           RunInViewer = FALSE,
+                           ...)
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 {
-  require(DataEditR)
-  require(dsCCPhosClient)
-  require(dplyr)
-  require(DSI)
-  require(DT)
-  require(gt)
-  require(plotly)
-  require(purrr)
-  require(shiny)
-  require(shinyjs)
-  require(shiny.router)
-  require(shiny.semantic)
-  require(stringr)
-  require(waiter)
+  # Create the app initiating function (UI and server component resulting in a ShinyApp object)
+  InitFunction <- function(...)
+  {
+      require(DataEditR)
+      require(dsCCPhosClient)
+      require(dplyr)
+      require(DSI)
+      require(DT)
+      require(gt)
+      require(plotly)
+      require(purrr)
+      require(shiny)
+      require(shinyjs)
+      require(shiny.router)
+      require(shiny.semantic)
+      require(stringr)
+      require(waiter)
 
+      # Set option to use themes for semantic CCS
+      #options(semantic.themes = TRUE)
 
-  # Set option to use themes for semantic CCS
-  #options(semantic.themes = TRUE)
+      #Worker <- shiny.worker::initialize_worker()
 
-  #Worker <- shiny.worker::initialize_worker()
+      # Since the app is deployed as a package, the folder for external resources (e.g. CSS files, static images) needs to be added manually
+      shiny::addResourcePath('www', system.file("www", package = "CCPhosApp"))
 
-  # Since the app is deployed as a package, the folder for external resources (e.g. CSS files, static images) needs to be added manually
-  shiny::addResourcePath('www', system.file("www", package = "CCPhosApp"))
+      # Start CCPhos app
+      shiny::shinyApp(ui = MainUIComponent(),
+                      server = MainServerComponent(...))
+  }
 
-  # Start CCPhos app
-  shiny::shinyApp(ui = MainUIComponent(),
-                  server = MainServerComponent(ADSTableCheckData = ADSTableCheckData,
-                                               CCPTestData = CCPTestData,
-                                               CDSTableCheckData = CDSTableCheckData,
-                                               CurationReportData = CurationReportData,
-                                               DSConnections = DSConnections,
-                                               RDSTableCheckData = RDSTableCheckData,
-                                               ServerSpecifications = ServerSpecifications,
-                                               ServerWorkspaceInfo = ServerWorkspaceInfo))
+  # Either use CCPhosApp::RunAutonomousApp() to run the app in a separate background process or run it in the hosting session
+  if (RunAutonomously == TRUE)
+  {
+      RunAutonomousApp(ShinyAppInitFunction = InitFunction,
+                       AppArguments = list(...),
+                       RunInViewer = RunInViewer)
+  } else {
+
+      # This returns the app itself
+      InitFunction(...)
+  }
 }

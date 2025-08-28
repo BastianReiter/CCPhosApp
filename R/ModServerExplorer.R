@@ -53,7 +53,8 @@ ModServerExplorer_UI <- function(id)
                          overflow: auto;",
 
                 DTOutput(ns("ObjectDetails"),
-                         width = "95%")),
+                         width = "95%",
+                         height = "95%")),
 
             div(style = "height: calc(100% - 30px);
                          overflow: auto;",
@@ -74,11 +75,34 @@ ModServerExplorer_Server <- function(id)
 #-------------------------------------------------------------------------------
 {
     require(dplyr)
+    require(DT)
+    require(purrr)
+    require(stringr)
 
     moduleServer(id,
                  function(input, output, session)
                  {
                       ns <- session$ns
+
+                      #---------------------------------------------------------
+                      # WaiterScreen <- CreateWaiterScreen(ID = ns("WaiterScreenContainer"))
+                      #
+                      # LoadingOn <- function()
+                      # {
+                      #     shinyjs::disable("ByObjectButton")
+                      #     shinyjs::disable("ByServerButton")
+                      #     shinyjs::disable("UpdateButton")
+                      #     WaiterScreen$show()
+                      # }
+                      # LoadingOff <- function()
+                      # {
+                      #     shinyjs::enable("ByObjectButton")
+                      #     shinyjs::enable("ByServerButton")
+                      #     shinyjs::enable("UpdateButton")
+                      #     WaiterScreen$hide()
+                      # }
+                      #---------------------------------------------------------
+
 
                       # To shorten reference reactive value
                       #ServerWorkspaceInfo <- reactive({ return(session$userData$ServerWorkspaceInfo()) })
@@ -107,8 +131,8 @@ ModServerExplorer_Server <- function(id)
 
                       # Reset object and server selections when primary selection criterion changes
                       observe({ req(session$userData$ServerWorkspaceInfo())
-                                SelectedObjectName(session$userData$ServerWorkspaceInfo()$Overview$Object[1])
-                                SelectedServerName(session$userData$ServerWorkspaceInfo()$Overview$ServerName[1])
+                                SelectedObjectName(session$userData$ServerWorkspaceInfo()$Overview$All$Object[1])
+                                SelectedServerName("All")
                               }) %>%
                             bindEvent(PrimarySelectionCriterion())
 
@@ -118,13 +142,12 @@ ModServerExplorer_Server <- function(id)
 
                                                           if (PrimarySelectionCriterion() == "ByObject")
                                                           {
-                                                              PrimarySelectionData <- session$userData$ServerWorkspaceInfo()$Overview %>%
-                                                                                          distinct(Object, Class)
+                                                              PrimarySelectionData <- session$userData$ServerWorkspaceInfo()$Overview$All %>%
+                                                                                          select(Object, Class)
                                                           }
                                                           if (PrimarySelectionCriterion() == "ByServer")
                                                           {
-                                                              PrimarySelectionData <- session$userData$ServerWorkspaceInfo()$Overview %>%
-                                                                                          distinct(ServerName)
+                                                              PrimarySelectionData <- data.frame(ServerName = names(session$userData$ServerWorkspaceInfo()$Overview))
                                                           }
                                                           return(PrimarySelectionData)
                                                        })
@@ -141,18 +164,22 @@ ModServerExplorer_Server <- function(id)
                                                             if (PrimarySelectionCriterion() == "ByObject" & !is.null(SelectedObjectName()))
                                                             {
                                                                 SecondarySelectionData <- session$userData$ServerWorkspaceInfo()$Overview %>%
+                                                                                              list_rbind(names_to = "ServerName") %>%
                                                                                               filter(Object == SelectedObjectName()) %>%
                                                                                               select(ServerName,
-                                                                                                     ObjectExists,
+                                                                                                     Exists,
                                                                                                      Length,
                                                                                                      RowCount) %>%
                                                                                               ConvertLogicalToIcon()
                                                             }
                                                             if (PrimarySelectionCriterion() == "ByServer" & !is.null(SelectedServerName()))
                                                             {
-                                                                SecondarySelectionData <- session$userData$ServerWorkspaceInfo()$Overview %>%
-                                                                                              filter(ServerName == SelectedServerName()) %>%
-                                                                                              select(-ServerName) %>%
+                                                                SecondarySelectionData <- session$userData$ServerWorkspaceInfo()$Overview[[SelectedServerName()]] %>%
+                                                                                              select(Object,
+                                                                                                     Exists,
+                                                                                                     Class,
+                                                                                                     Length,
+                                                                                                     RowCount) %>%
                                                                                               ConvertLogicalToIcon()
                                                             }
                                                             return(SecondarySelectionData)
@@ -165,10 +192,14 @@ ModServerExplorer_Server <- function(id)
                                                                           class = "ui small compact scrollable selectable table",
                                                                           editable = FALSE,
                                                                           escape = FALSE,
+                                                                          extensions = "FixedHeader",
                                                                           filter = "none",
-                                                                          options = list(info = FALSE,
+                                                                          options = list(fixedHeader = TRUE,
+                                                                                         info = FALSE,
+                                                                                         layout = list(top = NULL),
                                                                                          ordering = FALSE,
                                                                                          paging = FALSE,
+                                                                                         scrollY = 400,
                                                                                          searching = FALSE),
                                                                           rownames = FALSE,
                                                                           selection = list(mode = "single",
@@ -184,10 +215,14 @@ ModServerExplorer_Server <- function(id)
                                                                             class = "ui small compact scrollable selectable table",
                                                                             editable = FALSE,
                                                                             escape = FALSE,
+                                                                            extensions = "FixedHeader",
                                                                             filter = "none",
-                                                                            options = list(info = FALSE,
+                                                                            options = list(fixedHeader = TRUE,
+                                                                                           info = FALSE,
+                                                                                           layout = list(top = NULL),
                                                                                            ordering = FALSE,
                                                                                            paging = FALSE,
+                                                                                           scrollY = 400,
                                                                                            searching = FALSE),
                                                                             rownames = FALSE,
                                                                             selection = list(mode = "single",
@@ -245,23 +280,47 @@ ModServerExplorer_Server <- function(id)
 
                       DataObjectDetails <- reactive({ req(session$userData$ServerWorkspaceInfo())
                                                       req(SelectedObjectName())
+                                                      req(SelectedServerName())
 
-                                                      session$userData$ServerWorkspaceInfo()$Details[[SelectedObjectName()]]$Structure
+                                                      Data <- session$userData$ServerWorkspaceInfo()$ObjectDetails[[SelectedServerName()]][[SelectedObjectName()]]
+
+                                                      if ("Feature" %in% names(Data))
+                                                      {
+                                                          Data <- Data %>%
+                                                                      select(Feature,
+                                                                             Exists,
+                                                                             Type,
+                                                                             NonMissingValueRate) %>%
+                                                                      mutate(NonMissingValueRate = if_else(NonMissingValueRate > 0 & NonMissingValueRate < 0.01,
+                                                                                                           "<1%",
+                                                                                                           paste0(round(100 * NonMissingValueRate), "%"))) %>%
+                                                                      ConvertLogicalToIcon()
+                                                      }
+
+                                                      return(Data)
                                                     })
 
 
                       output$ObjectDetails <- renderDT({ req(DataObjectDetails())
 
+                                                         ColnamesVector <- NULL
+                                                         if ("NonMissingValueRate" %in% names(DataObjectDetails())) { ColnamesVector <- c("NMVR" = "NonMissingValueRate") }
+
                                                          DT::datatable(data = DataObjectDetails(),
                                                                        class = "ui small compact inverted scrollable selectable table",
+                                                                       colnames = ColnamesVector,
                                                                        editable = FALSE,
                                                                        escape = FALSE,
+                                                                       extensions = "FixedHeader",
                                                                        filter = "none",
-                                                                       options = list(info = FALSE,
+                                                                       options = list(fixedHeader = TRUE,
+                                                                                      info = FALSE,
+                                                                                      layout = list(top = NULL),
                                                                                       ordering = FALSE,
                                                                                       paging = FALSE,
+                                                                                      scrollY = 400,
                                                                                       searching = FALSE,
-                                                                                      layout = list(top = NULL)),
+                                                                                      columnDefs = list(list(width = "40px", targets = 1))),
                                                                        rownames = FALSE,
                                                                        selection = list(mode = "single",
                                                                                         target = "row"),
@@ -275,8 +334,11 @@ ModServerExplorer_Server <- function(id)
                                                         # Get the index of the selected row using DT functionality
                                                         RowIndex <- input$ObjectDetails_rows_selected
 
-                                                        # Returning name of element selected in table
-                                                        DataObjectDetails()$Element[RowIndex]
+                                                        # Returning name of feature selected in table
+                                                        if ("Feature" %in% names(DataObjectDetails()))
+                                                        {
+                                                            return(DataObjectDetails()$Feature[RowIndex])
+                                                        } else { return(NULL) }
                                                       })
 
                       DataValues <- reactive({  req(session$userData$ServerWorkspaceInfo())
@@ -284,8 +346,8 @@ ModServerExplorer_Server <- function(id)
                                                 req(SelectedElementName())
 
                                                 session$userData$ServerWorkspaceInfo()$EligibleValues[[SelectedObjectName()]][[SelectedElementName()]] %>%
-                                                    select(Value, Label)
-                                            })
+                                                    { if (!is.null(.)) { select(., Value, Label) } else { NULL } }
+                                             })
 
                       output$Values <- renderDT({ req(DataValues())
 
@@ -293,12 +355,15 @@ ModServerExplorer_Server <- function(id)
                                                                 class = "ui small compact scrollable table",
                                                                 editable = FALSE,
                                                                 escape = FALSE,
+                                                                extensions = "FixedHeader",
                                                                 filter = "none",
-                                                                options = list(info = FALSE,
+                                                                options = list(fixedHeader = TRUE,
+                                                                               info = FALSE,
+                                                                               layout = list(top = NULL),
                                                                                ordering = FALSE,
                                                                                paging = FALSE,
-                                                                               searching = FALSE,
-                                                                               layout = list(top = NULL)),
+                                                                               scrollY = 400,
+                                                                               searching = FALSE),
                                                                 rownames = FALSE,
                                                                 style = "semanticui")
                                                 })
