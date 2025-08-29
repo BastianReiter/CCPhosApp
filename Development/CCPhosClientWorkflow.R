@@ -57,6 +57,8 @@ CCPConnections <- ConnectToVirtualCCP(CCPTestData = TestData,
 # Display app in Viewer pane
 # options(shiny.launch.browser = .rs.invokeShinyPaneViewer)
 
+BgProcess <- StartCCPhosApp(RunAutonomously = TRUE)
+
 BgProcess <- ServerExplorer(RunAutonomously = FALSE)
 
 # BgProcess$is_alive()
