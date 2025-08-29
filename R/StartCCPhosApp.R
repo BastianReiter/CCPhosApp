@@ -57,7 +57,14 @@ StartCCPhosApp <- function(#--- Arguments for app itself ---
 
       # Start CCPhos app
       shiny::shinyApp(ui = MainUIComponent(),
-                      server = MainServerComponent(...))
+                      server = MainServerComponent(ADSTableCheckData = ADSTableCheckData,
+                                                   CCPTestData = CCPTestData,
+                                                   CDSTableCheckData = CDSTableCheckData,
+                                                   CurationReportData = CurationReportData,
+                                                   DSConnections = DSConnections,
+                                                   RDSTableCheckData = RDSTableCheckData,
+                                                   ServerSpecifications = ServerSpecifications,
+                                                   ServerWorkspaceInfo = ServerWorkspaceInfo))
   }
 
   # Either use CCPhosApp::RunAutonomousApp() to run the app in a separate background process or run it in the hosting session

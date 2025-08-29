@@ -27,7 +27,7 @@ Imports:
     tidyr,
     waiter (>= 0.2.5)
 Depends:
-    dsCCPhosClient (>= 0.1.79),
+    dsCCPhosClient (>= 0.1.84),
     R (>= 2.10)
 LazyData: true
 Remotes: 

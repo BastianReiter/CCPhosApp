@@ -83,7 +83,7 @@ ModCDSTableMonitor_Server <- function(id)
 
                       HTMLTableList_TableDetails <- reactive({  req(session$userData$CDSTableCheck())
 
-                                                                # Process data from 'CDSTableCheck' to get a list of data.frames (one per CDS table) that contain table details info
+                                                                # Process data from 'CDSTableCheck' to get a list of data.frames (one per CDS table) that contain detailed table meta data
                                                                 TableList <- session$userData$CDSTableCheck()[c("TableRowCounts",
                                                                                                                 "FeatureExistence",
                                                                                                                 "FeatureTypes",
