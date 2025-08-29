@@ -25,6 +25,9 @@ CreateTableMonitor <- function(TableData)
   # If 'TableData' is NULL (which occurs when there is no meta data for a NULL object)
   if (length(TableData) == 0) { return(NULL) }
 
+  # Also if 'TableData' exists, but the element 'FeatureElements' is NULL, abort function and return NULL
+  if (is.null(TableData$FeatureTypes)) { return(NULL) }
+
 
   # Process data.frames within list 'TableData' to consolidate info in one data.frame
   #-----------------------------------------------------------------------------
