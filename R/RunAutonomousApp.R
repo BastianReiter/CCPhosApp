@@ -49,6 +49,7 @@ RunAutonomousApp <- function(ShinyAppInitFunction,
 
                           # Load namespace of CCPhosApp for new background R session
                           library(CCPhosApp)
+                          library(DSI)
                           library(shiny)
 
                           # Start CCPhos app
@@ -56,6 +57,9 @@ RunAutonomousApp <- function(ShinyAppInitFunction,
                                         port = Port.Bg,
                                         host = Host.Bg,
                                         launch.browser = FALSE)
+
+                          # Temporary
+                          writeLines(capture.output(DSI::datashield.errors()), "ds_errors.txt")
 
                        },
                 supervise = TRUE)
