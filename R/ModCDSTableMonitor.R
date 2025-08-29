@@ -88,7 +88,7 @@ ModCDSTableMonitor_Server <- function(id)
                                                                                                                 "FeatureExistence",
                                                                                                                 "FeatureTypes",
                                                                                                                 "NonMissingValueRates")] %>%
-                                                                                list_transpose() %>%
+                                                                                list_transpose(simplify = FALSE) %>%
                                                                                 map(\(TableData) CreateTableMonitor(TableData))      # Call custom function 'CreateTableMonitor()'
 
                                                                 # Turn prepared data.frames into HTML table code
