@@ -82,7 +82,7 @@ ModServerExplorer_Server <- function(id)
     moduleServer(id,
                  function(input, output, session)
                  {
-                      ns <- session$ns
+                      # ns <- session$ns
 
                       #---------------------------------------------------------
                       # WaiterScreen <- CreateWaiterScreen(ID = ns("WaiterScreenContainer"))
@@ -103,11 +103,8 @@ ModServerExplorer_Server <- function(id)
                       # }
                       #---------------------------------------------------------
 
-
-                      # To shorten reference reactive value
-                      #ServerWorkspaceInfo <- reactive({ return(session$userData$ServerWorkspaceInfo()) })
-
                       observe({ req(session$userData$ServerWorkspaceInfo())
+                                req(session$userData$DSConnections())
                                 session$userData$ServerWorkspaceInfo(dsCCPhosClient::GetServerWorkspaceInfo(DSConnections = session$userData$DSConnections()))
                               }) %>%
                           bindEvent(input$UpdateButton)

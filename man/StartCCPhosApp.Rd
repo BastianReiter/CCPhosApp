@@ -12,7 +12,11 @@ StartCCPhosApp(
   DSConnections = NULL,
   RDSTableCheckData = NULL,
   ServerSpecifications = NULL,
-  ServerWorkspaceInfo = NULL
+  ServerWorkspaceInfo = NULL,
+  EndProcessWhenClosingApp = TRUE,
+  RunAutonomously = TRUE,
+  RunInViewer = FALSE,
+  ...
 )
 }
 \arguments{
@@ -23,6 +27,8 @@ StartCCPhosApp(
 \item{DSConnections}{\code{list} of \code{DSConnection} objects}
 
 \item{RDSTableCheckData}{\code{list} - Optional RDSTableCheck data}
+
+\item{ServerSpecifications}{\code{data.frame}}
 }
 \description{
 Launch Shiny app

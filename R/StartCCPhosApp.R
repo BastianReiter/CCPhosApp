@@ -4,7 +4,7 @@
 #' Launch Shiny app
 #'
 #' @param DSConnections \code{list} of \code{DSConnection} objects
-#' @param ServerSpecifications
+#' @param ServerSpecifications \code{data.frame}
 #' @param CCPTestData \code{list} - Optional CCP test data
 #' @param RDSTableCheckData \code{list} - Optional RDSTableCheck data
 #' @param CurationReportData \code{list} - Optional CurationReport data

@@ -37,6 +37,7 @@ library(devtools)
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Adding package dependencies using usethis::use_package()
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# use_package("assertthat")
 # use_package("callr")
 # use_package("DataEditR")
 # use_dev_package("dsCCPhosClient", remote = "BastianReiter/dsCCPhosClient")
@@ -67,7 +68,7 @@ library(devtools)
 # use_r("RunAutonomousApp.R")
 # use_r("StartCCPhosApp")
 # use_r("ServerComponent")
-# use_r("ServerExplorer.R")
+# use_r("Widget.ServerExplorer.R")
 # use_r("UIComponent")
 
 

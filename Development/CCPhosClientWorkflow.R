@@ -59,7 +59,11 @@ CCPConnections <- ConnectToVirtualCCP(CCPTestData = TestData,
 
 BgProcess <- StartCCPhosApp(RunAutonomously = TRUE)
 
-BgProcess <- ServerExplorer(RunAutonomously = FALSE)
+Widget.ServerExplorer(EnableLiveConnection = FALSE,
+                      RunAutonomously = FALSE,
+                      UseVirtualConnections = TRUE)
+
+
 
 # BgProcess$is_alive()
 # BgProcess$read_error()
@@ -77,8 +81,8 @@ LoadRawDataSet(ServerSpecifications = NULL)
 # Check RDS tables for existence and completeness
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-RDSTableCheck <- ds.CheckDataSet(DataSetName = "RawDataSet",
-                                 AssumeCCPDataSet = TRUE)
+RDSTableCheck <- ds.GetDataSetCheck(DataSetName = "RawDataSet",
+                                    AssumeCCPDataSet = TRUE)
 
 View(RDSTableCheck$TableStatus)
 
