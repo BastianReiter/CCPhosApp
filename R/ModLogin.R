@@ -131,15 +131,15 @@ ModLogin_Server <- function(id)
 
                     # Create a reactive expression containing a data frame read from an uploaded csv-file if provided
                     ServerSpecifications_InputData <- reactive({ FilePath <- input$FileInput$datapath
-                                                               if (is.null(FilePath)) { return(dsCCPhosClient::ServerSpecifications) }
-                                                               else { return(read.csv(file = FilePath)) } })
+                                                                 if (is.null(FilePath)) { return(dsCCPhosClient::ServerSpecifications) }
+                                                                 else { return(read.csv(file = FilePath)) } })
 
                     # Create a reactive value containing data in the specification's table (initially fed with optional input and then optionally edited)
                     ServerSpecifications_EditData <- dataEditServer(id = "ServerSpecificationsTable",
-                                                                  data = ServerSpecifications_InputData,
-                                                                  col_names = c("Server name", "Server URL", "Project name", "Token"),
-                                                                  col_stretch = TRUE,
-                                                                  col_options = list(Token = "password"))
+                                                                    data = ServerSpecifications_InputData,
+                                                                    col_names = c("Server name", "Server URL", "Project name", "Token"),
+                                                                    col_stretch = TRUE,
+                                                                    col_options = list(Token = "password"))
 
                     # Determine file-saving functionality
                     dataOutputServer(id = "ServerSpecificationsSave",

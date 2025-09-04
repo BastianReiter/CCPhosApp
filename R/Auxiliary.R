@@ -5,6 +5,32 @@
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#' AssertIfNotNull
+#'
+#' Shorthand for \code{asserthat::assert_that} that only checks condition if argument is not NULL (as is the case for some optional arguments)
+#'
+#' @param Argument The object passed to the function as argument
+#' @param AssertionCall \code{call} - The assertion expression passed to \code{assertthat::assert_that}
+#'
+#' @noRd
+#'
+#-------------------------------------------------------------------------------
+AssertIfNotNull <- function(Argument,
+                            AssertionCall)
+{
+  require(assertthat)
+
+  if (!is.null(Argument))
+  {
+      eval(expr = parse(text = paste0("assert_that(", deparse(AssertionCall), ")")),
+           envir = parent.frame())
+  }
+}
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #' ColorToRGBCSS
 #'
 #' Turn hexadecimal color code into a string of CSS code of the form 'rgba(r, g, b, a)'.

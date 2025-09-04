@@ -57,7 +57,7 @@ ModConnectionStatus_Server <- function(id)
                                                       else { shiny.semantic::icon(class = "large grey power off") } })
 
                       output$StatusText <- renderText({ if (is.list(session$userData$DSConnections())) { "Connected to CCP" }
-                                                        else { "No connection established" } })
+                                                        else { "No live connection" } })
 
                       observe({ if (is.list(session$userData$DSConnections()))
                                 {
