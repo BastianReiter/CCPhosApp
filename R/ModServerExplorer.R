@@ -26,7 +26,8 @@ ModServerExplorer_UI <- function(id)
                    class = "ui right attached toggle button"),
             button(ns("UpdateButton"),
                    label = "Update",
-                   class = "ui right attached button")),
+                   class = "ui right attached button"),
+            textOutput(outputId = ns("TestMonitor"))),
 
         # div(class = "ui top attached label",
         #     "Object"),
@@ -41,13 +42,15 @@ ModServerExplorer_UI <- function(id)
                          overflow: auto;",
 
                 DTOutput(ns("PrimarySelection"),
-                         width = "95%")),      # Width calculation necessary to avoid false overflow rendering (vertical scroll bar is approx. 14 px wide)
+                         width = "95%",      # Width calculation necessary to avoid false overflow rendering (vertical scroll bar is approx. 14 px wide)
+                         height = "95%")),
 
             div(style = "height: calc(100% - 30px);
                          overflow: auto;",
 
                 DTOutput(ns("SecondarySelection"),
-                         width = "95%")),
+                         width = "95%",
+                         height = "95%")),
 
             div(style = "height: calc(100% - 30px);
                          overflow: auto;",
@@ -60,7 +63,8 @@ ModServerExplorer_UI <- function(id)
                          overflow: auto;",
 
                 DTOutput(ns("Values"),
-                         width = "95%"))))
+                         width = "95%",
+                         height = "95%"))))
 }
 
 
@@ -83,6 +87,12 @@ ModServerExplorer_Server <- function(id)
                  function(input, output, session)
                  {
                       # ns <- session$ns
+
+                      output$TestMonitor <- renderText({
+                                                          #req(session$userData$ServerWorkspaceInfo())
+                                                          #paste(names(session$userData$ServerWorkspaceInfo()), collapse = ", ")
+                                                          SelectedObjectName()
+                                                       })
 
                       #---------------------------------------------------------
                       # WaiterScreen <- CreateWaiterScreen(ID = ns("WaiterScreenContainer"))

@@ -27,6 +27,7 @@
 #'
 #' @export
 #' @author Bastian Reiter
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 DataFrameToHtmlTable <- function(DataFrame,
                                  TableID = NULL,
                                  CategoryColumn = NULL,
@@ -35,7 +36,7 @@ DataFrameToHtmlTable <- function(DataFrame,
                                  ColumnIcons = NULL,
                                  ColumnLabels = NULL,
                                  ColumnLabelsLineBreak = FALSE,
-                                 ColumnMaxWidth = 1000,
+                                 ColumnMaxWidth = 50,
                                  HeaderColspans = NULL,
                                  RotatedHeaderNames = character(),
                                  RowColorColumn = NULL,
@@ -44,6 +45,7 @@ DataFrameToHtmlTable <- function(DataFrame,
                                  TurnColorValuesIntoDots = FALSE,
                                  TurnLogicalsIntoIcons = FALSE,
                                  TurnNAsIntoBlanks = FALSE)
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 {
     ### For testing purposes only
     # DataFrame <- readRDS("TestTable.rds")
