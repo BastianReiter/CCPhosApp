@@ -126,9 +126,10 @@ ModProcessingTerminal_Server <- function(id)
                                                                                 DSConnections = session$userData$DSConnections()))
 
                                   # Trigger function ds.CheckDataSet() for RDS and save returned list
-                                  RDSTableCheck <- dsCCPhosClient::ds.GetDataSetCheck(DataSetName = "RawDataSet",
-                                                                                      AssumeCCPDataSet = TRUE,
-                                                                                      DSConnections = session$userData$DSConnections())
+                                  RDSTableCheck <- dsFredaClient::ds.GetDataSetCheck(DataSetName = "RawDataSet",
+                                                                                     Module = "CCP",
+                                                                                     TransformationStage = "Raw",
+                                                                                     DSConnections = session$userData$DSConnections())
 
                                   # Assign to session$userData object
                                   session$userData$RDSTableCheck(RDSTableCheck)
@@ -141,7 +142,7 @@ ModProcessingTerminal_Server <- function(id)
                                   session$userData$Checkpoints(Checkpoints)
 
                                   # Trigger function GetServerWorkspaceInfo() and assign return (data.frame) to reactive value ServerWorkspaceInfo in session$userData
-                                  session$userData$ServerWorkspaceInfo(dsCCPhosClient::GetServerWorkspaceInfo(DSConnections = session$userData$DSConnections()))
+                                  session$userData$ServerWorkspaceInfo(dsFredaClient::GetServerWorkspaceInfo(DSConnections = session$userData$DSConnections()))
 
                                   # Set reactive value Complete TRUE
                                   Complete(TRUE)
@@ -168,9 +169,10 @@ ModProcessingTerminal_Server <- function(id)
                                   ReturnMessages(Curation$Messages)
 
                                   # Trigger function ds.CheckDataSet() for CDS and save returned list
-                                  CDSTableCheck <- dsCCPhosClient::ds.GetDataSetCheck(DataSetName = "CuratedDataSet",
-                                                                                      AssumeCCPDataSet = TRUE,
-                                                                                      DSConnections = session$userData$DSConnections())
+                                  CDSTableCheck <- dsFredaClient::ds.GetDataSetCheck(DataSetName = "CuratedDataSet",
+                                                                                     Module = "CCP",
+                                                                                     TransformationStage = "Curated",
+                                                                                     DSConnections = session$userData$DSConnections())
 
                                   # Assign to session$userData object
                                   session$userData$CDSTableCheck(CDSTableCheck)
@@ -183,10 +185,10 @@ ModProcessingTerminal_Server <- function(id)
                                   session$userData$Checkpoints(Checkpoints)
 
                                   # Trigger function GetServerWorkspaceInfo() and assign return to reactive value ServerWorkspaceInfo in session$userData
-                                  session$userData$ServerWorkspaceInfo(dsCCPhosClient::GetServerWorkspaceInfo(DSConnections = session$userData$DSConnections()))
+                                  session$userData$ServerWorkspaceInfo(dsFredaClient::GetServerWorkspaceInfo(DSConnections = session$userData$DSConnections()))
 
                                   # Trigger function ds.GetCurationReport() and assign return to reactive value 'CurationReport' in session$userData
-                                  session$userData$CurationReport(dsCCPhosClient::ds.GetCurationReport(DSConnections = session$userData$DSConnections()))
+                                  session$userData$CurationReport(dsFredaClient::ds.GetCurationReport(DSConnections = session$userData$DSConnections()))
 
                                   # Set reactive value Complete TRUE
                                   Complete(TRUE)
@@ -212,8 +214,8 @@ ModProcessingTerminal_Server <- function(id)
                                   ReturnMessages(Augmentation$Messages)
 
                                   # Trigger function ds.CheckDataSet() for ADS and save returned list
-                                  ADSTableCheck <- dsCCPhosClient::ds.GetDataSetCheck(DataSetName = "AugmentedDataSet",
-                                                                                      DSConnections = session$userData$DSConnections())
+                                  ADSTableCheck <- dsFredaClient::ds.GetDataSetCheck(DataSetName = "AugmentedDataSet",
+                                                                                     DSConnections = session$userData$DSConnections())
 
                                   # Assign to session$userData object
                                   session$userData$ADSTableCheck(ADSTableCheck)
@@ -226,7 +228,7 @@ ModProcessingTerminal_Server <- function(id)
                                   session$userData$Checkpoints(Checkpoints)
 
                                   # Trigger function GetServerWorkspaceInfo() and assign return to reactive value ServerWorkspaceInfo in session$userData
-                                  session$userData$ServerWorkspaceInfo(dsCCPhosClient::GetServerWorkspaceInfo(DSConnections = session$userData$DSConnections()))
+                                  session$userData$ServerWorkspaceInfo(dsFredaClient::GetServerWorkspaceInfo(DSConnections = session$userData$DSConnections()))
 
                                   # Set reactive value Complete TRUE
                                   Complete(TRUE)

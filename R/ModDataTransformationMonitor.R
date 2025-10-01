@@ -140,7 +140,7 @@ ModDataTransformationMonitor_Server <- function(id)
                                                                  #   - 'data': plot data for feature-specific plot
                                                                  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                                                                  session$userData$CurationReport()$Transformation[[input$ServerName]]$EligibilityOverviews[[input$MonitorTableName]] %>%
-                                                                     select(-ends_with("_Proportional")) %>%
+                                                                     select(-ends_with(".Proportional")) %>%
                                                                      pivot_longer(cols = c(Raw, Harmonized, Recoded, Final),
                                                                                   names_to = "Stage",
                                                                                   values_to = "Count") %>%
@@ -245,21 +245,21 @@ ModDataTransformationMonitor_Server <- function(id)
                                                               {
                                                                   session$userData$CurationReport()$Transformation[[input$ServerName]]$Monitors[[input$MonitorTableName]] %>%
                                                                       { if (input$ShowNonOccurringValues == FALSE) { filter(., IsOccurring == TRUE) } else {.} } %>%       # Filter for occurring values only, if option checked in UI
-                                                                      mutate(CellCSSClass_Value_Raw = case_when(IsOccurring == FALSE & IsEligible_Raw == TRUE ~ "CellCSSClass_Info",
-                                                                                                                IsOccurring == TRUE & IsEligible_Raw == TRUE ~ "CellCSSClass_Success",
-                                                                                                                !is.na(Value_Raw) & IsEligible_Raw == FALSE ~ "CellCSSClass_Failure",
-                                                                                                                is.na(Value_Raw) ~ "CellCSSClass_Grey",
+                                                                      mutate(CellCSSClass.Value.Raw = case_when(IsOccurring == FALSE & IsEligible.Raw == TRUE ~ "CellCSSClass_Info",
+                                                                                                                IsOccurring == TRUE & IsEligible.Raw == TRUE ~ "CellCSSClass_Success",
+                                                                                                                !is.na(Value.Raw) & IsEligible.Raw == FALSE ~ "CellCSSClass_Failure",
+                                                                                                                is.na(Value.Raw) ~ "CellCSSClass_Grey",
                                                                                                                 TRUE ~ "None"),
-                                                                             CellCSSClass_Value_Harmonized = case_when(IsOccurring == TRUE & IsEligible_Harmonized == TRUE ~ "CellCSSClass_Success",
-                                                                                                                       !is.na(Value_Harmonized) & IsEligible_Harmonized == FALSE ~ "CellCSSClass_Failure",
-                                                                                                                       is.na(Value_Harmonized) ~ "CellCSSClass_Grey",
+                                                                             CellCSSClass.Value.Harmonized = case_when(IsOccurring == TRUE & IsEligible.Harmonized == TRUE ~ "CellCSSClass_Success",
+                                                                                                                       !is.na(Value.Harmonized) & IsEligible.Harmonized == FALSE ~ "CellCSSClass_Failure",
+                                                                                                                       is.na(Value.Harmonized) ~ "CellCSSClass_Grey",
                                                                                                                        TRUE ~ "None"),
-                                                                             CellCSSClass_Value_Recoded = case_when(IsOccurring == TRUE & IsEligible_Recoded == TRUE ~ "CellCSSClass_Success",
-                                                                                                                    !is.na(Value_Recoded) & IsEligible_Recoded == FALSE ~ "CellCSSClass_Failure",
-                                                                                                                    is.na(Value_Recoded) ~ "CellCSSClass_Grey",
+                                                                             CellCSSClass.Value.Recoded = case_when(IsOccurring == TRUE & IsEligible.Recoded == TRUE ~ "CellCSSClass_Success",
+                                                                                                                    !is.na(Value.Recoded) & IsEligible.Recoded == FALSE ~ "CellCSSClass_Failure",
+                                                                                                                    is.na(Value.Recoded) ~ "CellCSSClass_Grey",
                                                                                                                     TRUE ~ "None"),
-                                                                             CellCSSClass_Value_Final = case_when(!is.na(Value_Final) ~ "CellCSSClass_Success",
-                                                                                                                  is.na(Value_Final) ~ "CellCSSClass_Grey",
+                                                                             CellCSSClass.Value.Final = case_when(!is.na(Value.Final) ~ "CellCSSClass_Success",
+                                                                                                                  is.na(Value.Final) ~ "CellCSSClass_Grey",
                                                                                                                   TRUE ~ "None"))
                                                               }
                                                             })
@@ -276,11 +276,11 @@ ModDataTransformationMonitor_Server <- function(id)
                                                                   # Modify data for rendering purposes
                                                                   TableData <- Data_TransformationTracks() %>%
                                                                                     select(Feature,
-                                                                                           Value_Raw,
-                                                                                           Value_Harmonized,
-                                                                                           Value_Recoded,
-                                                                                           Value_Final,
-                                                                                           Count_Raw,
+                                                                                           Value.Raw,
+                                                                                           Value.Harmonized,
+                                                                                           Value.Recoded,
+                                                                                           Value.Final,
+                                                                                           Count.Raw,
                                                                                            starts_with("CellCSSClass"))
 
                                                                   if (!is.null(TableData))
@@ -288,11 +288,11 @@ ModDataTransformationMonitor_Server <- function(id)
                                                                       DataFrameToHtmlTable(DataFrame = TableData,
                                                                                            CategoryColumn = "Feature",
                                                                                            ColContentHorizontalAlign = "center",
-                                                                                           ColumnLabels = c(Value_Raw = "Raw",
-                                                                                                            Value_Harmonized = "Harmonized",
-                                                                                                            Value_Recoded = "Recoded",
-                                                                                                            Value_Final = "Final",
-                                                                                                            Count_Raw = "Count"),
+                                                                                           ColumnLabels = c(Value.Raw = "Raw",
+                                                                                                            Value.Harmonized = "Harmonized",
+                                                                                                            Value.Recoded = "Recoded",
+                                                                                                            Value.Final = "Final",
+                                                                                                            Count.Raw = "Count"),
                                                                                            SemanticTableCSSClass = "ui small compact celled structured table")
                                                                   } })
                  })
