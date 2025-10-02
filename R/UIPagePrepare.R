@@ -128,9 +128,9 @@ UIPagePrepare <- function()
 
             div(class = "active content",
 
-                div(style = "height: 20em;
-                             overflow: auto;
-                             margin: 0;",
+                div(style = "height: 40em;",
+                             # overflow: auto;
+                             # margin: 0;",
 
                     ModServerExplorer_UI("Prepare-ServerExplorer")))),
 

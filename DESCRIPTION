@@ -1,6 +1,6 @@
 Package: CCPhosApp
-Title: The app for working with dsCCPhos
-Version: 0.1.86
+Title: A Shiny App for CCPhos
+Version: 0.2.03
 Authors@R: 
     person("Bastian", "Reiter", , "b.reiter@med.uni-frankfurt.de", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-1088-0502"))
@@ -14,6 +14,8 @@ Imports:
     assertthat,
     callr,
     DataEditR,
+    dsCCPhosClient,
+    dsFredaClient,
     DT,
     gt (>= 0.10.1),
     httpuv,
@@ -28,8 +30,8 @@ Imports:
     tidyr,
     waiter (>= 0.2.5)
 Depends:
-    dsCCPhosClient (>= 0.1.84),
     R (>= 2.10)
 LazyData: true
 Remotes: 
-    github::BastianReiter/dsCCPhosClient
+    github::BastianReiter/dsCCPhosClient,
+    github::BastianReiter/dsFredaClient

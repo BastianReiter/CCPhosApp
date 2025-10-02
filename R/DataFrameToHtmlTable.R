@@ -3,7 +3,7 @@
 #'
 #' Turn a data.frame into HTML table code.
 #'
-#' To enable cell-specific CSS classes or style code, the passed data.frame should have columns named 'CellCSSClass_ABC' where 'ABC' is another column in the data.frame.
+#' To enable cell-specific CSS classes or style code, the passed data.frame should have columns named 'CellCSSClass.ABC' where 'ABC' is another column in the data.frame.
 #'
 #' @param DataFrame \code{data.frame} or \code{tibble}
 #' @param TableID \code{string} - Used to identify the table object in the DOM
@@ -278,10 +278,10 @@ DataFrameToHtmlTable <- function(DataFrame,
                     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
                     # In case there is a column defining a cell-specific CSS class for current data column
-                    if (paste0("CellCSSClass_", ColumnName) %in% names(Data))
+                    if (paste0("CellCSSClass.", ColumnName) %in% names(Data))
                     {
                         CellCSSClass <- paste(CellCSSClass,
-                                              as.character(Data[i, paste0("CellCSSClass_", ColumnName)]))
+                                              as.character(Data[i, paste0("CellCSSClass.", ColumnName)]))
 
                         # Determine code for icon to be displayed in cell based on CSS class (grepl() call checks if the string in 'CellCSSClass' contains certain substrings)
                         CellIcon <- case_when(grepl("CellCSSClass_Success", CellCSSClass, fixed = TRUE) ~ "icon(class = 'small green check')",

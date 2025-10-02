@@ -86,11 +86,11 @@ ModCurationReport_Server <- function(id)
                                                                             map(function(TableData)
                                                                                 {
                                                                                     TableData <- TableData %>%
-                                                                                                    mutate(PrimaryExclusion = paste0(ExcludedPrimary, " (", round(ExcludedPrimary_Proportion * 100, 0), "%)"),
-                                                                                                           # InterimCount = paste0(AfterPrimaryExclusion, " (", round(AfterPrimaryExclusion_Proportion * 100, 0), "%)"),
-                                                                                                           SecondaryExclusion = paste0(ExcludedSecondary, " (", round(ExcludedSecondary_Proportion * 100, 0), "%)"),
-                                                                                                           SecondaryRedundancyExclusion = paste0(ExcludedSecondaryRedundancy, " (", round(ExcludedSecondaryRedundancy_Proportion * 100, 0), "%)"),
-                                                                                                           FinalCount = paste0(AfterSecondaryExclusion, " (", round(AfterSecondaryExclusion_Proportion * 100, 0), "%)")) %>%
+                                                                                                    mutate(PrimaryExclusion = paste0(ExcludedPrimary, " (", round(ExcludedPrimary.Proportion * 100, 0), "%)"),
+                                                                                                           # InterimCount = paste0(AfterPrimaryExclusion, " (", round(AfterPrimaryExclusion.Proportion * 100, 0), "%)"),
+                                                                                                           SecondaryExclusion = paste0(ExcludedSecondary, " (", round(ExcludedSecondary.Proportion * 100, 0), "%)"),
+                                                                                                           SecondaryRedundancyExclusion = paste0(ExcludedSecondaryRedundancy, " (", round(ExcludedSecondaryRedundancy.Proportion * 100, 0), "%)"),
+                                                                                                           FinalCount = paste0(AfterSecondaryExclusion, " (", round(AfterSecondaryExclusion.Proportion * 100, 0), "%)")) %>%
                                                                                                     select(Server,
                                                                                                            InitialCount,
                                                                                                            PrimaryExclusion,
