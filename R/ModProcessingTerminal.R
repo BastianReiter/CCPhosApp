@@ -128,7 +128,7 @@ ModProcessingTerminal_Server <- function(id)
                                   # Trigger function ds.CheckDataSet() for RDS and save returned list
                                   RDSTableCheck <- dsFredaClient::ds.GetDataSetCheck(DataSetName = "RawDataSet",
                                                                                      Module = "CCP",
-                                                                                     TransformationStage = "Raw",
+                                                                                     Stage = "Raw",
                                                                                      DSConnections = session$userData$DSConnections())
 
                                   # Assign to session$userData object
@@ -171,7 +171,7 @@ ModProcessingTerminal_Server <- function(id)
                                   # Trigger function ds.CheckDataSet() for CDS and save returned list
                                   CDSTableCheck <- dsFredaClient::ds.GetDataSetCheck(DataSetName = "CuratedDataSet",
                                                                                      Module = "CCP",
-                                                                                     TransformationStage = "Curated",
+                                                                                     Stage = "Curated",
                                                                                      DSConnections = session$userData$DSConnections())
 
                                   # Assign to session$userData object
