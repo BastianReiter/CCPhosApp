@@ -13,6 +13,7 @@
 #' @return When 'RunAutonomously' is set to \code{TRUE} this function can return the background process to make it assignable to an R symbol. Otherwise it will run/return a \code{shinyApp} object.
 #'
 #' @export
+#'
 #' @author Bastian Reiter
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Widget.ServerExplorer <- function(#--- Arguments for app itself ---
@@ -28,13 +29,11 @@ Widget.ServerExplorer <- function(#--- Arguments for app itself ---
                                   ...)
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 {
-  require(assertthat)
-
-  # --- For Testing Purposes ---#
+  # --- For Testing Purposes ---
   # DSConnections <- CCPConnections
   # ServerWorkspaceInfo <- dsCCPhosClient::GetServerWorkspaceInfo(DSConnections = DSConnections)
 
-  # --- Argument Assertions ---
+  # --- Argument Validation ---
   assert_that(is.logical(EndProcessWhenClosingApp),
               is.logical(RunAutonomously),
               is.logical(RunInViewer))
@@ -58,19 +57,18 @@ Widget.ServerExplorer <- function(#--- Arguments for app itself ---
   # Create the app initiating function (UI and server component resulting in a ShinyApp object)
   InitFunction <- function(...)
   {
-      require(dsCCPhosClient)
-      require(dplyr)
-      require(DSI)
-      require(DT)
-      #require(gt)
-      #require(plotly)
-      require(purrr)
-      require(shiny)
-      require(shinyjs)
-      require(shiny.semantic)
-      require(stringr)
-      require(waiter)
-
+      # require(dsCCPhosClient)
+      # require(dplyr)
+      # require(DSI)
+      # require(DT)
+      # #require(gt)
+      # #require(plotly)
+      # require(purrr)
+      # require(shiny)
+      # require(shinyjs)
+      # require(shiny.semantic)
+      # require(stringr)
+      # require(waiter)
 
       # Since the app is deployed as a package, the folder for external resources (e.g. CSS files, static images) needs to be added manually
       shiny::addResourcePath('www', system.file("www", package = "CCPhosApp"))

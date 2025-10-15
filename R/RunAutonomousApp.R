@@ -12,6 +12,7 @@
 #' @return A \code{processx::r_process} object. See also documentation for \code{callr::r_bg()}.
 #'
 #' @export
+#'
 #' @author Bastian Reiter
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 RunAutonomousApp <- function(ShinyAppInitFunction,
@@ -21,12 +22,6 @@ RunAutonomousApp <- function(ShinyAppInitFunction,
                              RunInViewer = FALSE)
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 {
-  require(callr)
-  require(dsCCPhosClient)
-  require(httpuv)
-  require(pingr)
-  require(shiny)
-
   # --- For Testing Purposes ---
   # ShinyAppInitFunction <- CCPhosApp::StartCCPhosApp
   # AppArguments <- list(CCPTestData = TestData)
@@ -47,7 +42,7 @@ RunAutonomousApp <- function(ShinyAppInitFunction,
                        {
                           #TestData <- readRDS("../dsCCPhos/Development/Data/TestData/CCPTestData.rds")
 
-                          # Load namespace of CCPhosApp for new background R session
+                          # Load namespaces for new background R session
                           library(CCPhosApp)
                           library(DSI)
                           library(shiny)
@@ -58,9 +53,8 @@ RunAutonomousApp <- function(ShinyAppInitFunction,
                                         host = Host.Bg,
                                         launch.browser = FALSE)
 
-                          # Temporary
+                          # Temporary error output
                           writeLines(capture.output(DSI::datashield.errors()), "ds_errors.txt")
-
                        },
                 supervise = TRUE)
 
@@ -75,7 +69,7 @@ RunAutonomousApp <- function(ShinyAppInitFunction,
   AppURL <- paste0("http://", Host, ":", Port)
 
   # Print a message with the 'AppURL'
-  dsCCPhosClient::PrintSoloMessage(c(Info = paste0("App available at ", AppURL)))
+  dsFredaClient::PrintSoloMessage(c(Info = paste0("App available at ", AppURL)))
 
   # If the option 'RunInViewer' is TRUE, display and run the app in the RStudio Viewer pane...
   if (RunInViewer == TRUE & require(rstudioapi) == TRUE)
@@ -89,5 +83,6 @@ RunAutonomousApp <- function(ShinyAppInitFunction,
 
   # system2("firefox", args = c("--new-window", AppURL))
 
+#-------------------------------------------------------------------------------
   return(Process)
 }

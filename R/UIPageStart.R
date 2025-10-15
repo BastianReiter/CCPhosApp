@@ -4,10 +4,8 @@
 #' @noRd
 UIPageStart <- function()
 {
+  div(h4(class = "ui dividing header",
+         "Connect to CCP sites"),
 
-    div(h4(class = "ui dividing header",
-           "Connect to CCP sites"),
-
-        ModLogin_UI("Login"))
-
+      ModLogin_UI("Login"))
 }

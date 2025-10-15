@@ -11,25 +11,25 @@
 ModCDSTableMonitor_UI <- function(id)
 #-------------------------------------------------------------------------------
 {
-    ns <- NS(id)
+  ns <- NS(id)
 
-    div(id = ns("CDSTableMonitorContainer"),
-        style = "",
+  div(id = ns("CDSTableMonitorContainer"),
+      style = "",
 
-        div(style = "display: grid;
-                     grid-template-columns: 1fr 3fr 1fr;",
+      div(style = "display: grid;
+                   grid-template-columns: 1fr 3fr 1fr;",
 
-            div(),
+          div(),
 
-            div(class = "ui segment",
-                style = "margin: 2em;",
+          div(class = "ui segment",
+              style = "margin: 2em;",
 
-                div(class = "ui top attached label",
-                    "CDS Table Details"),
+              div(class = "ui top attached label",
+                  "CDS Table Details"),
 
-                uiOutput(outputId = ns("TableDetails"))),
+              uiOutput(outputId = ns("TableDetails"))),
 
-            div()))
+          div()))
 }
 
 

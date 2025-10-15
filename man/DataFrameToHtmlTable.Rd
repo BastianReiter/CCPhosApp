@@ -13,7 +13,7 @@ DataFrameToHtmlTable(
   ColumnIcons = NULL,
   ColumnLabels = NULL,
   ColumnLabelsLineBreak = FALSE,
-  ColumnMaxWidth = 1000,
+  ColumnMaxWidth = 50,
   HeaderColspans = NULL,
   RotatedHeaderNames = character(),
   RowColorColumn = NULL,
@@ -66,7 +66,7 @@ HTML code
 Turn a data.frame into HTML table code.
 }
 \details{
-To enable cell-specific CSS classes or style code, the passed data.frame should have columns named 'CellCSSClass_ABC' where 'ABC' is another column in the data.frame.
+To enable cell-specific CSS classes or style code, the passed data.frame should have columns named 'CellCSSClass.ABC' where 'ABC' is another column in the data.frame.
 }
 \author{
 Bastian Reiter

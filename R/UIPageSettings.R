@@ -4,7 +4,7 @@
 #' @noRd
 UIPageSettings <- function()
 {
-    div(
-        titlePanel("CCPhos Settings")
-    )
+  div(
+      titlePanel("CCPhos Settings")
+  )
 }

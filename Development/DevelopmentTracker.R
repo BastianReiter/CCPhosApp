@@ -11,7 +11,6 @@
 # Packages used for development
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-library(usethis)
 library(devtools)
 #library(shiny.info)
 #library(sass)
@@ -41,6 +40,7 @@ library(devtools)
 # use_package("callr")
 # use_package("DataEditR")
 # use_dev_package("dsCCPhosClient", remote = "BastianReiter/dsCCPhosClient")
+# use_dev_package("dsFredaClient", remote = "BastianReiter/dsFredaClient")
 # use_package("DT")
 # use_package("gt")
 # use_package("httpuv")
@@ -57,44 +57,46 @@ library(devtools)
 # use_package("waiter")
 
 
-
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Adding general R functions
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-# use_r("Auxiliary.R")
-# use_r("CreateTableMonitor.R")
-# use_r("DataFrameToHtmlTable.R")
-# use_r("RunAutonomousApp.R")
-# use_r("StartCCPhosApp")
-# use_r("ServerComponent")
-# use_r("Widget.ServerExplorer.R")
-# use_r("UIComponent")
-
-
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Adding UI Specifications
+# Package documentation and import settings
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-# use_r("UIPageAnalyze")
-# use_r("UIPageExplore")
-# use_r("UIPageExport")
-# use_r("UIPagePrepare")
-# use_r("UIPageStart")
+# Set up central roxygen "script"
+#-------------------------------------------------------------------------------
+use_package_doc()
 
+# Use the %>%-operator in this package (not enough to import dplyr)
+#-------------------------------------------------------------------------------
+use_pipe(export = FALSE)
 
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Adding Shiny modules
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-# use_r("ModConnectionStatus")
-# use_r("ModDataTransformationMonitor")
-# use_r("ModInitialize")
-# use_r("ModLogin")
-# use_r("ModMessages")
-# use_r("ModProcessingTerminal")
-# use_r("ModServerObjectExplorer")
-# use_r("ModServerOpalMonitor")
-# use_r("ModServerWorkspaceMonitor")
-# use_r("ModUnivariateExploration")
+# Use specific functions from external packages
+#-------------------------------------------------------------------------------
+use_import_from("dsFredaClient", c("AddCumulativeRow",
+                                   "CheckDSConnections",
+                                   "DisplayTimeSeries",
+                                   "ds.ExtractFromList",
+                                   "ds.FilterTable",
+                                   "ds.GetCrossTab",
+                                   "ds.GetCurationReport",
+                                   "ds.GetDataSetCheck",
+                                   "ds.GetFeatureInfo",
+                                   "ds.GetFrequencyTable",
+                                   "ds.GetObjectMetaData",
+                                   "ds.GetObjectStatus",
+                                   "ds.GetSampleStatistics",
+                                   "ds.GetTableCheck",
+                                   "ds.GetTTEModel",
+                                   "ds.JoinTables",
+                                   "ds.MakeList",
+                                   "ds.MutateTable",
+                                   "ExploreFeature",
+                                   "ExportPlot",
+                                   "GetEligibleValues",
+                                   "GetServerOpalInfo",
+                                   "GetServerWorkspaceInfo",
+                                   "ggTheme",
+                                   "gtTheme",
+                                   "MakeBoxPlot",
+                                   "MakeColumnPlot",
+                                   "MakeFunctionMessage"))
 
