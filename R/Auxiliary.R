@@ -4,31 +4,6 @@
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#' AssertIfNotNull
-#'
-#' Shorthand for \code{asserthat::assert_that} that only checks condition if argument is not NULL (as is the case for some optional arguments)
-#'
-#' @param Argument The object passed to the function as argument
-#' @param AssertionCall \code{call} - The assertion expression passed to \code{assertthat::assert_that}
-#'
-#' @noRd
-#'
-#-------------------------------------------------------------------------------
-AssertIfNotNull <- function(Argument,
-                            AssertionCall)
-{
-  require(assertthat)
-
-  if (!is.null(Argument))
-  {
-      eval(expr = parse(text = paste0("assert_that(", deparse(AssertionCall), ")")),
-           envir = parent.frame())
-  }
-}
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #' ColorToRGBCSS
@@ -69,9 +44,6 @@ ColorToRGBCSS <- function(Color,
 #-------------------------------------------------------------------------------
 ConvertLogicalToIcon <- function(DataFrame)
 {
-  require(dplyr)
-  require(shiny.semantic)
-
   if (!is.null(DataFrame))
   {
       DataFrame %>%
@@ -96,7 +68,7 @@ ConvertLogicalToIcon <- function(DataFrame)
 CreateWaiterScreen <- function(ID)
 {
   waiter::Waiter$new(id = ID,
-                     html = spin_3(),
-                     color = transparent(.5))
+                     html = waiter::spin_3(),
+                     color = waiter::transparent(.5))
 }
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

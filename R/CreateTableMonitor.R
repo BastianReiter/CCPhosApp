@@ -10,13 +10,12 @@
 #'                                  \item 'HeaderColspans' }
 #'
 #' @export
+#'
 #' @author Bastian Reiter
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 CreateTableMonitor <- function(TableData)
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 {
-  require(dplyr)
-
   # --- For Testing Purposes ---
   # TableData <- NULL
 
@@ -31,7 +30,7 @@ CreateTableMonitor <- function(TableData)
 
   # Process info on feature types for sensible printing
   FeatureTypes <- TableData$FeatureTypes %>%
-                      rename_with(~ paste0(.x, "_TYPE"),
+                      rename_with(~ paste0(.x, ".TYPE"),
                                   -ServerName) %>%
                       mutate(across(.cols = -ServerName,
                                     .fns = ~ str_replace_all(string = .x,
@@ -42,7 +41,7 @@ CreateTableMonitor <- function(TableData)
 
   # Process non-missing value rates for sensible printing
   NonMissingValueRates <- TableData$NonMissingValueRates %>%
-                              rename_with(~ paste0(.x, "_NMVR"),
+                              rename_with(~ paste0(.x, ".NMVR"),
                                           -ServerName) %>%
                               mutate(across(.cols = -ServerName,
                                             .fns = function(.x)
@@ -55,13 +54,13 @@ CreateTableMonitor <- function(TableData)
 
   # To enable value-dependent cell styling, create data.frame with features containing CSS code
   NonMissingValueRates_CSS <- TableData$NonMissingValueRates %>%
-                                  rename_with(~ paste0("CellCSSCode_", .x, "_NMVR"),
+                                  rename_with(~ paste0("CellCSSCode.", .x, ".NMVR"),
                                               -ServerName) %>%
                                   mutate(across(.cols = -ServerName,
                                                 .fns = function(.x)
                                                        {
                                                           # Convert decimal numbers between 0 and 1 into hexadecimal color codes ranging on a defined color palette
-                                                          ColorFunction <- colorRampPalette(c("#B03060", "#FFD700", "#016936"))      # Use base-function grDevices::colorRampPalette to create function that allows mapping to hexadecimal codes on a palette of defined color points
+                                                          ColorFunction <- grDevices::colorRampPalette(c("#B03060", "#FFD700", "#016936"))      # Use base-function grDevices::colorRampPalette to create function that allows mapping to hexadecimal codes on a palette of defined color points
                                                           Palette <- ColorFunction(101)      # Create a vector of 101 colors to assure valid indexing (s. below)
                                                           ValueColor <- Palette[round(100 * .x, digits = 0) + 1]      # '+1' is necessary to avoid invalid indexing (the term in the []-brackets can create 101 different integer numbers)
 

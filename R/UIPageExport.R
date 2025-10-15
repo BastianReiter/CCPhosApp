@@ -4,7 +4,7 @@
 #' @noRd
 UIPageExport <- function()
 {
-    div(
-        titlePanel("CCPhos Export Output")
-    )
+  div(
+      titlePanel("CCPhos Export Output")
+  )
 }

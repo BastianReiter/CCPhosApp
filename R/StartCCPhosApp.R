@@ -32,21 +32,6 @@ StartCCPhosApp <- function(#--- Arguments for app itself ---
   # Create the app initiating function (UI and server component resulting in a ShinyApp object)
   InitFunction <- function(...)
   {
-      require(DataEditR)
-      require(dsCCPhosClient)
-      require(dplyr)
-      require(DSI)
-      require(DT)
-      require(gt)
-      require(plotly)
-      require(purrr)
-      require(shiny)
-      require(shinyjs)
-      require(shiny.router)
-      require(shiny.semantic)
-      require(stringr)
-      require(waiter)
-
       # Set option to use themes for semantic CCS
       #options(semantic.themes = TRUE)
 

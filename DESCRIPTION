@@ -1,6 +1,6 @@
 Package: CCPhosApp
 Title: A Shiny App for CCPhos
-Version: 0.2.03
+Version: 0.2.05
 Authors@R: 
     person("Bastian", "Reiter", , "b.reiter@med.uni-frankfurt.de", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-1088-0502"))
@@ -14,14 +14,18 @@ Imports:
     assertthat,
     callr,
     DataEditR,
+    dplyr,
     dsCCPhosClient,
-    dsFredaClient,
+    dsFredaClient (>= 0.2.5),
+    DSI,
     DT,
     gt (>= 0.10.1),
     httpuv,
+    magrittr,
     pingr,
     plotly,
-    shiny (>= 1.8.0),
+    purrr,
+    shiny,
     shiny.router,
     shiny.semantic (>= 0.5.0),
     shinyjs,

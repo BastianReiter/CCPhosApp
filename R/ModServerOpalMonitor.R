@@ -11,14 +11,14 @@
 ModServerOpalMonitor_UI <- function(id)
 #-------------------------------------------------------------------------------
 {
-    ns <- NS(id)
+  ns <- NS(id)
 
-    div(id = ns("ServerOpalMonitorContainer"),
-        #class = "ui scrollable segment",
-        style = "height: 100%;
-                 overflow: auto;",
+  div(id = ns("ServerOpalMonitorContainer"),
+      #class = "ui scrollable segment",
+      style = "height: 100%;
+               overflow: auto;",
 
-        uiOutput(outputId = ns("ServerOpalMonitor")))
+      uiOutput(outputId = ns("ServerOpalMonitor")))
 }
 
 
@@ -32,24 +32,24 @@ ModServerOpalMonitor_UI <- function(id)
 ModServerOpalMonitor_Server <- function(id)
 #-------------------------------------------------------------------------------
 {
-    moduleServer(id,
-                 function(input, output, session)
-                 {
-                      output$ServerOpalMonitor <- renderUI({  req(session$userData$ServerOpalInfo())
+  moduleServer(id,
+               function(input, output, session)
+               {
+                  output$ServerOpalMonitor <- renderUI({  req(session$userData$ServerOpalInfo())
 
-                                                              # Modify table data
-                                                              TableData <- session$userData$ServerOpalInfo() %>%
-                                                                                select(-CheckOpalTableAvailability)
+                                                          # Modify table data
+                                                          TableData <- session$userData$ServerOpalInfo() %>%
+                                                                            select(-CheckOpalTableAvailability)
 
-                                                              if (!is.null(TableData))
-                                                              {
-                                                                 DataFrameToHtmlTable(DataFrame = TableData,
-                                                                                      ColContentHorizontalAlign = "center",
-                                                                                      ColumnLabels = c(SiteName = "Site"),
-                                                                                      SemanticTableCSSClass = "ui small compact celled structured table",
-                                                                                      TurnLogicalsIntoIcons = TRUE)
-                                                              }
-                                                            })
-                 })
+                                                          if (!is.null(TableData))
+                                                          {
+                                                             DataFrameToHtmlTable(DataFrame = TableData,
+                                                                                  ColContentHorizontalAlign = "center",
+                                                                                  ColumnLabels = c(SiteName = "Site"),
+                                                                                  SemanticTableCSSClass = "ui small compact celled structured table",
+                                                                                  TurnLogicalsIntoIcons = TRUE)
+                                                          }
+                                                        })
+               })
 }
 

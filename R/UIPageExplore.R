@@ -4,23 +4,23 @@
 #' @noRd
 UIPageExplore <- function()
 {
-    div(id = "PageExplore",
+  div(id = "PageExplore",
 
-        h4(class = "ui dividing header",
-           "Data exploration"),
-
-
-        div(style = "height: 26em;",
-
-            ModServerExplorer_UI("Explore-ServerExplorer")),
+      h4(class = "ui dividing header",
+         "Data exploration"),
 
 
-        #-----------------------------------------------------------------------
-        div(class = "ui divider"),
-        #-----------------------------------------------------------------------
+      div(style = "height: 26em;",
+
+          ModServerExplorer_UI("Explore-ServerExplorer")),
 
 
-        div(style = "height: 60em;",
+      #-----------------------------------------------------------------------
+      div(class = "ui divider"),
+      #-----------------------------------------------------------------------
 
-            ModUnivariateExploration_UI("UnivariateExploration")))
+
+      div(style = "height: 60em;",
+
+          ModUnivariateExploration_UI("UnivariateExploration")))
 }

@@ -12,30 +12,30 @@ ModProcessingTerminal_UI <- function(id,
                                      ButtonLabel)
 #-------------------------------------------------------------------------------
 {
-    ns <- NS(id)
+  ns <- NS(id)
 
-    div(style = "display: grid;
-                 height: 100%;
-                 grid-template-rows: 4em 22.8em;",
+  div(style = "display: grid;
+               height: 100%;
+               grid-template-rows: 4em 22.8em;",
 
-        div(style = "padding: 10px;
-                     text-align: center;",
+      div(style = "padding: 10px;
+                   text-align: center;",
 
-            action_button(ns("ProcessingTrigger"),
-                          class = "ui blue button",
-                          style = "box-shadow: 0 0 10px 10px white;",
-                          label = ButtonLabel)),
+          shiny.semantic::action_button(ns("ProcessingTrigger"),
+                                        class = "ui blue button",
+                                        style = "box-shadow: 0 0 10px 10px white;",
+                                        label = ButtonLabel)),
 
-            div(style = "position: relative;",
+          div(style = "position: relative;",
 
-                div(id = ns("WaiterScreenContainer"),
-                    style = "position: absolute;
-                             height: 100%;
-                             width: 100%;
-                             top: 0.5em;
-                             left: 0;"),
+              div(id = ns("WaiterScreenContainer"),
+                  style = "position: absolute;
+                           height: 100%;
+                           width: 100%;
+                           top: 0.5em;
+                           left: 0;"),
 
-                ModMessageMonitor_UI(ns("Monitor"))))
+              ModMessageMonitor_UI(ns("Monitor"))))
 }
 
 
@@ -49,197 +49,198 @@ ModProcessingTerminal_UI <- function(id,
 ModProcessingTerminal_Server <- function(id)
 #-------------------------------------------------------------------------------
 {
+  moduleServer(id,
+               function(input, output, session)
+               {
+                  ReturnMessages <- reactiveVal(NULL)
+                  Complete <- reactiveVal(FALSE)
 
-    moduleServer(id,
-                 function(input, output, session)
-                 {
-                    ReturnMessages <- reactiveVal(NULL)
-                    Complete <- reactiveVal(FALSE)
+                  ModMessageMonitor_Server("Monitor",
+                                           MessagesList = ReturnMessages)
 
-                    ModMessageMonitor_Server("Monitor",
-                                             MessagesList = ReturnMessages)
-
-                    observe({ shinyjs::showElement(id = "Monitor", anim = TRUE, animType = "fade") }) %>%
-                        bindEvent(ReturnMessages())
-
-                    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                    # Setting up loading behavior with waiter package functionality
-                    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                    ns <- session$ns
-                    WaiterScreen <- CreateWaiterScreen(ID = ns("WaiterScreenContainer"))
-
-                    LoadingOn <- function()
-                    {
-                        shinyjs::disable("ProcessingTrigger")
-                        WaiterScreen$show()
-                    }
-
-                    LoadingOff <- function()
-                    {
-                        shinyjs::enable("ProcessingTrigger")
-                        WaiterScreen$hide()
-                    }
+                  observe({ shinyjs::showElement(id = "Monitor", anim = TRUE, animType = "fade") }) %>%
+                      bindEvent(ReturnMessages())
 
 
-                    if (id == "CheckServerRequirements")
-                    {
-                        observe({ # Assign loading behavior
-                                  LoadingOn()
-                                  on.exit(LoadingOff())
+                  # Setting up loading behavior with waiter package functionality
+                  #-------------------------------------------------------------
+                  ns <- session$ns
+                  WaiterScreen <- CreateWaiterScreen(ID = ns("WaiterScreenContainer"))
 
-                                  # Trigger function CheckServerRequirements() and save returned list
-                                  ServerCheck <- dsCCPhosClient::CheckServerRequirements(ServerSpecifications = session$userData$ServerSpecifications(),
-                                                                                         DSConnections = session$userData$DSConnections())
+                  LoadingOn <- function()
+                  {
+                      shinyjs::disable("ProcessingTrigger")
+                      WaiterScreen$show()
+                  }
 
-                                  # Assign 'Messages' to reactive value ReturnMessages
-                                  ReturnMessages(ServerCheck$Messages)
-
-                                  # Update 'Checkpoints' data frame ...
-                                  Checkpoints <- session$userData$Checkpoints() %>%
-                                                      left_join(select(ServerCheck$PackageAvailability, c(ServerName, CheckPackageAvailability)), by = join_by(ServerName)) %>%
-                                                      left_join(ServerCheck$VersionOfdsCCPhos, by = join_by(ServerName)) %>%
-                                                      left_join(select(ServerCheck$FunctionAvailability, c(ServerName, CheckFunctionAvailability)), by = join_by(ServerName)) %>%
-                                                      left_join(select(ServerCheck$OpalTableAvailability, c(ServerName, CheckOpalTableAvailability)), by = join_by(ServerName))
-
-                                  # ... and reassign it to session$userData object
-                                  session$userData$Checkpoints(Checkpoints)
-
-                                  # Trigger function GetServerOpalInfo() and assign return (data.frame) to reactive value ServerOpalInfo in session$userData
-                                  session$userData$ServerOpalInfo(ServerCheck$OpalTableAvailability)
-
-                                  # Set reactive value 'Complete' TRUE
-                                  Complete(TRUE)
-
-                                  }) %>%
-                            bindEvent(input$ProcessingTrigger)
-                    }
+                  LoadingOff <- function()
+                  {
+                      shinyjs::enable("ProcessingTrigger")
+                      WaiterScreen$hide()
+                  }
 
 
-                    if (id == "LoadData")
-                    {
-                        observe({ # Assign loading behavior
-                                  LoadingOn()
-                                  on.exit(LoadingOff())
+                  if (id == "CheckServerRequirements")
+                  {
+                      observe({ # Assign loading behavior
+                                LoadingOn()
+                                on.exit(LoadingOff())
 
-                                  # Trigger function LoadRawDataSet() and assign return to reactive value ReturnMessages
-                                  ReturnMessages(dsCCPhosClient::LoadRawDataSet(ServerSpecifications = session$userData$ServerSpecifications(),
-                                                                                DSConnections = session$userData$DSConnections()))
+                                # Trigger function CheckServerRequirements() and save returned list
+                                ServerCheck <- dsCCPhosClient::CheckServerRequirements(ServerSpecifications = session$userData$ServerSpecifications(),
+                                                                                       DSConnections = session$userData$DSConnections())
 
-                                  # Trigger function ds.CheckDataSet() for RDS and save returned list
-                                  RDSTableCheck <- dsFredaClient::ds.GetDataSetCheck(DataSetName = "RawDataSet",
-                                                                                     Module = "CCP",
-                                                                                     Stage = "Raw",
-                                                                                     DSConnections = session$userData$DSConnections())
+                                # Assign 'Messages' to reactive value ReturnMessages
+                                ReturnMessages(ServerCheck$Messages)
 
-                                  # Assign to session$userData object
-                                  session$userData$RDSTableCheck(RDSTableCheck)
+                                # Update 'Checkpoints' data frame ...
+                                Checkpoints <- session$userData$Checkpoints() %>%
+                                                    left_join(select(ServerCheck$PackageAvailability, c(ServerName, CheckPackageAvailability)), by = join_by(ServerName)) %>%
+                                                    left_join(ServerCheck$VersionOfdsCCPhos, by = join_by(ServerName)) %>%
+                                                    left_join(select(ServerCheck$FunctionAvailability, c(ServerName, CheckFunctionAvailability)), by = join_by(ServerName)) %>%
+                                                    left_join(select(ServerCheck$OpalTableAvailability, c(ServerName, CheckOpalTableAvailability)), by = join_by(ServerName))
 
-                                  # Update 'Checkpoints' data frame ...
-                                  Checkpoints <- session$userData$Checkpoints() %>%
-                                                      left_join(select(RDSTableCheck$TableStatus, c(ServerName, CheckRDSTables)), by = join_by(ServerName))
+                                # ... and reassign it to session$userData object
+                                session$userData$Checkpoints(Checkpoints)
 
-                                  # # ... and reassign it to session$userData object
-                                  session$userData$Checkpoints(Checkpoints)
+                                # Trigger function GetServerOpalInfo() and assign return (data.frame) to reactive value ServerOpalInfo in session$userData
+                                session$userData$ServerOpalInfo(ServerCheck$OpalTableAvailability)
 
-                                  # Trigger function GetServerWorkspaceInfo() and assign return (data.frame) to reactive value ServerWorkspaceInfo in session$userData
-                                  session$userData$ServerWorkspaceInfo(dsFredaClient::GetServerWorkspaceInfo(DSConnections = session$userData$DSConnections()))
+                                # Set reactive value 'Complete' TRUE
+                                Complete(TRUE)
 
-                                  # Set reactive value Complete TRUE
-                                  Complete(TRUE)
-
-                                  }) %>%
-                            bindEvent(input$ProcessingTrigger)
-                    }
+                                }) %>%
+                          bindEvent(input$ProcessingTrigger)
+                  }
 
 
-                    if (id == "CurateData")
-                    {
-                        observe({ # Assign loading behavior
-                                  LoadingOn()
-                                  on.exit(LoadingOff())
+                  if (id == "LoadData")
+                  {
+                      observe({ # Assign loading behavior
+                                LoadingOn()
+                                on.exit(LoadingOff())
 
-                                  # Trigger function ds.CurateData() and save return
-                                  Curation <- dsCCPhosClient::ds.CurateData(RawDataSetName = "RawDataSet",
-                                                                            Settings = NULL,
-                                                                            OutputName = "CurationOutput",
-                                                                            UnpackCuratedDataSet = TRUE,
-                                                                            DSConnections = session$userData$DSConnections())
+                                # Trigger function LoadRawDataSet() and assign return to reactive value ReturnMessages
+                                ReturnMessages(dsCCPhosClient::LoadRawDataSet(ServerSpecifications = session$userData$ServerSpecifications(),
+                                                                              RunAssignmentChecks = TRUE,
+                                                                              DSConnections = session$userData$DSConnections()))
 
-                                  # Assign returned messages (concatenated lists) to reactive value ReturnMessages
-                                  ReturnMessages(Curation$Messages)
+                                # Trigger function ds.CheckDataSet() for RDS and save returned list
+                                RDSTableCheck <- dsFredaClient::ds.GetDataSetCheck(DataSetName = "RawDataSet",
+                                                                                   Module = "CCP",
+                                                                                   Stage = "Raw",
+                                                                                   DSConnections = session$userData$DSConnections())
 
-                                  # Trigger function ds.CheckDataSet() for CDS and save returned list
-                                  CDSTableCheck <- dsFredaClient::ds.GetDataSetCheck(DataSetName = "CuratedDataSet",
-                                                                                     Module = "CCP",
-                                                                                     Stage = "Curated",
-                                                                                     DSConnections = session$userData$DSConnections())
+                                # Assign to session$userData object
+                                session$userData$RDSTableCheck(RDSTableCheck)
 
-                                  # Assign to session$userData object
-                                  session$userData$CDSTableCheck(CDSTableCheck)
+                                # Update 'Checkpoints' data frame ...
+                                Checkpoints <- session$userData$Checkpoints() %>%
+                                                    left_join(select(RDSTableCheck$TableStatus, c(ServerName, CheckRDSTables)), by = join_by(ServerName))
 
-                                  # Update 'Checkpoints' data frame ...
-                                  Checkpoints <- session$userData$Checkpoints() %>%
-                                                      left_join(Curation$CurationCompletionCheck, by = join_by(ServerName))
+                                # # ... and reassign it to session$userData object
+                                session$userData$Checkpoints(Checkpoints)
 
-                                  # # ... and reassign it to session$userData object
-                                  session$userData$Checkpoints(Checkpoints)
+                                # Trigger function GetServerWorkspaceInfo() and assign return (data.frame) to reactive value ServerWorkspaceInfo in session$userData
+                                session$userData$ServerWorkspaceInfo(dsFredaClient::GetServerWorkspaceInfo(DSConnections = session$userData$DSConnections()))
 
-                                  # Trigger function GetServerWorkspaceInfo() and assign return to reactive value ServerWorkspaceInfo in session$userData
-                                  session$userData$ServerWorkspaceInfo(dsFredaClient::GetServerWorkspaceInfo(DSConnections = session$userData$DSConnections()))
+                                # Set reactive value Complete TRUE
+                                Complete(TRUE)
 
-                                  # Trigger function ds.GetCurationReport() and assign return to reactive value 'CurationReport' in session$userData
-                                  session$userData$CurationReport(dsFredaClient::ds.GetCurationReport(DSConnections = session$userData$DSConnections()))
-
-                                  # Set reactive value Complete TRUE
-                                  Complete(TRUE)
-
-                                  }) %>%
-                            bindEvent(input$ProcessingTrigger)
-                    }
+                                }) %>%
+                          bindEvent(input$ProcessingTrigger)
+                  }
 
 
-                    if (id == "AugmentData")
-                    {
-                        observe({ # Assign loading behavior
-                                  LoadingOn()
-                                  on.exit(LoadingOff())
+                  if (id == "CurateData")
+                  {
+                      observe({ # Assign loading behavior
+                                LoadingOn()
+                                on.exit(LoadingOff())
 
-                                  # Trigger function ds.AugmentData() and save return
-                                  Augmentation <- dsCCPhosClient::ds.AugmentData(CuratedDataSetName = "CuratedDataSet",
-                                                                                 OutputName = "AugmentationOutput",
-                                                                                 UnpackAugmentedDataSet = TRUE,
-                                                                                 DSConnections = session$userData$DSConnections())
+                                # Trigger function ds.CurateData() and save return
+                                Curation <- dsCCPhosClient::ds.CurateData(RawDataSetName = "RawDataSet",
+                                                                          Settings = NULL,
+                                                                          OutputName = "CurationOutput",
+                                                                          UnpackCuratedDataSet = TRUE,
+                                                                          RunAssignmentChecks = FALSE,
+                                                                          DSConnections = session$userData$DSConnections())
 
-                                  # Assign returned messages (concatenated lists) to reactive value ReturnMessages
-                                  ReturnMessages(Augmentation$Messages)
+                                # Assign returned messages (concatenated lists) to reactive value ReturnMessages
+                                ReturnMessages(Curation$Messages)
 
-                                  # Trigger function ds.CheckDataSet() for ADS and save returned list
-                                  ADSTableCheck <- dsFredaClient::ds.GetDataSetCheck(DataSetName = "AugmentedDataSet",
-                                                                                     DSConnections = session$userData$DSConnections())
+                                # Trigger function ds.CheckDataSet() for CDS and save returned list
+                                CDSTableCheck <- dsFredaClient::ds.GetDataSetCheck(DataSetName = "CuratedDataSet",
+                                                                                   Module = "CCP",
+                                                                                   Stage = "Curated",
+                                                                                   DSConnections = session$userData$DSConnections())
 
-                                  # Assign to session$userData object
-                                  session$userData$ADSTableCheck(ADSTableCheck)
+                                # Assign to session$userData object
+                                session$userData$CDSTableCheck(CDSTableCheck)
 
-                                  # Update 'Checkpoints' data frame ...
-                                  Checkpoints <- session$userData$Checkpoints() %>%
-                                                      left_join(Augmentation$AugmentationCompletionCheck, by = join_by(ServerName))
+                                # Update 'Checkpoints' data frame ...
+                                Checkpoints <- session$userData$Checkpoints() %>%
+                                                    left_join(Curation$CurationCompletionCheck, by = join_by(ServerName))
 
-                                  # # ... and reassign it to session$userData object
-                                  session$userData$Checkpoints(Checkpoints)
+                                # # ... and reassign it to session$userData object
+                                session$userData$Checkpoints(Checkpoints)
 
-                                  # Trigger function GetServerWorkspaceInfo() and assign return to reactive value ServerWorkspaceInfo in session$userData
-                                  session$userData$ServerWorkspaceInfo(dsFredaClient::GetServerWorkspaceInfo(DSConnections = session$userData$DSConnections()))
+                                # Trigger function GetServerWorkspaceInfo() and assign return to reactive value ServerWorkspaceInfo in session$userData
+                                session$userData$ServerWorkspaceInfo(dsFredaClient::GetServerWorkspaceInfo(DSConnections = session$userData$DSConnections()))
 
-                                  # Set reactive value Complete TRUE
-                                  Complete(TRUE)
+                                # Trigger function ds.GetCurationReport() and assign return to reactive value 'CurationReport' in session$userData
+                                session$userData$CurationReport(dsFredaClient::ds.GetCurationReport(DSConnections = session$userData$DSConnections()))
 
-                                  }) %>%
-                            bindEvent(input$ProcessingTrigger)
-                    }
+                                # Set reactive value Complete TRUE
+                                Complete(TRUE)
 
-                    return(Complete)
+                                }) %>%
+                          bindEvent(input$ProcessingTrigger)
+                  }
 
-                 })
+
+                  if (id == "AugmentData")
+                  {
+                      observe({ # Assign loading behavior
+                                LoadingOn()
+                                on.exit(LoadingOff())
+
+                                # Trigger function ds.AugmentData() and save return
+                                Augmentation <- dsCCPhosClient::ds.AugmentData(CuratedDataSetName = "CuratedDataSet",
+                                                                               OutputName = "AugmentationOutput",
+                                                                               UnpackAugmentedDataSet = TRUE,
+                                                                               RunAssignmentChecks = FALSE,
+                                                                               DSConnections = session$userData$DSConnections())
+
+                                # Assign returned messages (concatenated lists) to reactive value ReturnMessages
+                                ReturnMessages(Augmentation$Messages)
+
+                                # Trigger function ds.CheckDataSet() for ADS and save returned list
+                                ADSTableCheck <- dsFredaClient::ds.GetDataSetCheck(DataSetName = "AugmentedDataSet",
+                                                                                   DSConnections = session$userData$DSConnections())
+
+                                # Assign to session$userData object
+                                session$userData$ADSTableCheck(ADSTableCheck)
+
+                                # Update 'Checkpoints' data frame ...
+                                Checkpoints <- session$userData$Checkpoints() %>%
+                                                    left_join(Augmentation$AugmentationCompletionCheck, by = join_by(ServerName))
+
+                                # # ... and reassign it to session$userData object
+                                session$userData$Checkpoints(Checkpoints)
+
+                                # Trigger function GetServerWorkspaceInfo() and assign return to reactive value ServerWorkspaceInfo in session$userData
+                                session$userData$ServerWorkspaceInfo(dsFredaClient::GetServerWorkspaceInfo(DSConnections = session$userData$DSConnections()))
+
+                                # Set reactive value Complete TRUE
+                                Complete(TRUE)
+
+                                }) %>%
+                          bindEvent(input$ProcessingTrigger)
+                  }
+
+                  return(Complete)
+               })
 }
 
 

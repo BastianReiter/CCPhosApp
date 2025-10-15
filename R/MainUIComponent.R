@@ -37,8 +37,8 @@ shiny.semantic::semanticPage(
 
     # Initiate use of waiter functionality
     waiter::useWaiter(),
-    waiter::waiterShowOnLoad(html = spin_3(),
-                             color = transparent(.5)),
+    waiter::waiterShowOnLoad(html = waiter::spin_3(),
+                             color = waiter::transparent(.5)),
 
     #waiter::autoWaiter(),
 
@@ -80,17 +80,17 @@ shiny.semantic::semanticPage(
 
 
         #--- HEADER ------------------------------------------------------------
-        header = split_layout(style = "display: flex;      /* Set up flexbox to use 'justify-content: space-between' to enable free space between columns without specifying column width */
-                                       justify-content: space-between;
-                                       align-items: center;",
+        header = shiny.semantic::split_layout(style = "display: flex;      /* Set up flexbox to use 'justify-content: space-between' to enable free space between columns without specifying column width */
+                                                       justify-content: space-between;
+                                                       align-items: center;",
 
-                              img(src = "www/Logo_CCPhosApp.png",
-                                  alt = "CCPhos App Logo",
-                                  height = "80px"),
+                                              img(src = "www/Logo_CCPhosApp.png",
+                                                  alt = "CCPhos App Logo",
+                                                  height = "80px"),
 
-                              uiOutput(outputId = "ProjectNameOutput"),
+                                              uiOutput(outputId = "ProjectNameOutput"),
 
-                              ModConnectionStatus_UI("ConnectionStatus")),
+                                              ModConnectionStatus_UI("ConnectionStatus")),
 
 
         #--- LEFT SIDE COLUMN --------------------------------------------------
@@ -101,53 +101,53 @@ shiny.semantic::semanticPage(
                              class = "item",
                              icon("plug"),
                              "CONNECT",
-                             href = route_link("/")),
+                             href = shiny.router::route_link("/")),
 
                            a(id = "MenuItem_Settings",
                              class = "item",
                              icon("cogs"),
                              "SETTINGS",
-                             href = route_link("settings")),
+                             href = shiny.router::route_link("settings")),
 
                            a(id = "MenuItem_Prepare",
                              class = "item",
                              icon("utensils"),      # Alternatives: mug hot, box open,
                              "PREPARE",
-                             href = route_link("prepare")),
+                             href = shiny.router::route_link("prepare")),
 
                            a(id = "MenuItem_Explore",
                              class = "item",
                              icon("binoculars"),      # Alternatives: tv
                              "EXPLORE",
-                             href = route_link("explore")),
+                             href = shiny.router::route_link("explore")),
 
                            a(id = "MenuItem_Analyze",
                              class = "item",
                              icon("calculator"),
                              "ANALYZE",
-                             href = route_link("analyze")),
+                             href = shiny.router::route_link("analyze")),
 
                            a(id = "MenuItem_Export",
                              class = "item",
                              icon("image"),
                              "EXPORT",
-                             href = route_link("export"))),
+                             href = shiny.router::route_link("export"))),
 
                        textOutput(outputId = "TestMonitor")),
 
 
         #--- MAIN PANEL --------------------------------------------------------
-        main = segment(class = "ui raised scrolling segment",
-                       style = "height: 100%;
-                                overflow: auto;",
+        main = shiny.semantic::segment(class = "ui raised scrolling segment",
+                                       style = "height: 100%;
+                                                overflow: auto;",
 
-                       # Use shiny.router functionality to enable multi-page UI structure defined in UIPage() functions
-                       shiny.router::router_ui(route("/", UIPageStart()),
-                                               route("settings", UIPageSettings()),
-                                               route("prepare", UIPagePrepare()),
-                                               route("explore", UIPageExplore()),
-                                               route("analyze", UIPageAnalyze()),
-                                               route("export", UIPageExport()))
+                                       # Use shiny.router functionality to enable multi-page UI structure defined in UIPage() functions
+                                       shiny.router::router_ui(shiny.router::route("/", UIPageStart()),
+                                                               shiny.router::route("settings", UIPageSettings()),
+                                                               shiny.router::route("prepare", UIPagePrepare()),
+                                                               shiny.router::route("explore", UIPageExplore()),
+                                                               shiny.router::route("analyze", UIPageAnalyze()),
+                                                               shiny.router::route("export", UIPageExport()))
         ),
 
 
