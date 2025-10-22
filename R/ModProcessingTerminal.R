@@ -103,8 +103,8 @@ ModProcessingTerminal_Server <- function(id)
                                 # ... and reassign it to session$userData object
                                 session$userData$Checkpoints(Checkpoints)
 
-                                # Trigger function GetServerOpalInfo() and assign return (data.frame) to reactive value ServerOpalInfo in session$userData
-                                session$userData$ServerOpalInfo(ServerCheck$OpalTableAvailability)
+                                # Trigger function GetServerOpalDBInfo() and assign return (data.frame) to reactive value ServerOpalDBInfo in session$userData
+                                session$userData$ServerOpalDBInfo(ServerCheck$OpalTableAvailability)
 
                                 # Set reactive value 'Complete' TRUE
                                 Complete(TRUE)

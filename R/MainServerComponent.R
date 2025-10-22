@@ -39,7 +39,7 @@ MainServerComponent <- function(ADSTableCheckData = NULL,
     session$userData$CurationReport <- reactiveVal(NULL)
     session$userData$DSConnections <- reactiveVal(NULL)
     session$userData$RDSTableCheck <- reactiveVal(NULL)
-    session$userData$ServerOpalInfo <- reactiveVal(NULL)
+    session$userData$ServerOpalDBInfo <- reactiveVal(NULL)
     session$userData$ServerSpecifications <- reactiveVal(NULL)
     session$userData$ServerWorkspaceInfo <- reactiveVal(NULL)
 
@@ -150,8 +150,8 @@ MainServerComponent <- function(ADSTableCheckData = NULL,
     # --- Call module: Server Checkpoints ---
     ModCheckpoints_Server("Checkpoints")
 
-    # --- Call module: Server Opal Monitor ---
-    ModServerOpalMonitor_Server("ServerOpalMonitor")
+    # --- Call module: Server Opal DB Monitor ---
+    ModServerOpalDBMonitor_Server("ServerOpalDBMonitor")
 
     # --- Call module: Server Explorer ---
     ModServerExplorer_Server("Prepare-ServerExplorer")

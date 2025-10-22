@@ -110,7 +110,7 @@ UIPagePrepare <- function()
                            overflow: auto;
                            margin: 0;",
 
-                  ModServerOpalMonitor_UI("ServerOpalMonitor")))),
+                  ModServerOpalDBMonitor_UI("ServerOpalDBMonitor")))),
 
 
       #-----------------------------------------------------------------------
@@ -200,9 +200,9 @@ UIPagePrepare <- function()
       #                              overflow: auto;
       #                              margin: 0;",
       #
-      #                     tabset(tabs = list(list(menu = "Opal", content = ModServerOpalMonitor_UI("ServerOpalMonitor"), id = "Tab_ServerOpalMonitor"),
+      #                     tabset(tabs = list(list(menu = "Opal", content = ModServerOpalDBMonitor_UI("ServerOpalDBMonitor"), id = "Tab_ServerOpalDBMonitor"),
       #                                        list(menu = "RDS Tables", content = ModRDSTableMonitor_UI("RDSTableMonitor"), id = "Tab_RDSTableMonitor")),
-      #                            active = "Tab_ServerOpalMonitor")),
+      #                            active = "Tab_ServerOpalDBMonitor")),
       #
       #                 div(style = "height: 100%;
       #                              overflow: auto;",
