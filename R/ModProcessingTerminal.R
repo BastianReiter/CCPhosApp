@@ -126,7 +126,7 @@ ModProcessingTerminal_Server <- function(id)
                                                                               DSConnections = session$userData$DSConnections()))
 
                                 # Trigger function ds.CheckDataSet() for RDS and save returned list
-                                RDSTableCheck <- dsFredaClient::ds.GetDataSetCheck(DataSetName = "RawDataSet",
+                                RDSTableCheck <- dsFredaClient::ds.GetDataSetCheck(DataSetName = "CCP.RawDataSet",
                                                                                    Module = "CCP",
                                                                                    Stage = "Raw",
                                                                                    DSConnections = session$userData$DSConnections())
@@ -159,9 +159,9 @@ ModProcessingTerminal_Server <- function(id)
                                 on.exit(LoadingOff())
 
                                 # Trigger function ds.CurateData() and save return
-                                Curation <- dsCCPhosClient::ds.CurateData(RawDataSetName = "RawDataSet",
+                                Curation <- dsCCPhosClient::ds.CurateData(RawDataSetName = "CCP.RawDataSet",
                                                                           Settings = NULL,
-                                                                          OutputName = "CurationOutput",
+                                                                          OutputName = "CCP.CurationOutput",
                                                                           UnpackCuratedDataSet = TRUE,
                                                                           RunAssignmentChecks = FALSE,
                                                                           DSConnections = session$userData$DSConnections())
@@ -170,7 +170,7 @@ ModProcessingTerminal_Server <- function(id)
                                 ReturnMessages(Curation$Messages)
 
                                 # Trigger function ds.CheckDataSet() for CDS and save returned list
-                                CDSTableCheck <- dsFredaClient::ds.GetDataSetCheck(DataSetName = "CuratedDataSet",
+                                CDSTableCheck <- dsFredaClient::ds.GetDataSetCheck(DataSetName = "CCP.CuratedDataSet",
                                                                                    Module = "CCP",
                                                                                    Stage = "Curated",
                                                                                    DSConnections = session$userData$DSConnections())
@@ -206,8 +206,8 @@ ModProcessingTerminal_Server <- function(id)
                                 on.exit(LoadingOff())
 
                                 # Trigger function ds.AugmentData() and save return
-                                Augmentation <- dsCCPhosClient::ds.AugmentData(CuratedDataSetName = "CuratedDataSet",
-                                                                               OutputName = "AugmentationOutput",
+                                Augmentation <- dsCCPhosClient::ds.AugmentData(CuratedDataSetName = "CCP.CuratedDataSet",
+                                                                               OutputName = "CCP.AugmentationOutput",
                                                                                UnpackAugmentedDataSet = TRUE,
                                                                                RunAssignmentChecks = FALSE,
                                                                                DSConnections = session$userData$DSConnections())
@@ -216,7 +216,7 @@ ModProcessingTerminal_Server <- function(id)
                                 ReturnMessages(Augmentation$Messages)
 
                                 # Trigger function ds.CheckDataSet() for ADS and save returned list
-                                ADSTableCheck <- dsFredaClient::ds.GetDataSetCheck(DataSetName = "AugmentedDataSet",
+                                ADSTableCheck <- dsFredaClient::ds.GetDataSetCheck(DataSetName = "CCP.AugmentedDataSet",
                                                                                    DSConnections = session$userData$DSConnections())
 
                                 # Assign to session$userData object
