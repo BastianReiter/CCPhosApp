@@ -233,7 +233,8 @@ ModServerExplorer_Server <- function(id)
                                                                                            searching = FALSE),
                                                                             rownames = FALSE,
                                                                             selection = list(mode = "single",
-                                                                                             target = "row"),
+                                                                                             target = "row",
+                                                                                             selected = 1),
                                                                             style = "semanticui")
                                                             })
 

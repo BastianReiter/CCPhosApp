@@ -19,11 +19,12 @@
 Widget.ServerExplorer <- function(#--- Arguments for app itself ---
                                   ServerSpecifications = NULL,
                                   ServerWorkspaceInfo = NULL,
+                                  ExplorationData = NULL,
                                   DSConnections = NULL,
                                   #--- Arguments for app wrapper ---
-                                  EnableLiveConnection = TRUE,
+                                  EnableLiveConnection = FALSE,
                                   EndProcessWhenClosingApp = TRUE,
-                                  RunAutonomously = TRUE,
+                                  RunAutonomously = FALSE,
                                   RunInViewer = FALSE,
                                   UseVirtualConnections = FALSE,
                                   ...)
@@ -40,6 +41,7 @@ Widget.ServerExplorer <- function(#--- Arguments for app itself ---
 
   if (!is.null(ServerSpecifications)) assert_that(is.data.frame(ServerSpecifications))
   if (!is.null(ServerWorkspaceInfo)) assert_that(is.list(ServerWorkspaceInfo))
+  if (!is.null(ExplorationData)) assert_that(is.list(ExplorationData))
 
   # Check validity of 'DSConnections' or find them programmatically if none are passed
   DSConnections <- CheckDSConnections(DSConnections)
@@ -57,19 +59,6 @@ Widget.ServerExplorer <- function(#--- Arguments for app itself ---
   # Create the app initiating function (UI and server component resulting in a ShinyApp object)
   InitFunction <- function(...)
   {
-      # require(dsCCPhosClient)
-      # require(dplyr)
-      # require(DSI)
-      # require(DT)
-      # #require(gt)
-      # #require(plotly)
-      # require(purrr)
-      # require(shiny)
-      # require(shinyjs)
-      # require(shiny.semantic)
-      # require(stringr)
-      # require(waiter)
-
       # Since the app is deployed as a package, the folder for external resources (e.g. CSS files, static images) needs to be added manually
       shiny::addResourcePath('www', system.file("www", package = "CCPhosApp"))
 
@@ -113,7 +102,8 @@ Widget.ServerExplorer <- function(#--- Arguments for app itself ---
                                   Selection <- ModServerExplorer_Server(id = "ServerExplorer")
                                   # ... that is passed to another module
                                   ModUnivariateExploration_Server(id = "UnivariateExploration",
-                                                                  Selection)
+                                                                  Selection,
+                                                                  ExplorationData)
                                 }
 
           # Call Widget frame module and pass widget-specific server logic
