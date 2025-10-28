@@ -60,7 +60,7 @@ ModRDSTableMonitor_Server <- function(id)
                                                                       select(-CheckRDSTables)
 
                                                     # For HTML table, create vector of column labels with shortened table names to save some horizontal space
-                                                    ColumnLabels <- str_remove(colnames(TableData), "RDS.") %>% set_names(colnames(TableData))
+                                                    ColumnLabels <- str_remove(colnames(TableData), "CCP.RDS.") %>% set_names(colnames(TableData))
                                                     ColumnLabels[1] <- "Server"
 
                                                     if (!is.null(TableData))

@@ -217,6 +217,8 @@ ModProcessingTerminal_Server <- function(id)
 
                                 # Trigger function ds.CheckDataSet() for ADS and save returned list
                                 ADSTableCheck <- dsFredaClient::ds.GetDataSetCheck(DataSetName = "CCP.AugmentedDataSet",
+                                                                                   Module = "CCP",
+                                                                                   Stage = "Augmented",
                                                                                    DSConnections = session$userData$DSConnections())
 
                                 # Assign to session$userData object

@@ -122,7 +122,8 @@ ModUnivariateExploration_UI <- function(id)
 #' @noRd
 #-------------------------------------------------------------------------------
 ModUnivariateExploration_Server <- function(id,
-                                            ObjectSelection)
+                                            ObjectSelection,
+                                            ExplorationData = NULL)      # Pre-collected exploration data can optionally be passed
 #-------------------------------------------------------------------------------
 {
   moduleServer(id,
@@ -171,38 +172,50 @@ ModUnivariateExploration_Server <- function(id,
                                                            " from ", ObjectSelection$Object()) }) %>% bindEvent({ TriggerUpdate() })
 
 
-                  # A tibble created by dsCCPhosClient::dsGetFeatureInfo()
-                  FeatureInfo <- reactive({ req(session$userData$DSConnections())
-                                            req(ObjectSelection)
+                  # If selected Object is a data.frame or tibble, run dsFredaClient::ExploreFeature, which returns a list with elements 'FeatureInfo' and 'Statistics'
+                  FeatureExplorationData <- reactive({  req(session$userData$DSConnections())
+                                                        req(ObjectSelection)
 
-                                            # Get meta data of table object
-                                            TableMetaData <- ds.GetObjectMetaData(ObjectName = ObjectSelection$Object(),
-                                                                                  DSConnections = session$userData$DSConnections())
+                                                        if (!is.null(ExplorationData) &&
+                                                              !is.null(ExplorationData[[ObjectSelection$Object()]]) &&
+                                                              !is.null(ExplorationData[[ObjectSelection$Object()]][[ObjectSelection$Element()]]))
+                                                        {
+                                                            return(ExplorationData[[ObjectSelection$Object()]][[ObjectSelection$Element()]])
 
-                                            # Check if selected object is a tibble / data.frame. If not, return NULL,
-                                            if (TableMetaData$FirstEligible$Class != "data.frame") { return(NULL) }
+                                                        } else {
 
-                                            # Returns a tibble
-                                            dsFredaClient::ds.GetFeatureInfo(TableName = ObjectSelection$Object(),
-                                                                             FeatureName = ObjectSelection$Element(),
-                                                                             DSConnections = session$userData$DSConnections())
-                                            }) %>% bindEvent({ TriggerUpdate() })
+                                                          # Get meta data of table object
+                                                          TableMetaData <- ds.GetObjectMetaData(ObjectName = ObjectSelection$Object(),
+                                                                                                DSConnections = session$userData$DSConnections())
+
+                                                          # Check if selected object is a tibble / data.frame. If not, return NULL,
+                                                          if (TableMetaData$FirstEligible$Class != "data.frame") { return(NULL) }
+
+                                                          # Returns a list with elements 'FeatureInfo' and 'Statistics'
+                                                          dsFredaClient::ExploreFeature(TableName = ObjectSelection$Object(),
+                                                                                        FeatureName = ObjectSelection$Element(),
+                                                                                        DSConnections = session$userData$DSConnections())
+                                                        }
+                                                      }) %>% bindEvent({ TriggerUpdate() })
 
 
                   # Reactive expression containing type of selected feature ('character', 'numeric', ...)
-                  FeatureType <- reactive({ req(FeatureInfo())
-                                            filter(FeatureInfo(), Server == "All")$DataType })
+                  FeatureType <- reactive({ req(FeatureExplorationData())
+                                            filter(FeatureExplorationData()$FeatureInfo, Server == "All")$DataType })
+
+                  Statistics <- reactive({  req(FeatureExplorationData())
+                                            FeatureExplorationData()$Statistics })
 
 
                   # Render table containing info about data availability in selected feature
-                  output$FeatureInfoTable <- DT::renderDT({  req(FeatureInfo())
+                  output$FeatureInfoTable <- DT::renderDT({  req(FeatureExplorationData())
 
                                                              # Assign loading behavior
                                                              LoadingOn()
                                                              on.exit(LoadingOff())
 
                                                              # Restructure table data for table displaying purposes ('Count (Proportion %)')
-                                                             TableData <- FeatureInfo() %>%
+                                                             TableData <- FeatureExplorationData()$FeatureInfo %>%
                                                                               mutate("N Valid" = paste0(N.Valid, " (", round(ValidProportion * 100, 0), "%)"),
                                                                                      "N Missing" = paste0(N.Missing, " (", round(MissingProportion * 100, 0), "%)"),
                                                                                      .after = N.Total) %>%
@@ -229,28 +242,10 @@ ModUnivariateExploration_Server <- function(id,
                                                            }) %>% bindEvent({ TriggerUpdate() })
 
 
-                  Statistics <- reactive({  req(FeatureType())
-
-                                            # Get and return tibble containing statistics depending on feature type
-                                            if (FeatureType() %in% c("double", "integer", "numeric"))
-                                            {
-                                                return(dsFredaClient::ds.GetSampleStatistics(TableName = ObjectSelection$Object(),
-                                                                                             MetricFeatureName = ObjectSelection$Element(),
-                                                                                             DSConnections = session$userData$DSConnections()))
-                                            }
-                                            else if (FeatureType() %in% c("character", "logical"))
-                                            {
-                                                return(dsFredaClient::ds.GetFrequencyTable(TableName = ObjectSelection$Object(),
-                                                                                           FeatureName = ObjectSelection$Element(),
-                                                                                           MaxNumberCategories = input$SliderMaxNumberCategories,
-                                                                                           DSConnections = session$userData$DSConnections()))
-                                            }
-                                            else { return(NULL) }
-
-                                         }) %>% bindEvent({ TriggerUpdate() })
 
 
-                  output$StatisticsTable <- DT::renderDT({  req(Statistics())
+
+                  output$StatisticsTable <- DT::renderDT({  req(FeatureExplorationData)
 
                                                             # Assign loading behavior
                                                             LoadingOn()

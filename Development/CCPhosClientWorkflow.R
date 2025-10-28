@@ -3,29 +3,6 @@
 #   - Virtual DataSHIELD infrastructure for testing purposes -
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-# Install newest base DataSHIELD packages
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# devtools::install_github(repo = "datashield/dsBase")
-# devtools::install_github(repo = "datashield/dsBaseClient")
-
-# Install own DataSHIELD packages
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# devtools::install_github(repo = "BastianReiter/dsCCPhos")
-# devtools::install_github(repo = "BastianReiter/dsCCPhosClient")
-# devtools::install_github(repo = "BastianReiter/CCPhosApp")
-
-# Install additional Datashield-packages
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# install.packages("dsTidyverse")
-# install.packages("dsTidyverseClient")
-#
-# devtools::install_github("tombisho/dsSynthetic", dependencies = TRUE)
-# devtools::install_github("tombisho/dsSyntheticClient", dependencies = TRUE)
-#
-# devtools::install_github("neelsoumya/dsSurvival")
-# devtools::install_github("neelsoumya/dsSurvivalClient")
-
-
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Load required packages
@@ -57,11 +34,9 @@ CCPConnections <- ConnectToVirtualCCP(CCPTestData = TestData,
 # Display app in Viewer pane
 # options(shiny.launch.browser = .rs.invokeShinyPaneViewer)
 
-BgProcess <- StartCCPhosApp(RunAutonomously = TRUE)
+# BgProcess <- StartCCPhosApp(RunAutonomously = TRUE)
 
-Widget.ServerExplorer(EnableLiveConnection = FALSE,
-                      RunAutonomously = FALSE,
-                      UseVirtualConnections = TRUE)
+
 
 
 
@@ -81,17 +56,8 @@ LoadRawDataSet(ServerSpecifications = NULL)
 # Check RDS tables for existence and completeness
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-RDSTableCheck <- ds.GetDataSetCheck(DataSetName = "RawDataSet",
+RDSTableCheck <- ds.GetDataSetCheck(DataSetName = "CCP.RawDataSet",
                                     AssumeCCPDataSet = TRUE)
-
-View(RDSTableCheck$TableStatus)
-
-View(RDSTableCheck$TableRowCounts$RDS_Diagnosis)
-View(RDSTableCheck$FeatureExistence$RDS_Diagnosis)
-View(RDSTableCheck$FeatureTypes$RDS_Diagnosis)
-View(RDSTableCheck$NonMissingValueRates$RDS_Diagnosis)
-
-RDSTableCheck$TableStatus
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -108,12 +74,13 @@ ds.DrawSample(RawDataSetName = "RawDataSet",
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Transform Raw Data Set (RDS) into Curated Data Set (CDS) (using default settings)
-ds.CurateData(RawDataSetName = "RawDataSet",
+ds.CurateData(RawDataSetName = "CCP.RawDataSet",
               Settings = NULL,
-              OutputName = "CurationOutput")
+              OutputName = "CCP.CurationOutput")
 
-CDSTableCheck <- ds.CheckDataSet(DataSetName = "CuratedDataSet",
-                                 AssumeCCPDataSet = TRUE)
+CDSTableCheck <- ds.CheckDataSet(DataSetName = "CCP.CuratedDataSet",
+                                 Module = "CCP",
+                                 Stage = "Curated")
 
 # Get curation reports
 CurationReport <- ds.GetCurationReport()
@@ -143,6 +110,18 @@ ADSTableCheck <- ds.CheckDataSet(DataSetName = "AugmentedDataSet")
 # Collect comprehensive information about all workspace objects
 ServerWorkspaceInfo <- GetServerWorkspaceInfo()
 
+ExplorationData <- dsFredaClient::GetExplorationData(InputWorkspaceInfo = ServerWorkspaceInfo)
+                                                     TableSelection = c("CCP.ADS.Diagnosis",
+                                                                         "CCP.ADS.DiseaseCourse",
+                                                                         "CCP.ADS.Events",
+                                                                         "CCP.ADS.Patient",
+                                                                         "CCP.ADS.Therapy"))
+
+Widget.ServerExplorer(ServerWorkspaceInfo = ServerWorkspaceInfo,
+                      ExplorationData = ExplorationData,
+                      EnableLiveConnection = FALSE,
+                      RunAutonomously = FALSE,
+                      UseVirtualConnections = TRUE)
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
