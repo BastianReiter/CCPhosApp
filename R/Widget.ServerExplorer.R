@@ -90,7 +90,7 @@ Widget.ServerExplorer <- function(#--- Arguments for app itself ---
       #-------------------------------------------------------------------------
       # Widget Server Logic
       #-------------------------------------------------------------------------
-      Server <- function(input, output, session)
+      Server <- function(input, output, session, ...)
       {
           # Hide waiter loading screen after initial app load has finished
           waiter::waiter_hide()
@@ -102,8 +102,7 @@ Widget.ServerExplorer <- function(#--- Arguments for app itself ---
                                   Selection <- ModServerExplorer_Server(id = "ServerExplorer")
                                   # ... that is passed to another module
                                   ModUnivariateExploration_Server(id = "UnivariateExploration",
-                                                                  Selection,
-                                                                  ExplorationData)
+                                                                  Selection)
                                 }
 
           # Call Widget frame module and pass widget-specific server logic
@@ -115,6 +114,7 @@ Widget.ServerExplorer <- function(#--- Arguments for app itself ---
 
           # Initialize global objects
           session$userData$DSConnections <- reactiveVal(NULL)
+          session$userData$ExplorationData <- NULL
           session$userData$ServerSpecifications <- reactiveVal(NULL)
           session$userData$ServerWorkspaceInfo <- reactiveVal(NULL)
 
@@ -125,6 +125,7 @@ Widget.ServerExplorer <- function(#--- Arguments for app itself ---
           # 'ModInitialize' assigns content to session$userData objects at app start
           ModInitialize(id = "Initialize",
                         DSConnections = DSConnections,
+                        ExplorationData = ExplorationData,
                         ServerSpecifications = ServerSpecifications,
                         ServerWorkspaceInfo = ServerWorkspaceInfo)
 
@@ -133,7 +134,7 @@ Widget.ServerExplorer <- function(#--- Arguments for app itself ---
           if (EndProcessWhenClosingApp == TRUE) { session$onSessionEnded(function() { stopApp() }) }
       }
 
-      # Return Mini-App
+      # Return Widget App
       shiny::shinyApp(ui = UI,
                       server = Server)
   }

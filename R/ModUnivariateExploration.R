@@ -81,7 +81,6 @@ ModUnivariateExploration_UI <- function(id)
                                            max = 10,
                                            step = 1)),
 
-
           # Feature Info row
           #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -111,6 +110,7 @@ ModUnivariateExploration_UI <- function(id)
 
                   plotOutput(ns("StatisticsPlot"),
                              width = "80%")))))
+              #textOutput(outputId = ns("TestMonitor")))))
 }
 
 
@@ -122,8 +122,7 @@ ModUnivariateExploration_UI <- function(id)
 #' @noRd
 #-------------------------------------------------------------------------------
 ModUnivariateExploration_Server <- function(id,
-                                            ObjectSelection,
-                                            ExplorationData = NULL)      # Pre-collected exploration data can optionally be passed
+                                            ObjectSelection)
 #-------------------------------------------------------------------------------
 {
   moduleServer(id,
@@ -151,6 +150,30 @@ ModUnivariateExploration_Server <- function(id,
                   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
+                  # output$TestMonitor <- renderText({
+                  #                                     #req(session$userData$ServerWorkspaceInfo())
+                  #                                     #paste(names(session$userData$ServerWorkspaceInfo()), collapse = ", ")
+                  #                                     # paste(
+                  #                                     #   paste(names(session$userData$ExplorationData), collapse = ", "),
+                  #                                     #   paste(names(session$userData$ExplorationData[[ObjectSelection$Object()]]), collapse = ", "),
+                  #                                     #   paste(names(session$userData$ExplorationData[[ObjectSelection$Object()]][[ObjectSelection$Element()]]), collapse = ", "),
+                  #                                     #   collapse = "   |   ")
+                  #
+                  #                                     # paste(paste(names(FeatureExplorationData()), collapse = ", "),
+                  #                                     #       paste(class(FeatureExplorationData()), collapse = ", "),
+                  #                                     #       #class(FeatureExplorationData()[["FeatureInfo"]]),
+                  #                                     #       collapse = "; ")
+                  #
+                  #
+                  #
+                  #                                     # paste(!is.null(session$userData$ExplorationData),
+                  #                                     #       !is.null(session$userData$ExplorationData[[ObjectSelection$Object()]]),
+                  #                                     #       !is.null(session$userData$ExplorationData[[ObjectSelection$Object()]][[ObjectSelection$Element()]]),
+                  #                                     #       collapse = ", ")
+                  #
+                  #                                  })
+
+
                   # Create reactive expression that returns an expression triggering output rendering (by being bound to various expressions below)
                   TriggerUpdate <- reactive({ if (input$AutoUpdate == TRUE)
                                               {
@@ -173,29 +196,38 @@ ModUnivariateExploration_Server <- function(id,
 
 
                   # If selected Object is a data.frame or tibble, run dsFredaClient::ExploreFeature, which returns a list with elements 'FeatureInfo' and 'Statistics'
-                  FeatureExplorationData <- reactive({  req(session$userData$DSConnections())
-                                                        req(ObjectSelection)
+                  FeatureExplorationData <- reactive({  req(ObjectSelection)
 
-                                                        if (!is.null(ExplorationData) &&
-                                                              !is.null(ExplorationData[[ObjectSelection$Object()]]) &&
-                                                              !is.null(ExplorationData[[ObjectSelection$Object()]][[ObjectSelection$Element()]]))
+                                                        CurrentExplorationData <- NULL
+
+                                                        # Check if there is pre-collected exploration data (as used in ServerExplorer Widget)
+                                                        if (!is.null(session$userData$ExplorationData) &&
+                                                              !is.null(session$userData$ExplorationData[[ObjectSelection$Object()]]) &&
+                                                              !is.null(session$userData$ExplorationData[[ObjectSelection$Object()]][[ObjectSelection$Element()]]))
                                                         {
-                                                            return(ExplorationData[[ObjectSelection$Object()]][[ObjectSelection$Element()]])
+                                                            CurrentExplorationData <- session$userData$ExplorationData[[ObjectSelection$Object()]][[ObjectSelection$Element()]]
+                                                            #print(paste("Ping: ", names(session$userData$ExplorationData[[ObjectSelection$Object()]][[ObjectSelection$Element()]]), collapse = ", "))
 
                                                         } else {
+
+                                                          req(session$userData$DSConnections())
 
                                                           # Get meta data of table object
                                                           TableMetaData <- ds.GetObjectMetaData(ObjectName = ObjectSelection$Object(),
                                                                                                 DSConnections = session$userData$DSConnections())
 
                                                           # Check if selected object is a tibble / data.frame. If not, return NULL,
-                                                          if (TableMetaData$FirstEligible$Class != "data.frame") { return(NULL) }
-
-                                                          # Returns a list with elements 'FeatureInfo' and 'Statistics'
-                                                          dsFredaClient::ExploreFeature(TableName = ObjectSelection$Object(),
-                                                                                        FeatureName = ObjectSelection$Element(),
-                                                                                        DSConnections = session$userData$DSConnections())
+                                                          if (TableMetaData$FirstEligible$Class == "data.frame")
+                                                          {
+                                                              # Returns a list with elements 'FeatureInfo' and 'Statistics'
+                                                              CurrentExplorationData <- dsFredaClient::ExploreFeature(TableName = ObjectSelection$Object(),
+                                                                                                                      FeatureName = ObjectSelection$Element(),
+                                                                                                                      DSConnections = session$userData$DSConnections())
+                                                          }
                                                         }
+
+                                                        CurrentExplorationData
+
                                                       }) %>% bindEvent({ TriggerUpdate() })
 
 

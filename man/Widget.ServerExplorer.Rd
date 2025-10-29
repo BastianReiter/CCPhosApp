@@ -7,10 +7,11 @@
 Widget.ServerExplorer(
   ServerSpecifications = NULL,
   ServerWorkspaceInfo = NULL,
+  ExplorationData = NULL,
   DSConnections = NULL,
-  EnableLiveConnection = TRUE,
+  EnableLiveConnection = FALSE,
   EndProcessWhenClosingApp = TRUE,
-  RunAutonomously = TRUE,
+  RunAutonomously = FALSE,
   RunInViewer = FALSE,
   UseVirtualConnections = FALSE,
   ...
