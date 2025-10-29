@@ -37,9 +37,6 @@ CCPConnections <- ConnectToVirtualCCP(CCPTestData = TestData,
 # BgProcess <- StartCCPhosApp(RunAutonomously = TRUE)
 
 
-
-
-
 # BgProcess$is_alive()
 # BgProcess$read_error()
 # BgProcess$kill()
@@ -93,8 +90,7 @@ CurationReport <- ds.GetCurationReport()
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Run ds.AugmentData
-Messages <- ds.AugmentData(CuratedDataSetName = "CuratedDataSet",
-                           OutputName = "AugmentationOutput")
+ds.AugmentData(CuratedDataSetName = "CCP.CuratedDataSet")
 
 
 ADSTableCheck <- ds.CheckDataSet(DataSetName = "AugmentedDataSet")
@@ -110,18 +106,33 @@ ADSTableCheck <- ds.CheckDataSet(DataSetName = "AugmentedDataSet")
 # Collect comprehensive information about all workspace objects
 ServerWorkspaceInfo <- GetServerWorkspaceInfo()
 
-ExplorationData <- dsFredaClient::GetExplorationData(InputWorkspaceInfo = ServerWorkspaceInfo)
-                                                     TableSelection = c("CCP.ADS.Diagnosis",
-                                                                         "CCP.ADS.DiseaseCourse",
-                                                                         "CCP.ADS.Events",
-                                                                         "CCP.ADS.Patient",
-                                                                         "CCP.ADS.Therapy"))
 
-Widget.ServerExplorer(ServerWorkspaceInfo = ServerWorkspaceInfo,
-                      ExplorationData = ExplorationData,
-                      EnableLiveConnection = FALSE,
-                      RunAutonomously = FALSE,
-                      UseVirtualConnections = TRUE)
+Exploration <-dsFredaClient::GetExplorationData(OrderList = list(CCP.ADS.Diagnosis = c("ICD10Code",
+                                                                                       "ICDOTopographyCode",
+                                                                                       "LocalizationSide",
+                                                                                       "ICDOMorphologyCode",
+                                                                                       "Grading",
+                                                                                       "UICCStage",
+                                                                                       "UICCStageCategory",
+                                                                                       "TNM.T",
+                                                                                       "TNM.N",
+                                                                                       "TNM.M",
+                                                                                       "PatientAgeAtDiagnosis",
+                                                                                       "TimeDiagnosisToDeath",
+                                                                                       "TimeFollowUp"),
+                                                                 CCP.ADS.Patient = c("Sex",
+                                                                                     "LastVitalStatus",
+                                                                                     "CausesOfDeath",
+                                                                                     "CountDiagnoses")))
+
+
+Proc <- Widget.ServerExplorer(ServerWorkspaceInfo = ServerWorkspaceInfo,
+                              ExplorationData = Exploration,
+                              EnableLiveConnection = TRUE,
+                              RunAutonomously = FALSE,
+                              UseVirtualConnections = FALSE)
+
+Proc$read_error()
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
