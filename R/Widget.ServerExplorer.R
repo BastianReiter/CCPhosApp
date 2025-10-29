@@ -92,6 +92,8 @@ Widget.ServerExplorer <- function(#--- Arguments for app itself ---
       #-------------------------------------------------------------------------
       Server <- function(input, output, session, ...)
       {
+          options(shiny.useragg = FALSE)
+
           # Hide waiter loading screen after initial app load has finished
           waiter::waiter_hide()
 

@@ -129,7 +129,7 @@ Exploration <-dsFredaClient::GetExplorationData(OrderList = list(CCP.ADS.Diagnos
 Proc <- Widget.ServerExplorer(ServerWorkspaceInfo = ServerWorkspaceInfo,
                               ExplorationData = Exploration,
                               EnableLiveConnection = TRUE,
-                              RunAutonomously = FALSE,
+                              RunAutonomously = TRUE,
                               UseVirtualConnections = FALSE)
 
 Proc$read_error()
