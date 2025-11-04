@@ -25,8 +25,8 @@ CreateTableMonitor <- function(TableData)
   if (length(TableData) == 0 || any(sapply(TableData, is.null))) { return(NULL) }
 
 
-  # Process data.frames within list 'TableData' to consolidate info in one data.frame
-  #-----------------------------------------------------------------------------
+# Process data.frames within list 'TableData' to consolidate info in one data.frame
+#-------------------------------------------------------------------------------
 
   # Process info on feature types for sensible printing
   FeatureTypes <- TableData$FeatureTypes %>%

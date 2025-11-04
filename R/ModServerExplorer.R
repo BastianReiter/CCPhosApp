@@ -119,8 +119,13 @@ ModServerExplorer_Server <- function(id)
                             LoadingOn()
                             on.exit(LoadingOff())
 
-                            # Call dsFredaClient::GetServerWorkspaceInfo()
-                            session$userData$ServerWorkspaceInfo(dsFredaClient::GetServerWorkspaceInfo(DSConnections = session$userData$DSConnections()))
+                            # Trigger function GetServerWorkspaceInfo() and assign return to reactive value ServerWorkspaceInfo in session$userData
+                            InfoData <- SafeDS(dsFredaClient::GetServerWorkspaceInfo(DSConnections = session$userData$DSConnections()))
+                            # ... handle possible errors ...
+                            if (inherits(InfoData, "dsFail")) { ShowDSError(); return(NULL) }
+                            # ... and assign return (data.frame) to reactive value ServerWorkspaceInfo in session$userData
+                            session$userData$ServerWorkspaceInfo(InfoData)
+
                           }) %>%
                       bindEvent(input$UpdateButton)
 

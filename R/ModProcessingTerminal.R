@@ -87,8 +87,11 @@ ModProcessingTerminal_Server <- function(id)
                                 on.exit(LoadingOff())
 
                                 # Trigger function CheckServerRequirements() and save returned list
-                                ServerCheck <- dsCCPhosClient::CheckServerRequirements(ServerSpecifications = session$userData$ServerSpecifications(),
-                                                                                       DSConnections = session$userData$DSConnections())
+                                ServerCheck <- SafeDS(dsCCPhosClient::CheckServerRequirements(ServerSpecifications = session$userData$ServerSpecifications(),
+                                                                                              DSConnections = session$userData$DSConnections()))
+
+                                # In case of error (determined by class of 'SafeDS()' output), break reactive chain and show error notification
+                                if (inherits(ServerCheck, "dsFail")) { ShowDSError(); return(NULL) }
 
                                 # Assign 'Messages' to reactive value ReturnMessages
                                 ReturnMessages(ServerCheck$Messages)
@@ -120,16 +123,24 @@ ModProcessingTerminal_Server <- function(id)
                                 LoadingOn()
                                 on.exit(LoadingOff())
 
-                                # Trigger function LoadRawDataSet() and assign return to reactive value ReturnMessages
-                                ReturnMessages(dsCCPhosClient::LoadRawDataSet(ServerSpecifications = session$userData$ServerSpecifications(),
-                                                                              RunAssignmentChecks = TRUE,
-                                                                              DSConnections = session$userData$DSConnections()))
+                                # Trigger function LoadRawDataSet()
+                                Messages <- SafeDS(dsCCPhosClient::LoadRawDataSet(ServerSpecifications = session$userData$ServerSpecifications(),
+                                                                                  RunAssignmentChecks = TRUE,
+                                                                                  DSConnections = session$userData$DSConnections()))
+
+                                # In case of error (determined by class of 'SafeDS()' output), break reactive chain and show error notification
+                                if (inherits(Messages, "dsFail")) { ShowDSError(); return(NULL) }
+
+                                # Assign messages to reactive value
+                                ReturnMessages(Messages)
 
                                 # Trigger function ds.CheckDataSet() for RDS and save returned list
-                                RDSTableCheck <- dsFredaClient::ds.GetDataSetCheck(DataSetName = "CCP.RawDataSet",
-                                                                                   Module = "CCP",
-                                                                                   Stage = "Raw",
-                                                                                   DSConnections = session$userData$DSConnections())
+                                RDSTableCheck <- SafeDS(dsFredaClient::ds.GetDataSetCheck(DataSetName = "CCP.RawDataSet",
+                                                                                          Module = "CCP",
+                                                                                          Stage = "Raw",
+                                                                                          DSConnections = session$userData$DSConnections()))
+
+                                if (inherits(RDSTableCheck, "dsFail")) { ShowDSError(); return(NULL) }
 
                                 # Assign to session$userData object
                                 session$userData$RDSTableCheck(RDSTableCheck)
@@ -141,8 +152,12 @@ ModProcessingTerminal_Server <- function(id)
                                 # # ... and reassign it to session$userData object
                                 session$userData$Checkpoints(Checkpoints)
 
-                                # Trigger function GetServerWorkspaceInfo() and assign return (data.frame) to reactive value ServerWorkspaceInfo in session$userData
-                                session$userData$ServerWorkspaceInfo(dsFredaClient::GetServerWorkspaceInfo(DSConnections = session$userData$DSConnections()))
+                                # Trigger function GetServerWorkspaceInfo()...
+                                InfoData <- SafeDS(dsFredaClient::GetServerWorkspaceInfo(DSConnections = session$userData$DSConnections()))
+                                # ... handle possible error ...
+                                if (inherits(InfoData, "dsFail")) { ShowDSError(); return(NULL) }
+                                # ... and assign return (data.frame) to reactive value ServerWorkspaceInfo in session$userData
+                                session$userData$ServerWorkspaceInfo(InfoData)
 
                                 # Set reactive value Complete TRUE
                                 Complete(TRUE)
@@ -159,21 +174,25 @@ ModProcessingTerminal_Server <- function(id)
                                 on.exit(LoadingOff())
 
                                 # Trigger function ds.CurateData() and save return
-                                Curation <- dsCCPhosClient::ds.CurateData(RawDataSetName = "CCP.RawDataSet",
-                                                                          Settings = NULL,
-                                                                          OutputName = "CCP.CurationOutput",
-                                                                          UnpackCuratedDataSet = TRUE,
-                                                                          RunAssignmentChecks = FALSE,
-                                                                          DSConnections = session$userData$DSConnections())
+                                Curation <- SafeDS(dsCCPhosClient::ds.CurateData(RawDataSetName = "CCP.RawDataSet",
+                                                                                 Settings = NULL,
+                                                                                 OutputName = "CCP.CurationOutput",
+                                                                                 UnpackCuratedDataSet = TRUE,
+                                                                                 RunAssignmentChecks = FALSE,
+                                                                                 DSConnections = session$userData$DSConnections()))
+
+                                if (inherits(Curation, "dsFail")) { ShowDSError(); return(NULL) }
 
                                 # Assign returned messages (concatenated lists) to reactive value ReturnMessages
                                 ReturnMessages(Curation$Messages)
 
                                 # Trigger function ds.CheckDataSet() for CDS and save returned list
-                                CDSTableCheck <- dsFredaClient::ds.GetDataSetCheck(DataSetName = "CCP.CuratedDataSet",
-                                                                                   Module = "CCP",
-                                                                                   Stage = "Curated",
-                                                                                   DSConnections = session$userData$DSConnections())
+                                CDSTableCheck <- SafeDS(dsFredaClient::ds.GetDataSetCheck(DataSetName = "CCP.CuratedDataSet",
+                                                                                          Module = "CCP",
+                                                                                          Stage = "Curated",
+                                                                                          DSConnections = session$userData$DSConnections()))
+
+                                if (inherits(CDSTableCheck, "dsFail")) { ShowDSError(); return(NULL) }
 
                                 # Assign to session$userData object
                                 session$userData$CDSTableCheck(CDSTableCheck)
@@ -186,10 +205,18 @@ ModProcessingTerminal_Server <- function(id)
                                 session$userData$Checkpoints(Checkpoints)
 
                                 # Trigger function GetServerWorkspaceInfo() and assign return to reactive value ServerWorkspaceInfo in session$userData
-                                session$userData$ServerWorkspaceInfo(dsFredaClient::GetServerWorkspaceInfo(DSConnections = session$userData$DSConnections()))
+                                InfoData <- SafeDS(dsFredaClient::GetServerWorkspaceInfo(DSConnections = session$userData$DSConnections()))
+                                # ... handle possible error ...
+                                if (inherits(InfoData, "dsFail")) { ShowDSError(); return(NULL) }
+                                # ... and assign return (data.frame) to reactive value ServerWorkspaceInfo in session$userData
+                                session$userData$ServerWorkspaceInfo(InfoData)
 
                                 # Trigger function ds.GetCurationReport() and assign return to reactive value 'CurationReport' in session$userData
-                                session$userData$CurationReport(dsFredaClient::ds.GetCurationReport(DSConnections = session$userData$DSConnections()))
+                                CurationReport <- SafeDS(dsFredaClient::GetCurationReport(DSConnections = session$userData$DSConnections()))
+                                # ... handle possible errors ...
+                                if (inherits(InfoData, "dsFail")) { ShowDSError(); return(NULL) }
+                                # ... and assign return to reactive value in session$userData
+                                session$userData$CurationReport(CurationReport)
 
                                 # Set reactive value Complete TRUE
                                 Complete(TRUE)
@@ -206,20 +233,24 @@ ModProcessingTerminal_Server <- function(id)
                                 on.exit(LoadingOff())
 
                                 # Trigger function ds.AugmentData() and save return
-                                Augmentation <- dsCCPhosClient::ds.AugmentData(CuratedDataSetName = "CCP.CuratedDataSet",
-                                                                               OutputName = "CCP.AugmentationOutput",
-                                                                               UnpackAugmentedDataSet = TRUE,
-                                                                               RunAssignmentChecks = FALSE,
-                                                                               DSConnections = session$userData$DSConnections())
+                                Augmentation <- SafeDS(dsCCPhosClient::ds.AugmentData(CuratedDataSetName = "CCP.CuratedDataSet",
+                                                                                      OutputName = "CCP.AugmentationOutput",
+                                                                                      UnpackAugmentedDataSet = TRUE,
+                                                                                      RunAssignmentChecks = FALSE,
+                                                                                      DSConnections = session$userData$DSConnections()))
+
+                                if (inherits(Augmentation, "dsFail")) { ShowDSError(); return(NULL) }
 
                                 # Assign returned messages (concatenated lists) to reactive value ReturnMessages
                                 ReturnMessages(Augmentation$Messages)
 
                                 # Trigger function ds.CheckDataSet() for ADS and save returned list
-                                ADSTableCheck <- dsFredaClient::ds.GetDataSetCheck(DataSetName = "CCP.AugmentedDataSet",
-                                                                                   Module = "CCP",
-                                                                                   Stage = "Augmented",
-                                                                                   DSConnections = session$userData$DSConnections())
+                                ADSTableCheck <- SafeDS(dsFredaClient::ds.GetDataSetCheck(DataSetName = "CCP.AugmentedDataSet",
+                                                                                          Module = "CCP",
+                                                                                          Stage = "Augmented",
+                                                                                          DSConnections = session$userData$DSConnections()))
+
+                                if (inherits(ADSTableCheck, "dsFail")) { ShowDSError(); return(NULL) }
 
                                 # Assign to session$userData object
                                 session$userData$ADSTableCheck(ADSTableCheck)
@@ -232,7 +263,11 @@ ModProcessingTerminal_Server <- function(id)
                                 session$userData$Checkpoints(Checkpoints)
 
                                 # Trigger function GetServerWorkspaceInfo() and assign return to reactive value ServerWorkspaceInfo in session$userData
-                                session$userData$ServerWorkspaceInfo(dsFredaClient::GetServerWorkspaceInfo(DSConnections = session$userData$DSConnections()))
+                                InfoData <- SafeDS(dsFredaClient::GetServerWorkspaceInfo(DSConnections = session$userData$DSConnections()))
+                                # ... handle possible error ...
+                                if (inherits(InfoData, "dsFail")) { ShowDSError(); return(NULL) }
+                                # ... and assign return (data.frame) to reactive value ServerWorkspaceInfo in session$userData
+                                session$userData$ServerWorkspaceInfo(InfoData)
 
                                 # Set reactive value Complete TRUE
                                 Complete(TRUE)

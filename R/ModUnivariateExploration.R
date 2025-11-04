@@ -213,16 +213,22 @@ ModUnivariateExploration_Server <- function(id,
                                                           req(session$userData$DSConnections())
 
                                                           # Get meta data of table object
-                                                          TableMetaData <- ds.GetObjectMetaData(ObjectName = ObjectSelection$Object(),
-                                                                                                DSConnections = session$userData$DSConnections())
+                                                          TableMetaData <- SafeDS(ds.GetObjectMetaData(ObjectName = ObjectSelection$Object(),
+                                                                                                       DSConnections = session$userData$DSConnections()))
+
+                                                          # Handle possible DataSHIELD error ...
+                                                          if (inherits(TableMetaData, "dsFail")) { ShowDSError(); return(NULL) }
 
                                                           # Check if selected object is a tibble / data.frame. If not, return NULL,
                                                           if (TableMetaData$FirstEligible$Class == "data.frame")
                                                           {
                                                               # Returns a list with elements 'FeatureInfo' and 'Statistics'
-                                                              CurrentExplorationData <- dsFredaClient::ExploreFeature(TableName = ObjectSelection$Object(),
-                                                                                                                      FeatureName = ObjectSelection$Element(),
-                                                                                                                      DSConnections = session$userData$DSConnections())
+                                                              CurrentExplorationData <- SafeDS(dsFredaClient::ExploreFeature(TableName = ObjectSelection$Object(),
+                                                                                                                             FeatureName = ObjectSelection$Element(),
+                                                                                                                             DSConnections = session$userData$DSConnections()))
+
+                                                              # Handle possible DataSHIELD error ...
+                                                              if (inherits(CurrentExplorationData, "dsFail")) { ShowDSError(); return(NULL) }
                                                           }
                                                         }
 
