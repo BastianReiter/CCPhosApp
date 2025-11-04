@@ -102,7 +102,6 @@ MainServerComponent <- function(ADSTableCheckData = NULL,
 
 
 
-
     # --- Call module: Connection Status ---
     ModConnectionStatus_Server(id = "ConnectionStatus")
 
