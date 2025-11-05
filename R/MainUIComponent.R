@@ -99,37 +99,37 @@ shiny.semantic::semanticPage(
 
                            a(id = "MenuItem_Start",
                              class = "item",
-                             icon("plug"),
+                             shiny.semantic::icon("plug"),
                              "CONNECT",
                              href = shiny.router::route_link("/")),
 
                            a(id = "MenuItem_Settings",
                              class = "item",
-                             icon("cogs"),
+                             shiny.semantic::icon("cogs"),
                              "SETTINGS",
                              href = shiny.router::route_link("settings")),
 
                            a(id = "MenuItem_Prepare",
                              class = "item",
-                             icon("utensils"),      # Alternatives: mug hot, box open,
+                             shiny.semantic::icon("utensils"),      # Alternatives: mug hot, box open,
                              "PREPARE",
                              href = shiny.router::route_link("prepare")),
 
                            a(id = "MenuItem_Explore",
                              class = "item",
-                             icon("binoculars"),      # Alternatives: tv
+                             shiny.semantic::icon("binoculars"),      # Alternatives: tv
                              "EXPLORE",
                              href = shiny.router::route_link("explore")),
 
                            a(id = "MenuItem_Analyze",
                              class = "item",
-                             icon("calculator"),
+                             shiny.semantic::icon("calculator"),
                              "ANALYZE",
                              href = shiny.router::route_link("analyze")),
 
                            a(id = "MenuItem_Export",
                              class = "item",
-                             icon("image"),
+                             shiny.semantic::icon("image"),
                              "EXPORT",
                              href = shiny.router::route_link("export"))),
 

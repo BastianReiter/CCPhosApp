@@ -24,7 +24,7 @@ StartCCPhosApp <- function(#--- Arguments for app itself ---
                            ServerWorkspaceInfo = NULL,
                            #--- Arguments for app wrapper ---
                            EndProcessWhenClosingApp = TRUE,
-                           RunAutonomously = TRUE,
+                           RunAutonomously = FALSE,
                            RunInViewer = FALSE,
                            ...)
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
