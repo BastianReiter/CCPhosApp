@@ -53,8 +53,9 @@ LoadRawDataSet(ServerSpecifications = NULL)
 # Check RDS tables for existence and completeness
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-RDSTableCheck <- ds.GetDataSetCheck(DataSetName = "CCP.RawDataSet",
-                                    AssumeCCPDataSet = TRUE)
+RDSTableCheck <- dsFredaClient::ds.GetDataSetCheck(DataSetName = "CCP.RawDataSet",
+                                                   Module = "CCP",
+                                                   Stage = "Raw")
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -75,9 +76,9 @@ ds.CurateData(RawDataSetName = "CCP.RawDataSet",
               Settings = NULL,
               OutputName = "CCP.CurationOutput")
 
-CDSTableCheck <- ds.CheckDataSet(DataSetName = "CCP.CuratedDataSet",
-                                 Module = "CCP",
-                                 Stage = "Curated")
+CDSTableCheck <- ds.GetDataSetCheck(DataSetName = "CCP.CuratedDataSet",
+                                    Module = "CCP",
+                                    Stage = "Curated")
 
 # Get curation reports
 CurationReport <- ds.GetCurationReport()
@@ -94,6 +95,11 @@ ds.AugmentData(CuratedDataSetName = "CCP.CuratedDataSet")
 
 
 ADSTableCheck <- ds.CheckDataSet(DataSetName = "AugmentedDataSet")
+
+
+
+
+Widget.ProcessingMonitor(UseVirtualConnections = TRUE)
 
 
 
@@ -130,7 +136,7 @@ Proc <- Widget.ServerExplorer(ServerWorkspaceInfo = ServerWorkspaceInfo,
                               ExplorationData = Exploration,
                               EnableLiveConnection = TRUE,
                               RunAutonomously = TRUE,
-                              UseVirtualConnections = FALSE)
+                              UseVirtualConnections = TRUE)
 
 Proc$read_error()
 

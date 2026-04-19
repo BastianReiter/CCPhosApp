@@ -1,7 +1,7 @@
 
 #' Widget.ProcessingMonitor
 #'
-#' Launch a Shiny app that facilitates interacting with output of processing monitoring, like data transformation tracks and data set checks.
+#' Launch a Shiny app that facilitates interacting with output of processing monitoring, like data set checks and data transformation tracks.
 #'
 #' @param ServerSpecifications \code{data.frame} containing credentials for login
 #' @param DSConnections \code{list} of \code{DSConnection} objects
@@ -17,11 +17,15 @@
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Widget.ProcessingMonitor <- function(#--- Arguments for app itself ---
                                      ServerSpecifications = NULL,
+                                     RDSCheckData = NULL,
+                                     CDSCheckData = NULL,
+                                     ADSCheckData = NULL,
+                                     CurationReport = NULL,
                                      DSConnections = NULL,
                                      #--- Arguments for app wrapper ---
-                                     EnableLiveConnection = TRUE,
+                                     EnableLiveConnection = FALSE,
                                      EndProcessWhenClosingApp = TRUE,
-                                     RunAutonomously = TRUE,
+                                     RunAutonomously = FALSE,
                                      RunInViewer = FALSE,
                                      UseVirtualConnections = FALSE,
                                      ...)
@@ -37,7 +41,10 @@ Widget.ProcessingMonitor <- function(#--- Arguments for app itself ---
               is.logical(RunInViewer))
 
   if (!is.null(ServerSpecifications)) assert_that(is.data.frame(ServerSpecifications))
-  if (!is.null(ServerWorkspaceInfo)) assert_that(is.list(ServerWorkspaceInfo))
+  if (!is.null(RDSCheckData)) assert_that(is.list(RDSCheckData))
+  if (!is.null(CDSCheckData)) assert_that(is.list(CDSCheckData))
+  if (!is.null(ADSCheckData)) assert_that(is.list(ADSCheckData))
+  if (!is.null(CurationReport)) assert_that(is.list(CurationReport))
 
   # Check validity of 'DSConnections' or find them programmatically if none are passed
   DSConnections <- CheckDSConnections(DSConnections)
@@ -48,27 +55,26 @@ Widget.ProcessingMonitor <- function(#--- Arguments for app itself ---
   if (UseVirtualConnections == TRUE) { EnableLiveConnection == FALSE }
   if (EnableLiveConnection == TRUE) { DSConnections <- NULL }
 
-  # If no 'ServerWorkspaceInfo' object is passed, get it programmatically
-  if (is.null(ServerWorkspaceInfo) && EnableLiveConnection == FALSE) { ServerWorkspaceInfo <- GetServerWorkspaceInfo(DSConnections = DSConnections) }
-
+  # If no monitor data is passed, get it programmatically
+  if (is.null(RDSCheckData) && EnableLiveConnection == FALSE) { RDSCheckData <- dsFredaClient::ds.GetDataSetCheck(DataSetName = "CCP.RawDataSet",
+                                                                                                                  Module = "CCP",
+                                                                                                                  Stage = "Raw",
+                                                                                                                  DSConnections = DSConnections) }
+  if (is.null(CDSCheckData) && EnableLiveConnection == FALSE) { CDSCheckData <- dsFredaClient::ds.GetDataSetCheck(DataSetName = "CCP.CuratedDataSet",
+                                                                                                                  Module = "CCP",
+                                                                                                                  Stage = "Curated",
+                                                                                                                  DSConnections = DSConnections) }
+  if (is.null(ADSCheckData) && EnableLiveConnection == FALSE) { ADSCheckData <- dsFredaClient::ds.GetDataSetCheck(DataSetName = "CCP.AugmentedDataSet",
+                                                                                                                  Module = "CCP",
+                                                                                                                  Stage = "Augmented",
+                                                                                                                  DSConnections = DSConnections) }
+  if (is.null(CurationReport) && EnableLiveConnection == FALSE) { CurationReport <- dsFredaClient::ds.GetCurationReport(Module = "CCP",
+                                                                                                                        DSConnections = DSConnections) }
+#-------------------------------------------------------------------------------
 
   # Create the app initiating function (UI and server component resulting in a ShinyApp object)
   InitFunction <- function(...)
   {
-      # require(dsCCPhosClient)
-      # require(dplyr)
-      # require(DSI)
-      # require(DT)
-      # #require(gt)
-      # #require(plotly)
-      # require(purrr)
-      # require(shiny)
-      # require(shinyjs)
-      # require(shiny.semantic)
-      # require(stringr)
-      # require(waiter)
-
-
       # Since the app is deployed as a package, the folder for external resources (e.g. CSS files, static images) needs to be added manually
       shiny::addResourcePath('www', system.file("www", package = "CCPhosApp"))
 
@@ -80,15 +86,67 @@ Widget.ProcessingMonitor <- function(#--- Arguments for app itself ---
           Layout <- function(ns)
           {
               div(h4(class = "ui dividing header",
-                  "Server Explorer"),
+                  "Processing Monitor"),
 
-                  div(style = "height: 40em;",
+                  div(class = "ui accordion",
 
-                      ModServerExplorer_UI(ns("ServerExplorer"))),
+                      div(class = "active title AccordionHeader",
+                          shiny.semantic::icon(class = "dropdown"),
+                          "Data Set Checks"),
 
-                  div(class = "ui divider"),
+                      div(class = "active content",
 
-                  div(ModUnivariateExploration_UI(ns("UnivariateExploration"))))
+                          div(style = "height: 30em;
+                                       overflow: auto;
+                                       margin: 0;",
+
+                              shiny.semantic::tabset(tabs = list(list(menu = "Raw Data Set (RDS)",
+                                                                      content = ModDataSetMonitor_UI("RDSMonitor")),
+                                                                 list(menu = "Curated Data Set (CDS)",
+                                                                      content = ModDataSetMonitor_UI("CDSMonitor")),
+                                                                 list(menu = "Augmented Data Set (ADS)",
+                                                                      content = ModDataSetMonitor_UI("ADSMonitor"))))))),
+
+
+                  #-----------------------------------------------------------------------
+                  div(class = "ui divider",
+                      style = "margin: 1.5em 0;"),
+                  #-----------------------------------------------------------------------
+
+
+                  div(class = "ui accordion",      # Note: For this to work an extra JS script is necessary (see MainUIComponent())
+
+                      div(class = "active title AccordionHeader",
+                          shiny.semantic::icon(class = "dropdown"),
+                          "Curation Report"),
+
+                      div(class = "active content",
+
+                          div(style = "height: 20em;
+                                       overflow: auto;
+                                       margin: 0;",
+
+                              ModCurationReport_UI("CurationReport")))),
+
+
+                  #-----------------------------------------------------------------------
+                  div(class = "ui divider",
+                      style = "margin: 1.5em 0;"),
+                  #-----------------------------------------------------------------------
+
+
+                  div(class = "ui accordion",
+
+                      div(class = "active title AccordionHeader",
+                          shiny.semantic::icon(class = "dropdown"),
+                          "Data Transformation Monitor"),
+
+                      div(class = "active content",
+
+                          div(style = "height: 30em;
+                                       overflow: auto;",
+
+                              ModDataTransformationMonitor_UI("DataTransformationMonitor")))))
            }
 
            # Call Widget frame module UI and pass widget-specific UI layout
@@ -108,11 +166,18 @@ Widget.ProcessingMonitor <- function(#--- Arguments for app itself ---
           # Define widget-specific server logic that is passed to widget frame module
           WidgetServerLogic <- function(session)
                                {
-                                  # The called module returns a list of reactive values...
-                                  Selection <- ModServerExplorer_Server(id = "ServerExplorer")
-                                  # ... that is passed to another module
-                                  ModUnivariateExploration_Server(id = "UnivariateExploration",
-                                                                  Selection)
+
+
+                                  # # --- Call modules: DataSet Monitors ---
+                                  # ModDataSetMonitor_Server(id = "RDSMonitor", DataSetCheckData = session$userData$RDSCheckData)
+                                  # ModDataSetMonitor_Server(id = "CDSMonitor", DataSetCheckData = session$userData$CDSCheckData)
+                                  # ModDataSetMonitor_Server(id = "ADSMonitor", DataSetCheckData = session$userData$ADSCheckData)
+                                  #
+                                  # # --- Call module: Data Curation Monitor ---
+                                  # ModCurationReport_Server(id = "CurationReport")
+                                  #
+                                  # # --- Call module: Data Transformation Monitor ---
+                                  # ModDataTransformationMonitor_Server(id = "DataTransformationMonitor")
                                 }
 
           # Call Widget frame module and pass widget-specific server logic
@@ -123,9 +188,12 @@ Widget.ProcessingMonitor <- function(#--- Arguments for app itself ---
           #---------------------------------------------------------------------
 
           # Initialize global objects
+          session$userData$RDSCheckData <- reactiveVal(NULL)
+          session$userData$CDSCheckData <- reactiveVal(NULL)
+          session$userData$ADSCheckData <- reactiveVal(NULL)
+          session$userData$CurationReport <- reactiveVal(NULL)
           session$userData$DSConnections <- reactiveVal(NULL)
           session$userData$ServerSpecifications <- reactiveVal(NULL)
-          session$userData$ServerWorkspaceInfo <- reactiveVal(NULL)
 
           # output$TestMonitor <- renderText({  req(session$userData$ServerWorkspaceInfo())
           #                                     paste0(names(session$userData$ServerWorkspaceInfo()), collapse = ", ") })
@@ -133,10 +201,12 @@ Widget.ProcessingMonitor <- function(#--- Arguments for app itself ---
 
           # 'ModInitialize' assigns content to session$userData objects at app start
           ModInitialize(id = "Initialize",
+                        RDSCheckData = RDSCheckData,
+                        CDSCheckData = CDSCheckData,
+                        ADSCheckData = ADSCheckData,
+                        CurationReport = CurationReport,
                         DSConnections = DSConnections,
-                        ServerSpecifications = ServerSpecifications,
-                        ServerWorkspaceInfo = ServerWorkspaceInfo)
-
+                        ServerSpecifications = ServerSpecifications)
 
           # If the option 'EndProcessWhenClosingApp' is TRUE, the following ensures that the background process is automatically ending when the app shuts down
           if (EndProcessWhenClosingApp == TRUE) { session$onSessionEnded(function() { stopApp() }) }
@@ -146,6 +216,8 @@ Widget.ProcessingMonitor <- function(#--- Arguments for app itself ---
       shiny::shinyApp(ui = UI,
                       server = Server)
   }
+
+#-------------------------------------------------------------------------------
 
   # Either use CCPhosApp::RunAutonomousApp() to run the app in a separate background process or run it in the hosting session
   if (RunAutonomously == TRUE)

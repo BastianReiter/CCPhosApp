@@ -106,6 +106,8 @@ ModCurationReport_Server <- function(id)
                                                                                                                       FinalCount = "Final Count"),
                                                                                                      SemanticTableCSSClass = "ui small compact inverted scrollable structured table")
                                                                             })
+
+                                                      HTMLTables
                                                     })
 
                   output[["EntryCounts_1"]] <- renderUI({ req(TableList_EntryCounts); TableList_EntryCounts()[[1]] })

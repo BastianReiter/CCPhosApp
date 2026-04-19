@@ -135,22 +135,15 @@ ModProcessingTerminal_Server <- function(id)
                                 ReturnMessages(Messages)
 
                                 # Trigger function ds.CheckDataSet() for RDS and save returned list
-                                RDSTableCheck <- SafeDS(dsFredaClient::ds.GetDataSetCheck(DataSetName = "CCP.RawDataSet",
-                                                                                          Module = "CCP",
-                                                                                          Stage = "Raw",
-                                                                                          DSConnections = session$userData$DSConnections()))
+                                RDSCheckData <- SafeDS(dsFredaClient::ds.GetDataSetCheck(DataSetName = "CCP.RawDataSet",
+                                                                                         Module = "CCP",
+                                                                                         Stage = "Raw",
+                                                                                         DSConnections = session$userData$DSConnections()))
 
-                                if (inherits(RDSTableCheck, "dsFail")) { ShowDSError(); return(NULL) }
+                                if (inherits(RDSCheckData, "dsFail")) { ShowDSError(); return(NULL) }
 
                                 # Assign to session$userData object
-                                session$userData$RDSTableCheck(RDSTableCheck)
-
-                                # Update 'Checkpoints' data frame ...
-                                Checkpoints <- session$userData$Checkpoints() %>%
-                                                    left_join(select(RDSTableCheck$TableStatus, c(ServerName, CheckRDSTables)), by = join_by(ServerName))
-
-                                # # ... and reassign it to session$userData object
-                                session$userData$Checkpoints(Checkpoints)
+                                session$userData$RDSCheckData(RDSCheckData)
 
                                 # Trigger function GetServerWorkspaceInfo()...
                                 InfoData <- SafeDS(dsFredaClient::GetServerWorkspaceInfo(DSConnections = session$userData$DSConnections()))
@@ -187,15 +180,15 @@ ModProcessingTerminal_Server <- function(id)
                                 ReturnMessages(Curation$Messages)
 
                                 # Trigger function ds.CheckDataSet() for CDS and save returned list
-                                CDSTableCheck <- SafeDS(dsFredaClient::ds.GetDataSetCheck(DataSetName = "CCP.CuratedDataSet",
-                                                                                          Module = "CCP",
-                                                                                          Stage = "Curated",
-                                                                                          DSConnections = session$userData$DSConnections()))
+                                CDSCheckData <- SafeDS(dsFredaClient::ds.GetDataSetCheck(DataSetName = "CCP.CuratedDataSet",
+                                                                                         Module = "CCP",
+                                                                                         Stage = "Curated",
+                                                                                         DSConnections = session$userData$DSConnections()))
 
-                                if (inherits(CDSTableCheck, "dsFail")) { ShowDSError(); return(NULL) }
+                                if (inherits(CDSCheckData, "dsFail")) { ShowDSError(); return(NULL) }
 
                                 # Assign to session$userData object
-                                session$userData$CDSTableCheck(CDSTableCheck)
+                                session$userData$CDSCheckData(CDSCheckData)
 
                                 # Update 'Checkpoints' data frame ...
                                 Checkpoints <- session$userData$Checkpoints() %>%
@@ -212,9 +205,10 @@ ModProcessingTerminal_Server <- function(id)
                                 session$userData$ServerWorkspaceInfo(InfoData)
 
                                 # Trigger function ds.GetCurationReport() and assign return to reactive value 'CurationReport' in session$userData
-                                CurationReport <- SafeDS(dsFredaClient::GetCurationReport(DSConnections = session$userData$DSConnections()))
+                                CurationReport <- SafeDS(dsFredaClient::ds.GetCurationReport(Module = "CCP",
+                                                                                             DSConnections = session$userData$DSConnections()))
                                 # ... handle possible errors ...
-                                if (inherits(InfoData, "dsFail")) { ShowDSError(); return(NULL) }
+                                if (inherits(CurationReport, "dsFail")) { ShowDSError(); return(NULL) }
                                 # ... and assign return to reactive value in session$userData
                                 session$userData$CurationReport(CurationReport)
 
@@ -245,15 +239,15 @@ ModProcessingTerminal_Server <- function(id)
                                 ReturnMessages(Augmentation$Messages)
 
                                 # Trigger function ds.CheckDataSet() for ADS and save returned list
-                                ADSTableCheck <- SafeDS(dsFredaClient::ds.GetDataSetCheck(DataSetName = "CCP.AugmentedDataSet",
-                                                                                          Module = "CCP",
-                                                                                          Stage = "Augmented",
-                                                                                          DSConnections = session$userData$DSConnections()))
+                                ADSCheckData <- SafeDS(dsFredaClient::ds.GetDataSetCheck(DataSetName = "CCP.AugmentedDataSet",
+                                                                                         Module = "CCP",
+                                                                                         Stage = "Augmented",
+                                                                                         DSConnections = session$userData$DSConnections()))
 
-                                if (inherits(ADSTableCheck, "dsFail")) { ShowDSError(); return(NULL) }
+                                if (inherits(ADSCheckData, "dsFail")) { ShowDSError(); return(NULL) }
 
                                 # Assign to session$userData object
-                                session$userData$ADSTableCheck(ADSTableCheck)
+                                session$userData$ADSCheckData(ADSCheckData)
 
                                 # Update 'Checkpoints' data frame ...
                                 Checkpoints <- session$userData$Checkpoints() %>%
