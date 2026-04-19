@@ -77,7 +77,6 @@ ModCheckpoints_Server <- function(id)
                                                                                                     CheckPackageAvailability = "box",
                                                                                                     CheckFunctionAvailability = "cogs",
                                                                                                     CheckOpalTableAvailability = "server",
-                                                                                                    CheckRDSTables = "database",
                                                                                                     CheckCurationCompletion = "wrench",
                                                                                                     CheckAugmentationCompletion = "magic"),
                                                                                     SemanticTableCSSClass = "ui small compact celled structured table",

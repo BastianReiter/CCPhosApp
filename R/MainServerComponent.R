@@ -9,12 +9,12 @@
 #'
 #' @author Bastian Reiter
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-MainServerComponent <- function(ADSTableCheckData = NULL,
-                                CCPTestData = NULL,
-                                CDSTableCheckData = NULL,
-                                CurationReportData = NULL,
+MainServerComponent <- function(CCPTestData = NULL,
+                                RDSCheckData = NULL,
+                                CDSCheckData = NULL,
+                                ADSCheckData = NULL,
+                                CurationReport = NULL,
                                 DSConnections = NULL,
-                                RDSTableCheckData = NULL,
                                 ServerSpecifications = NULL,
                                 ServerWorkspaceInfo = NULL)
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -33,12 +33,12 @@ MainServerComponent <- function(ADSTableCheckData = NULL,
     waiter::waiter_hide()
 
     # Initialize global objects
-    session$userData$ADSTableCheck <- reactiveVal(NULL)
-    session$userData$CDSTableCheck <- reactiveVal(NULL)
+    session$userData$ADSCheckData <- reactiveVal(NULL)
+    session$userData$CDSCheckData <- reactiveVal(NULL)
     session$userData$Checkpoints <- reactiveVal(NULL)
     session$userData$CurationReport <- reactiveVal(NULL)
     session$userData$DSConnections <- reactiveVal(NULL)
-    session$userData$RDSTableCheck <- reactiveVal(NULL)
+    session$userData$RDSCheckData <- reactiveVal(NULL)
     session$userData$ServerOpalDBInfo <- reactiveVal(NULL)
     session$userData$ServerSpecifications <- reactiveVal(NULL)
     session$userData$ServerWorkspaceInfo <- reactiveVal(NULL)
@@ -49,12 +49,12 @@ MainServerComponent <- function(ADSTableCheckData = NULL,
     # --- Call module: Initialize ---
     # Assigns content to session$userData objects at app start
     ModInitialize(id = "Initialize",
-                  ADSTableCheckData = ADSTableCheckData,
+                  ADSCheckData = ADSCheckData,
                   CCPTestData = CCPTestData,
-                  CDSTableCheckData = CDSTableCheckData,
-                  CurationReportData = CurationReportData,
+                  CDSCheckData = CDSCheckData,
+                  CurationReport = CurationReport,
                   DSConnections = DSConnections,
-                  RDSTableCheckData = RDSTableCheckData,
+                  RDSCheckData = RDSCheckData,
                   ServerSpecifications = ServerSpecifications,
                   ServerWorkspaceInfo = ServerWorkspaceInfo)
 
@@ -155,21 +155,16 @@ MainServerComponent <- function(ADSTableCheckData = NULL,
     # --- Call module: Server Explorer ---
     ModServerExplorer_Server("Prepare-ServerExplorer")
 
-    # --- Call module: RDS Table Monitor ---
-    ModRDSTableMonitor_Server("RDSTableMonitor")
+    # --- Call modules: DataSet Monitors ---
+    ModDataSetMonitor_Server("RDSMonitor", DataSetCheckData = session$userData$RDSCheckData)
+    ModDataSetMonitor_Server("CDSMonitor", DataSetCheckData = session$userData$CDSCheckData)
+    ModDataSetMonitor_Server("ADSMonitor", DataSetCheckData = session$userData$ADSCheckData)
 
     # --- Call module: Data Curation Monitor ---
     ModCurationReport_Server("CurationReport")
 
     # --- Call module: Data Transformation Monitor ---
     ModDataTransformationMonitor_Server("DataTransformationMonitor")
-
-    # --- Call module: CDS Table Monitor ---
-    ModCDSTableMonitor_Server("CDSTableMonitor")
-
-    # --- Call module: ADS Table Monitor ---
-    ModADSTableMonitor_Server("ADSTableMonitor")
-
 
 
     MakeStep <- function(IconClass = "",

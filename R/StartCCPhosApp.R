@@ -6,20 +6,20 @@
 #' @param DSConnections \code{list} of \code{DSConnection} objects
 #' @param ServerSpecifications \code{data.frame}
 #' @param CCPTestData \code{list} - Optional CCP test data
-#' @param RDSTableCheckData \code{list} - Optional RDSTableCheck data
-#' @param CurationReportData \code{list} - Optional CurationReport data
+#' @param RDSCheckData \code{list} - Optional RDSCheck data
+#' @param CurationReport \code{list} - Optional CurationReport data
 #'
 #' @export
 #'
 #' @author Bastian Reiter
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 StartCCPhosApp <- function(#--- Arguments for app itself ---
-                           ADSTableCheckData = NULL,
                            CCPTestData = NULL,
-                           CDSTableCheckData = NULL,
-                           CurationReportData = NULL,
+                           RDSCheckData = NULL,
+                           CDSCheckData = NULL,
+                           ADSCheckData = NULL,
+                           CurationReport = NULL,
                            DSConnections = NULL,
-                           RDSTableCheckData = NULL,
                            ServerSpecifications = NULL,
                            ServerWorkspaceInfo = NULL,
                            #--- Arguments for app wrapper ---
@@ -42,12 +42,12 @@ StartCCPhosApp <- function(#--- Arguments for app itself ---
 
       # Start CCPhos app
       shiny::shinyApp(ui = MainUIComponent(),
-                      server = MainServerComponent(ADSTableCheckData = ADSTableCheckData,
-                                                   CCPTestData = CCPTestData,
-                                                   CDSTableCheckData = CDSTableCheckData,
-                                                   CurationReportData = CurationReportData,
+                      server = MainServerComponent(CCPTestData = CCPTestData,
+                                                   RDSCheckData = RDSCheckData,
+                                                   CDSCheckData = CDSCheckData,
+                                                   ADSCheckData = ADSCheckData,
+                                                   CurationReport = CurationReport,
                                                    DSConnections = DSConnections,
-                                                   RDSTableCheckData = RDSTableCheckData,
                                                    ServerSpecifications = ServerSpecifications,
                                                    ServerWorkspaceInfo = ServerWorkspaceInfo))
   }

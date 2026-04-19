@@ -144,7 +144,7 @@ UIPagePrepare <- function()
 
           div(class = "active title AccordionHeader",
               shiny.semantic::icon(class = "dropdown"),
-              "Raw Data Set Table Check"),
+              "Data Set Checks"),
 
           div(class = "active content",
 
@@ -152,7 +152,12 @@ UIPagePrepare <- function()
                            overflow: auto;
                            margin: 0;",
 
-                  ModRDSTableMonitor_UI("RDSTableMonitor")))),
+                  shiny.semantic::tabset(tabs = list(list(menu = "Raw Data Set (RDS)",
+                                                          content = ModDataSetMonitor_UI("RDSMonitor")),
+                                                     list(menu = "Curated Data Set (CDS)",
+                                                          content = ModDataSetMonitor_UI("CDSMonitor")),
+                                                     list(menu = "Augmented Data Set (ADS)",
+                                                          content = ModDataSetMonitor_UI("ADSMonitor"))))))),
 
 
       #-----------------------------------------------------------------------
@@ -176,40 +181,6 @@ UIPagePrepare <- function()
                   ModCurationReport_UI("CurationReport")))),
 
 
-      # #-----------------------------------------------------------------------
-      # div(class = "ui divider",
-      #     style = "margin: 1.5em 0;"),
-      # #-----------------------------------------------------------------------
-      #
-      #
-      # div(class = "ui accordion",      # Note: For this to work an extra JS script is necessary (see MainUIComponent())
-      #
-      #     div(class = "active title AccordionHeader",
-      #         shiny.semantic::icon(class = "dropdown"),
-      #         "Server R Session Workspace"),
-      #
-      #     div(class = "active content",
-      #
-      #         div( # Child of 'active content' in accordion has to be a container div. Can not be the grid div directly, this leads to loss of grid structure when accordion functionality is performed.
-      #             div(style = "display: grid;
-      #                          grid-template-columns: 1fr 1fr;
-      #                          grid-gap: 2em;
-      #                          height: 22em;",
-      #
-      #                 div(style = "height: 100%;
-      #                              overflow: auto;
-      #                              margin: 0;",
-      #
-      #                     tabset(tabs = list(list(menu = "Opal", content = ModServerOpalDBMonitor_UI("ServerOpalDBMonitor"), id = "Tab_ServerOpalDBMonitor"),
-      #                                        list(menu = "RDS Tables", content = ModRDSTableMonitor_UI("RDSTableMonitor"), id = "Tab_RDSTableMonitor")),
-      #                            active = "Tab_ServerOpalDBMonitor")),
-      #
-      #                 div(style = "height: 100%;
-      #                              overflow: auto;",
-      #                     ModServerExplorer_UI("Prepare-ServerExplorer",
-      #                                                  ShowObjectDetailsTable = FALSE)))))),
-
-
       #-----------------------------------------------------------------------
       div(class = "ui divider",
           style = "margin: 1.5em 0;"),
@@ -227,55 +198,5 @@ UIPagePrepare <- function()
               div(style = "height: 30em;
                            overflow: auto;",
 
-                  ModDataTransformationMonitor_UI("DataTransformationMonitor")))),
-
-
-
-      # tabset(tabs = list(list(menu = "Validation Reports", content = uiOutput("TabContentValidationReports"), id = "Tab_ValidationReports"),
-      #                    list(menu = "Transformation Monitors", content = uiOutput("TabContentTransformationMonitors"), id = "Tab_TransformationMonitors")),
-      #        active = "Tab_TransformationMonitors")
-
-
-      #-----------------------------------------------------------------------
-      div(class = "ui divider",
-          style = "margin: 1.5em 0;"),
-      #-----------------------------------------------------------------------
-
-
-      div(class = "ui accordion",      # Note: For this to work an extra JS script is necessary (see MainUIComponent())
-
-          div(class = "active title AccordionHeader",
-              shiny.semantic::icon(class = "dropdown"),
-              "Curated Data Set Table Check"),
-
-          div(class = "active content",
-
-              div(style = "height: 30em;
-                           overflow: auto;
-                           margin: 0;",
-
-                  ModCDSTableMonitor_UI("CDSTableMonitor")))),
-
-
-
-      #-----------------------------------------------------------------------
-      div(class = "ui divider",
-          style = "margin: 1.5em 0;"),
-      #-----------------------------------------------------------------------
-
-
-      div(class = "ui accordion",      # Note: For this to work an extra JS script is necessary (see MainUIComponent())
-
-          div(class = "active title AccordionHeader",
-              shiny.semantic::icon(class = "dropdown"),
-              "Augmented Data Set Table Check"),
-
-          div(class = "active content",
-
-              div(style = "height: 30em;
-                           overflow: auto;
-                           margin: 0;",
-
-                  ModADSTableMonitor_UI("ADSTableMonitor"))))
-  )
+                  ModDataTransformationMonitor_UI("DataTransformationMonitor")))))
 }

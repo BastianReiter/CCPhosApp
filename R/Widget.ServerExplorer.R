@@ -53,8 +53,9 @@ Widget.ServerExplorer <- function(#--- Arguments for app itself ---
   if (EnableLiveConnection == TRUE) { DSConnections <- NULL }
 
   # If no 'ServerWorkspaceInfo' object is passed, get it programmatically
-  if (is.null(ServerWorkspaceInfo) && EnableLiveConnection == FALSE) { ServerWorkspaceInfo <- GetServerWorkspaceInfo(DSConnections = DSConnections) }
+  if (is.null(ServerWorkspaceInfo) && EnableLiveConnection == FALSE) { ServerWorkspaceInfo <- dsFredaClient::GetServerWorkspaceInfo(DSConnections = DSConnections) }
 
+#-------------------------------------------------------------------------------
 
   # Create the app initiating function (UI and server component resulting in a ShinyApp object)
   InitFunction <- function(...)
@@ -92,6 +93,7 @@ Widget.ServerExplorer <- function(#--- Arguments for app itself ---
       #-------------------------------------------------------------------------
       Server <- function(input, output, session, ...)
       {
+          # Temporary Workaround as long as installation of R package "ragg" is not working because of missing Linux packages
           options(shiny.useragg = FALSE)
 
           # Hide waiter loading screen after initial app load has finished
@@ -140,6 +142,8 @@ Widget.ServerExplorer <- function(#--- Arguments for app itself ---
       shiny::shinyApp(ui = UI,
                       server = Server)
   }
+
+#-------------------------------------------------------------------------------
 
   # Either use CCPhosApp::RunAutonomousApp() to run the app in a separate background process or run it in the hosting session
   if (RunAutonomously == TRUE)

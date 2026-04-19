@@ -25,7 +25,7 @@ ADSTableCheck <- readRDS(file = "C:/Users/Basti/OneDrive/ARBEIT/IDMKD/Projekte/C
 
 StartCCPhosApp(CCPTestData = TestData,
                RunAutonomously = FALSE)
-               # CDSTableCheckData = RDSTableCheck,
+               # RDSTableCheckData = RDSTableCheck
                # ADSTableCheckData = ADSTableCheck,
                # CurationReportData = CurationReport)
 

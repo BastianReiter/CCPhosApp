@@ -10,13 +10,13 @@
 #' @noRd
 #-------------------------------------------------------------------------------
 ModInitialize <- function(id,
-                          ADSTableCheckData = NULL,
+                          ADSCheckData = NULL,
                           CCPTestData = NULL,
-                          CDSTableCheckData = NULL,
-                          CurationReportData = NULL,
+                          CDSCheckData = NULL,
+                          CurationReport = NULL,
                           DSConnections = NULL,
                           ExplorationData = NULL,
-                          RDSTableCheckData = NULL,
+                          RDSCheckData = NULL,
                           ServerSpecifications = NULL,
                           ServerWorkspaceInfo = NULL)
 #-------------------------------------------------------------------------------
@@ -24,19 +24,19 @@ ModInitialize <- function(id,
   moduleServer(id,
                function(input, output, session)
                {
-                  if (!is.null(ADSTableCheckData)) { session$userData$ADSTableCheck(ADSTableCheckData) }
+                  if (!is.null(ADSCheckData)) { session$userData$ADSCheckData(ADSCheckData) }
 
                   if (!is.null(CCPTestData)) { session$userData$CCPTestData <- CCPTestData }
 
-                  if (!is.null(CDSTableCheckData)) { session$userData$CDSTableCheck(CDSTableCheckData) }
+                  if (!is.null(CDSCheckData)) { session$userData$CDSCheckData(CDSCheckData) }
 
-                  if (!is.null(CurationReportData)) { session$userData$CurationReport(CurationReportData) }
+                  if (!is.null(CurationReport)) { session$userData$CurationReport(CurationReport) }
 
                   if (!is.null(DSConnections)) { session$userData$DSConnections(DSConnections) }
 
                   if (!is.null(ExplorationData)) { session$userData$ExplorationData <- ExplorationData }
 
-                  if (!is.null(RDSTableCheckData)) { session$userData$RDSTableCheck(RDSTableCheckData) }
+                  if (!is.null(RDSCheckData)) { session$userData$RDSCheckData(RDSCheckData) }
 
                   if (!is.null(ServerSpecifications)) { session$userData$ServerSpecifications(ServerSpecifications)
                   } else if (!is.null(session$userData$ServerSpecifications)) { session$userData$ServerSpecifications(as.data.frame(dsCCPhosClient::ServerSpecifications)) }
